@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.ctoolkit.maven</groupId>
+        <artifactId>ctoolkit-parent</artifactId>
+        <version>2</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.ctoolkit.services</groupId>
+    <artifactId>ctoolkit-services</artifactId>
+    <version>0.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>CtoolkiT Services - Parent</name>
+    <description>CtoolkiT Services - Parent Project</description>
+    <url>https://github.com/turnonline/ctoolkit-services</url>
+
+    <scm>
+        <connection>scm:git:[fetch=]git@github.com:turnonline/ctoolkit-services.git</connection>
+        <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-services.git</developerConnection>
+        <url>https://github.com/turnonline/ctoolkit-services</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <url>${project.scm.url}/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <name>Aurel Medvegy</name>
+            <id>medvegy</id>
+            <email>aurel.medvegy@ctoolkit.org</email>
+        </developer>
+        <developer>
+            <name>Jozef Pohorelec</name>
+            <id>pohorelec</id>
+            <email>jozef.pohorelec@ctoolkit.org</email>
+        </developer>
+    </developers>
+
+    <modules>
+        <module>api</module>
+        <module>appengine-storage</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${javax.inject.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-1.0-sdk</artifactId>
+                <version>${appengine.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.objectify</groupId>
+                <artifactId>objectify</artifactId>
+                <version>${objectify.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.sf.jsr107cache</groupId>
+                <artifactId>jsr107cache</artifactId>
+                <version>${jsr107cache.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${jsr305.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <!--Test dependencies-->
+            <dependency>
+                <groupId>org.jmockit</groupId>
+                <artifactId>jmockit</artifactId>
+                <version>${jmockit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <properties>
+        <javax.inject.version>1</javax.inject.version>
+        <guice.version>3.0</guice.version>
+        <appengine.version>1.9.25</appengine.version>
+        <objectify.version>4.1.3</objectify.version>
+        <slf4j-api.version>1.6.6</slf4j-api.version>
+        <jsr107cache.version>1.1</jsr107cache.version>
+        <jsr305.version>2.0.3</jsr305.version>
+        <jmockit.version>1.18</jmockit.version>
+        <junit.version>4.10</junit.version>
+    </properties>
+</project>
