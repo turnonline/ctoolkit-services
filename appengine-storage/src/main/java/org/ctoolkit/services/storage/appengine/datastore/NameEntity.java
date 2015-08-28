@@ -1,4 +1,4 @@
-package org.ctoolkit.services.storage.appengine;
+package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;

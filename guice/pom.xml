@@ -11,10 +11,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ctoolkit-services-appengine-storage</artifactId>
+    <artifactId>ctoolkit-services-appengine-guice</artifactId>
     <packaging>jar</packaging>
-    <name>CtoolkiT Services - AppEngine Storage</name>
-    <description>CtoolkiT Services - Google AppEngine Storage Implementation</description>
+    <name>CtoolkiT Services - AppEngine Guice</name>
+    <description>CtoolkiT Services - Google AppEngine Guice Configuration</description>
 
     <dependencies>
         <dependency>
@@ -23,17 +23,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.ctoolkit.services</groupId>
-            <artifactId>ctoolkit-services-appengine-guice</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-1.0-sdk</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.objectify</groupId>
-            <artifactId>objectify</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -44,21 +35,12 @@
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-        </dependency>
-        <!--Test dependencies-->
-        <dependency>
-            <groupId>org.jmockit</groupId>
-            <artifactId>jmockit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
         </dependency>
     </dependencies>
 

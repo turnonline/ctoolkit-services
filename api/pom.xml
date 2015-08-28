@@ -13,7 +13,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ctoolkit-services-api</artifactId>
     <packaging>jar</packaging>
-    <name>CtoolkiT Services API</name>
+    <name>CtoolkiT Services - API</name>
     <description>CtoolkiT Services API</description>
 
     <dependencies>

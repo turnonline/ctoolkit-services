@@ -11,10 +11,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ctoolkit-services-appengine-storage</artifactId>
+    <artifactId>ctoolkit-services-appengine-upload</artifactId>
     <packaging>jar</packaging>
-    <name>CtoolkiT Services - AppEngine Storage</name>
-    <description>CtoolkiT Services - Google AppEngine Storage Implementation</description>
+    <name>CtoolkiT Services - AppEngine Upload</name>
+    <description>CtoolkiT Services - Google AppEngine Upload to Cloud Storage</description>
 
     <dependencies>
         <dependency>
@@ -32,8 +32,16 @@
             <artifactId>appengine-api-1.0-sdk</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.objectify</groupId>
-            <artifactId>objectify</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -42,6 +50,14 @@
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

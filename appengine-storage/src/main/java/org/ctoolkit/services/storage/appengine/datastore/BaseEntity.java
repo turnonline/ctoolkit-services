@@ -1,4 +1,4 @@
-package org.ctoolkit.services.storage.appengine;
+package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
