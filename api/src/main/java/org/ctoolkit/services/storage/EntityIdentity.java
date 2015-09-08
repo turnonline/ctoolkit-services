@@ -49,4 +49,11 @@ public interface EntityIdentity<P extends EntityIdentity>
      * @return the parent identification
      */
     P getParent();
+
+    /**
+     * Sets the parent identification of this entity instance, or null if there is no parent.
+     *
+     * @param parent the parent instance to be set
+     */
+    void setParent( P parent );
 }
