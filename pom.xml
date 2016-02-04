@@ -46,7 +46,7 @@
         <module>api</module>
         <module>guice</module>
         <module>upload</module>
-        <module>appengine-storage</module>
+        <module>storage</module>
     </modules>
 
     <dependencyManagement>

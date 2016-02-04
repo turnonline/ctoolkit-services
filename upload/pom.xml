@@ -11,7 +11,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ctoolkit-services-appengine-upload</artifactId>
+    <artifactId>ctoolkit-upload</artifactId>
     <packaging>jar</packaging>
     <name>CtoolkiT Services - AppEngine Upload</name>
     <description>CtoolkiT Services - Google AppEngine Upload to Cloud Storage</description>
@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>org.ctoolkit.services</groupId>
-            <artifactId>ctoolkit-services-appengine-guice</artifactId>
+            <artifactId>ctoolkit-guice</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

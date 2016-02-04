@@ -11,7 +11,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ctoolkit-services-appengine-guice</artifactId>
+    <artifactId>ctoolkit-guice</artifactId>
     <packaging>jar</packaging>
     <name>CtoolkiT Services - AppEngine Guice</name>
     <description>CtoolkiT Services - Google AppEngine Guice Configuration</description>
