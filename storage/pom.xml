@@ -11,7 +11,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ctoolkit-storage</artifactId>
+    <artifactId>ctoolkit-services-storage</artifactId>
     <packaging>jar</packaging>
     <name>CtoolkiT Services - AppEngine Storage</name>
     <description>CtoolkiT Services - Google AppEngine Storage Implementation</description>
@@ -24,7 +24,7 @@
         </dependency>
         <dependency>
             <groupId>org.ctoolkit.services</groupId>
-            <artifactId>ctoolkit-guice</artifactId>
+            <artifactId>ctoolkit-services-guice</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
