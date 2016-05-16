@@ -15,8 +15,8 @@ import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.services.storage.DataUploadHandler;
 import org.ctoolkit.services.storage.DataUploadListener;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Testing of {@link DataUploadHandlerServlet}.
@@ -66,13 +66,13 @@ public class DataUploadHandlerServletTest
     @Mocked
     private DataUploadListener listener;
 
-    @Before
+    @BeforeMethod
     public void setUp() throws Exception
     {
         listeners.add( listener );
     }
 
-    @Test( expected = IllegalArgumentException.class )
+    @Test( expectedExceptions = IllegalArgumentException.class )
     public void doPostWrongFieldName( @Mocked final HttpServletRequest request,
                                       @Mocked final HttpServletResponse response,
                                       @Mocked final FileInfo fileInfo )
