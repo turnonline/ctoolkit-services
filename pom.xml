@@ -45,12 +45,14 @@
     <modules>
         <module>api</module>
         <module>guice</module>
+        <module>identity</module>
         <module>upload</module>
         <module>storage</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Bill Of Material -->
             <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
                 <artifactId>ctoolkit-library-bom</artifactId>
@@ -63,6 +65,32 @@
                 <artifactId>appengine-api-1.0-sdk</artifactId>
                 <version>${gae.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <!-- CToolkiT dependencies -->
+            <dependency>
+                <groupId>org.ctoolkit.restapi</groupId>
+                <artifactId>rest-client-facade-api</artifactId>
+                <version>0.10</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ctoolkit.restapi</groupId>
+                <artifactId>rest-client-facade-appengine</artifactId>
+                <version>0.13</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.jdo</groupId>
+                        <artifactId>jdo2-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.google.http-client</groupId>
+                        <artifactId>google-http-client-jdo</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.ctoolkit.restapi</groupId>
+                <artifactId>ctoolkit-client-identity-toolkit</artifactId>
+                <version>0.13</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
