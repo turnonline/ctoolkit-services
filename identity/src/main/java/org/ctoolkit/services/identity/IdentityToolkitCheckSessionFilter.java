@@ -2,6 +2,8 @@ package org.ctoolkit.services.identity;
 
 import com.google.common.base.Strings;
 import org.ctoolkit.restapi.client.identity.Identity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,7 +19,13 @@ import java.io.IOException;
 import java.util.Set;
 
 /**
- * The filter to check application's session user with a logged in user.
+ * The application's session filter to manage authenticated identity toolkit user instance.
+ * If there is an instance that's not presented in the session (filter config value value of the
+ * {@link #SESSION_AUTH_USER_ATTRIBUTE}) filter will call
+ * {@link IdentityLoginListener#processIdentity(HttpServletRequest, HttpServletResponse, Identity, String)}
+ * to manage its presence (client's implementation responsibility).
+ * If session has a non null user instance presented but no current authenticated identity user instance,
+ * session will be invalidated.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -25,12 +33,28 @@ import java.util.Set;
 public class IdentityToolkitCheckSessionFilter
         implements Filter
 {
+    private static final Logger logger = LoggerFactory.getLogger( IdentityToolkitCheckSessionFilter.class );
+
+    /**
+     * The filter config attribute to configure key where authenticated identity user will be placed in session
+     */
     public static String SESSION_AUTH_USER_ATTRIBUTE = "_identity_filter_SESSION_AUTH_USER_ATTRIBUTE";
 
+    /**
+     * The filter config attribute to configure a redirect path, for example "/my-account".
+     * Once configured, logged in user, filter matching at these paths LOGIN_PATH or SIGN_UP_PATH,
+     * will be redirected to this.
+     */
     public static String REDIRECT_PATH = "_identity_filter_REDIRECT_TO_IF_LOGGED_IN";
 
+    /**
+     * The filter config attribute to configure a sign up path, for example "/sign-up"
+     */
     public static String SIGN_UP_PATH = "_identity_filter_SIGN_UP_PATH";
 
+    /**
+     * The filter config attribute to configure a login path, for example "/login"
+     */
     public static String LOGIN_PATH = "_identity_filter_LOGIN_PATH";
 
     private final IdentityResolver identityResolver;
@@ -60,6 +84,26 @@ public class IdentityToolkitCheckSessionFilter
         this.loggedInRedirect = filterConfig.getInitParameter( REDIRECT_PATH );
         this.signUpPath = filterConfig.getInitParameter( SIGN_UP_PATH );
         this.loginPath = filterConfig.getInitParameter( LOGIN_PATH );
+
+        if ( Strings.isNullOrEmpty( this.sessionAttribute ) )
+        {
+            throw new IllegalArgumentException( "Session attribute must be configured. " );
+        }
+        if ( Strings.isNullOrEmpty( this.loggedInRedirect ) )
+        {
+            this.loggedInRedirect = "";
+            logger.warn( "No REDIRECT_PATH has been configured!" );
+        }
+        if ( Strings.isNullOrEmpty( this.signUpPath ) )
+        {
+            this.signUpPath = "";
+            logger.warn( "No SIGN_UP_PATH has been configured!" );
+        }
+        if ( Strings.isNullOrEmpty( this.loginPath ) )
+        {
+            this.loginPath = "";
+            logger.warn( "No LOGIN_PATH has been configured!" );
+        }
     }
 
     @Override

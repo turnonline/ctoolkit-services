@@ -2,6 +2,7 @@ package org.ctoolkit.services.identity;
 
 import com.google.api.client.http.HttpStatusCodes;
 import com.google.common.base.Optional;
+import com.google.common.base.Strings;
 import com.google.identitytoolkit.GitkitClient;
 import com.google.identitytoolkit.GitkitServerException;
 import org.ctoolkit.restapi.client.identity.IdentityToolkitClient;
@@ -54,6 +55,11 @@ public class IdentityToolkitLoginTroubleHandler
     {
         super.init( config );
         this.loginPath = config.getInitParameter( IdentityToolkitCheckSessionFilter.LOGIN_PATH );
+
+        if ( Strings.isNullOrEmpty( this.loginPath ) )
+        {
+            throw new IllegalArgumentException( "Identity filter LOGIN_PATH attribute must be configured!" );
+        }
     }
 
     @Override
@@ -66,7 +72,6 @@ public class IdentityToolkitLoginTroubleHandler
 
             String email = oobResponse.getEmail();
             GitkitClient.OobAction action = oobResponse.getOobAction();
-            Optional<String> oobUrl = oobResponse.getOobUrl();
 
             if ( action != null )
             {
@@ -74,6 +79,7 @@ public class IdentityToolkitLoginTroubleHandler
                 {
 
                     case RESET_PASSWORD:
+                        Optional<String> oobUrl = oobResponse.getOobUrl();
                         if ( oobUrl.isPresent() )
                         {
                             String resetLink = oobUrl.get();
