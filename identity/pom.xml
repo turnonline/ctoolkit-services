@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
-            <artifactId>rest-client-facade-api</artifactId>
+            <artifactId>ctoolkit-rest-facade-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.ctoolkit.restapi</groupId>
