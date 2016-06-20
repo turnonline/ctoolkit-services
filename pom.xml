@@ -45,6 +45,7 @@
     <modules>
         <module>api</module>
         <module>guice</module>
+        <module>common</module>
         <module>identity</module>
         <module>upload</module>
         <module>storage</module>
@@ -63,6 +64,12 @@
             <dependency>
                 <groupId>com.google.appengine</groupId>
                 <artifactId>appengine-api-1.0-sdk</artifactId>
+                <version>${gae.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-jsr107cache</artifactId>
                 <version>${gae.version}</version>
                 <scope>provided</scope>
             </dependency>
@@ -93,6 +100,12 @@
                 <version>0.15</version>
             </dependency>
             <!--Test dependencies-->
+            <dependency>
+                <groupId>org.ctoolkit.test</groupId>
+                <artifactId>ctoolkit-test</artifactId>
+                <version>1.2</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.jmockit</groupId>
                 <artifactId>jmockit</artifactId>

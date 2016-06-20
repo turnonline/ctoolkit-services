@@ -9,6 +9,9 @@ import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 import org.ctoolkit.services.storage.DataUploadListener;
 
 import javax.inject.Singleton;
@@ -46,5 +49,12 @@ public class CtoolkitServicesAppEngineModule
     AppIdentityService provideAppIdentityService()
     {
         return AppIdentityServiceFactory.getAppIdentityService();
+    }
+
+    @Provides
+    @Singleton
+    CacheFactory provideCacheFactory() throws CacheException
+    {
+        return CacheManager.getInstance().getCacheFactory();
     }
 }

@@ -48,11 +48,7 @@ public class IdentityToolkitLoginTroubleHandlerTest
     @Test
     public void fullInit( final @Mocked ServletConfig config ) throws Exception
     {
-        new ServletConfigExpectations( config )
-        {
-            {
-            }
-        };
+        new ServletConfigExpectations( config );
 
         tested.init( config );
     }
@@ -67,11 +63,7 @@ public class IdentityToolkitLoginTroubleHandlerTest
         final PrintWriter writer = new PrintWriter( new StringWriter() );
         listeners.add( listener );
 
-        new ServletConfigExpectations( config )
-        {
-            {
-            }
-        };
+        new ServletConfigExpectations( config );
 
         new Expectations( writer )
         {
@@ -119,11 +111,7 @@ public class IdentityToolkitLoginTroubleHandlerTest
         final String email = "identity.test@ctoolkit.org";
         listeners.add( listener );
 
-        new ServletConfigExpectations( config )
-        {
-            {
-            }
-        };
+        new ServletConfigExpectations( config );
 
         new Expectations( writer )
         {
@@ -176,11 +164,7 @@ public class IdentityToolkitLoginTroubleHandlerTest
         final String newEmail = "identity.new@ctoolkit.org";
         listeners.add( listener );
 
-        new ServletConfigExpectations( config )
-        {
-            {
-            }
-        };
+        new ServletConfigExpectations( config );
 
         new Expectations( writer )
         {
@@ -217,10 +201,11 @@ public class IdentityToolkitLoginTroubleHandlerTest
         };
     }
 
-    private static class ServletConfigExpectations
+    @SuppressWarnings( "WeakerAccess" )
+    final class ServletConfigExpectations
             extends Expectations
     {
-        static String LOGIN_VALUE = "/login_attribute_value";
+        String LOGIN_VALUE = "/login_attribute_value";
 
         ServletConfigExpectations( ServletConfig config )
         {
