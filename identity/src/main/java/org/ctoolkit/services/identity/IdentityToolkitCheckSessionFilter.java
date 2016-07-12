@@ -16,6 +16,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -57,6 +58,11 @@ public class IdentityToolkitCheckSessionFilter
      */
     public static String LOGIN_PATH = "_identity_filter_LOGIN_PATH";
 
+    /**
+     * The filter config attribute to configure a list of comma separated servlet paths to be ignored by filter
+     */
+    public static String IGNORE_PATHS = "_identity_filter_IGNORE_PATHS";
+
     private final IdentityResolver identityResolver;
 
     private final Set<IdentityLoginListener> listeners;
@@ -68,6 +74,8 @@ public class IdentityToolkitCheckSessionFilter
     private String signUpPath;
 
     private String loginPath;
+
+    private Set<String> ignorePaths = new HashSet<>();
 
     @Inject
     public IdentityToolkitCheckSessionFilter( IdentityResolver identityResolver, Set<IdentityLoginListener> listeners )
@@ -104,6 +112,8 @@ public class IdentityToolkitCheckSessionFilter
             this.loginPath = "";
             logger.warn( "No LOGIN_PATH has been configured!" );
         }
+
+        initIgnorePaths( filterConfig );
     }
 
     @Override
@@ -112,6 +122,12 @@ public class IdentityToolkitCheckSessionFilter
     {
         HttpServletRequest httpRequest = ( HttpServletRequest ) request;
         HttpServletResponse httpResponse = ( HttpServletResponse ) response;
+
+        if ( ignoreServletPath( httpRequest ) )
+        {
+            chain.doFilter( request, response );
+            return;
+        }
 
         Identity identity = identityResolver.resolve( httpRequest );
         String signedEmail = identity != null ? identity.getEmail() : null;
@@ -147,6 +163,52 @@ public class IdentityToolkitCheckSessionFilter
         }
 
         chain.doFilter( request, response );
+    }
+
+    /**
+     * Initializes the ignore paths with values taken from the comma separated string.
+     */
+    private void initIgnorePaths( final FilterConfig filterConfig )
+    {
+        String value = filterConfig.getInitParameter( IGNORE_PATHS );
+        if ( !Strings.isNullOrEmpty( value ) )
+        {
+            for ( String path : value.split( "," ) )
+            {
+                path = path.trim();
+                if ( !path.startsWith( "/" ) )
+                {
+                    path = "/" + path;
+                }
+                ignorePaths.add( path );
+            }
+        }
+    }
+
+    /**
+     * Checks whether given request has servlet path to be ignored.
+     *
+     * @param request the current http request
+     * @return true if the request should be ignored, otherwise false
+     */
+    private boolean ignoreServletPath( final HttpServletRequest request )
+    {
+        if ( !ignorePaths.isEmpty() )
+        {
+            String servletPath = request.getServletPath();
+            if ( !Strings.isNullOrEmpty( servletPath ) )
+            {
+                for ( String toBeIgnored : ignorePaths )
+                {
+                    if ( servletPath.startsWith( toBeIgnored ) )
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

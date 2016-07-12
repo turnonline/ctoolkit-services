@@ -16,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.IGNORE_PATHS;
 import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.LOGIN_PATH;
 import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.REDIRECT_PATH;
 import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.SESSION_AUTH_USER_ATTRIBUTE;
@@ -29,6 +30,8 @@ import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.S
  */
 public class IdentityToolkitCheckSessionFilterTest
 {
+    private final static String SESSION_ATTR_VALUE = "session_attribute_value";
+
     @Tested
     private IdentityToolkitCheckSessionFilter tested;
 
@@ -49,13 +52,39 @@ public class IdentityToolkitCheckSessionFilterTest
     @Test
     public void fullInit( final @Mocked FilterConfig config ) throws Exception
     {
-        new FilterConfigExpectations( config )
+        new FilterConfigExpectations( config );
+
+        tested.init( config );
+    }
+
+    @Test
+    public void ignorePath1( final @Mocked FilterConfig config,
+                             final @Mocked HttpServletRequest request,
+                             final @Mocked HttpServletResponse response,
+                             final @Mocked FilterChain chain ) throws Exception
+    {
+        new FilterConfigExpectations( config );
+
+        new Expectations()
         {
             {
+                request.getServletPath();
+                result = "/pathY";
             }
         };
 
         tested.init( config );
+        tested.doFilter( request, response, chain );
+
+        new Verifications()
+        {
+            {
+                identityResolver.resolve( ( HttpServletRequest ) any );
+                times = 0;
+
+                chain.doFilter( request, response );
+            }
+        };
     }
 
     @Test
@@ -69,7 +98,9 @@ public class IdentityToolkitCheckSessionFilterTest
     {
         listeners.add( listener );
 
-        new FilterConfigExpectations( config )
+        new FilterConfigExpectations( config );
+
+        new Expectations()
         {
             {
                 identityResolver.resolve( ( HttpServletRequest ) any );
@@ -89,7 +120,7 @@ public class IdentityToolkitCheckSessionFilterTest
         new Verifications()
         {
             {
-                listener.processIdentity( request, response, identity, FilterConfigExpectations.SESSION_ATTR_VALUE );
+                listener.processIdentity( request, response, identity, SESSION_ATTR_VALUE );
 
                 response.sendRedirect( anyString );
                 times = 0;
@@ -113,7 +144,9 @@ public class IdentityToolkitCheckSessionFilterTest
     {
         listeners.add( listener );
 
-        new FilterConfigExpectations( config )
+        new FilterConfigExpectations( config );
+
+        new Expectations()
         {
             {
                 identityResolver.resolve( ( HttpServletRequest ) any );
@@ -159,7 +192,9 @@ public class IdentityToolkitCheckSessionFilterTest
     {
         listeners.add( listener );
 
-        new FilterConfigExpectations( config )
+        new FilterConfigExpectations( config );
+
+        new Expectations()
         {
             {
                 session.getAttribute( SESSION_ATTR_VALUE );
@@ -186,16 +221,16 @@ public class IdentityToolkitCheckSessionFilterTest
         };
     }
 
-    private static class FilterConfigExpectations
+    private final static class FilterConfigExpectations
             extends Expectations
     {
-        static String SESSION_ATTR_VALUE = "session_attribute_value";
-
         static String REDIRECT_VALUE = "/redirect_attribute_value";
 
         static String SIGN_UP_VALUE = "/sign_up_attribute_value";
 
         static String LOGIN_VALUE = "/login_attribute_value";
+
+        static String IGNORE_PATHS_VALUES = "pathY,/path2";
 
         FilterConfigExpectations( FilterConfig filterConfig )
         {
@@ -210,6 +245,9 @@ public class IdentityToolkitCheckSessionFilterTest
 
             filterConfig.getInitParameter( LOGIN_PATH );
             result = LOGIN_VALUE;
+
+            filterConfig.getInitParameter( IGNORE_PATHS );
+            result = IGNORE_PATHS_VALUES;
         }
     }
 }
