@@ -44,6 +44,10 @@
             <artifactId>guice</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
@@ -60,6 +64,10 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ctoolkit.test</groupId>
+            <artifactId>ctoolkit-test</artifactId>
         </dependency>
     </dependencies>
 

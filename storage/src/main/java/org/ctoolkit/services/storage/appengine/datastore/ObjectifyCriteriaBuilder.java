@@ -48,14 +48,14 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * Objectify CriteriaBuilder implementation. All expression produces a Objectify query object. Query object may
  * be chained.
  * <p/>
- * It's not thread safe and it's intended to be created the new instance for every query.
+ * It's not thread safe and it's intended to create a new instance for every query.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 class ObjectifyCriteriaBuilder<E>
         implements CriteriaBuilder<Query<E>, E>
 {
-    Class<E> entityClass;
+    private Class<E> entityClass;
 
     private Query<E> query;
 

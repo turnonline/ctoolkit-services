@@ -28,98 +28,98 @@ package org.ctoolkit.services.storage.criteria;
 public interface CriteriaBuilder<Q, E>
 {
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( BetweenExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( InExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( IdInExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( NameInExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( LikeExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( LogicalExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( NullExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( PropertyExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( SimpleExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( ReferenceIdExpression expression );
 
     /**
-     * Returns the implementation specific expression.
+     * Returns the implementation specific query builder.
      *
      * @param expression the criteria expression instance
-     * @return the implementation specific expression
+     * @return the implementation specific query builder
      */
     Q build( ReferenceNameExpression expression );
 
     /**
-     * Returns the implementation specific criteria.
+     * Returns the implementation specific query builder.
      *
      * @param criteria the criteria instance
-     * @return the implementation specific criteria
+     * @return the implementation specific query builder
      */
     Q build( Criteria<E> criteria );
 }
