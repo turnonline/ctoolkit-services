@@ -3,6 +3,7 @@ package org.ctoolkit.services.storage.appengine.datastore;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.googlecode.objectify.Key;
 import org.ctoolkit.services.storage.EntityExecutor;
@@ -70,6 +71,11 @@ public class PropertyMapDbHandlerTest
         Entity dbEntity = lowDb.get( Key.create( entity ).getRaw() );
         Map<String, Object> dbProperties = dbEntity.getProperties();
         assertFalse( dbProperties.containsKey( PROP_1 ), "Property '" + PROP_1 + "' should be removed from entity." );
+
+        PropertyMapDbHandler dbHandler = new PropertyMapDbHandler( Key.create( entity ) );
+        dbProperties = dbHandler.load( Lists.newArrayList( PROP_3, "whateverBla" ) );
+        assertEquals( dbProperties.size(), 1, "Only single property is being" );
+        assertTrue( dbProperties.containsKey( PROP_3 ), "Only '" + PROP_3 + "' is being expected." );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )

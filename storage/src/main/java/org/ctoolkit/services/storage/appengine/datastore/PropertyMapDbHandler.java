@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import com.googlecode.objectify.Key;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,28 +117,51 @@ public class PropertyMapDbHandler
 
     }
 
+    /**
+     * Loads map of values. The list of properties in the map are defined by value of property {@link #DYN_PROPERTIES}.
+     * {@link #load(List)}
+     *
+     * @return the map of values
+     */
     public Map<String, Object> load()
     {
+        return load( null );
+    }
+
+    /**
+     * Loads map of values for given list of property names. If {@code null} it will retrieve
+     * saved {@link #DYN_PROPERTIES} list of names.
+     *
+     * @param propertyNames the list of property names to retrieve
+     * @return the map of values
+     */
+    public Map<String, Object> load( @Nullable List<String> propertyNames )
+    {
         DatastoreService lowDb = DatastoreServiceFactory.getDatastoreService();
-        List<String> propertyNames;
         Map<String, Object> map = new HashMap<>();
 
         try
         {
             Entity entity = lowDb.get( key.getRaw() );
 
-            //noinspection unchecked
-            propertyNames = ( List<String> ) entity.getProperty( DYN_PROPERTIES );
             if ( propertyNames == null )
             {
-                // there is nothing to load
-                return map;
+                //noinspection unchecked
+                propertyNames = ( List<String> ) entity.getProperty( DYN_PROPERTIES );
+                if ( propertyNames == null )
+                {
+                    // there is nothing to load
+                    return map;
+                }
             }
 
             for ( String property : propertyNames )
             {
                 Object value = entity.getProperty( property );
-                map.put( property, value );
+                if ( value != null )
+                {
+                    map.put( property, value );
+                }
             }
         }
         catch ( EntityNotFoundException e )
