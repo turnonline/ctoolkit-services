@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
@@ -25,6 +25,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.googlecode.objectify.ObjectifyService;
+import org.ctoolkit.services.storage.appengine.datastore.FakeEntity;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
