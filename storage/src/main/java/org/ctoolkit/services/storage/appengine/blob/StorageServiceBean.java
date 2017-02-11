@@ -20,8 +20,6 @@ package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
 import com.google.appengine.api.appidentity.AppIdentityServiceFactory;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
 import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
 import com.google.appengine.tools.cloudstorage.GcsFileOptions;
 import com.google.appengine.tools.cloudstorage.GcsFilename;
@@ -60,8 +58,6 @@ public class StorageServiceBean
 
     private AppIdentityService appIdentityService = AppIdentityServiceFactory.getAppIdentityService();
 
-    private BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
-
     public StorageServiceBean()
     {
     }
@@ -93,8 +89,6 @@ public class StorageServiceBean
             GcsOutputChannel outputChannel = gcsService.createOrReplace( gcsFileName, fileOptions );
             outputChannel.write( ByteBuffer.wrap( data ) );
             outputChannel.close();
-
-            blobstoreService.createGsBlobKey( getGcsFullName( fileName, bucketName ) );
 
             // populate metadata of the blob
             info = new BlobInfo();
