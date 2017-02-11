@@ -30,7 +30,7 @@ import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
 import com.google.appengine.tools.cloudstorage.GcsService;
 import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
 import org.ctoolkit.services.storage.BlobInfo;
-import org.ctoolkit.services.storage.BlobService;
+import org.ctoolkit.services.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +51,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
-public class BlobServiceBean
-        implements BlobService
+public class StorageServiceBean
+        implements StorageService
 {
-    private static final Logger log = LoggerFactory.getLogger( BlobServiceBean.class );
+    private static final Logger log = LoggerFactory.getLogger( StorageServiceBean.class );
 
     private static final GcsService gcsService = GcsServiceFactory.createGcsService();
 
@@ -62,7 +62,7 @@ public class BlobServiceBean
 
     private BlobstoreService blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
 
-    public BlobServiceBean()
+    public StorageServiceBean()
     {
     }
 

@@ -20,7 +20,7 @@ package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.common.io.ByteStreams;
 import org.ctoolkit.services.storage.BlobInfo;
-import org.ctoolkit.services.storage.BlobService;
+import org.ctoolkit.services.storage.StorageService;
 import org.ctoolkit.services.storage.appengine.GuiceBerryTestNgCase;
 import org.testng.annotations.Test;
 
@@ -36,16 +36,16 @@ import static org.testng.Assert.assertTrue;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class BlobServiceDbTest
+public class StorageServiceDbTest
         extends GuiceBerryTestNgCase
 {
     @Inject
-    private BlobService tested;
+    private StorageService tested;
 
     @Test
     public void storeAndServe() throws Exception
     {
-        InputStream stream = BlobServiceDbTest.class.getResourceAsStream( "thismac.png" );
+        InputStream stream = StorageServiceDbTest.class.getResourceAsStream( "thismac.png" );
         byte[] dataInput = ByteStreams.toByteArray( stream );
         String mimeType = "image/png";
 
@@ -66,7 +66,7 @@ public class BlobServiceDbTest
     @Test
     public void delete() throws Exception
     {
-        InputStream stream = BlobServiceDbTest.class.getResourceAsStream( "thismac.png" );
+        InputStream stream = StorageServiceDbTest.class.getResourceAsStream( "thismac.png" );
         byte[] dataInput = ByteStreams.toByteArray( stream );
         String mimeType = "image/png";
 
@@ -77,7 +77,7 @@ public class BlobServiceDbTest
     @Test
     public void blobInfo() throws Exception
     {
-        InputStream stream = BlobServiceDbTest.class.getResourceAsStream( "thismac.png" );
+        InputStream stream = StorageServiceDbTest.class.getResourceAsStream( "thismac.png" );
         byte[] dataInput = ByteStreams.toByteArray( stream );
         String mimeType = "image/png";
 

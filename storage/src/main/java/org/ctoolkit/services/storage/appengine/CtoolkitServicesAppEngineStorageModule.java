@@ -19,9 +19,9 @@
 package org.ctoolkit.services.storage.appengine;
 
 import com.google.inject.AbstractModule;
-import org.ctoolkit.services.storage.BlobService;
 import org.ctoolkit.services.storage.EntityExecutor;
-import org.ctoolkit.services.storage.appengine.blob.BlobServiceBean;
+import org.ctoolkit.services.storage.StorageService;
+import org.ctoolkit.services.storage.appengine.blob.StorageServiceBean;
 import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor;
 
 /**
@@ -36,6 +36,6 @@ public class CtoolkitServicesAppEngineStorageModule
     protected void configure()
     {
         bind( EntityExecutor.class ).to( ObjectifyEntityExecutor.class );
-        bind( BlobService.class ).to( BlobServiceBean.class );
+        bind( StorageService.class ).to( StorageServiceBean.class );
     }
 }

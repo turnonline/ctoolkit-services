@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public interface BlobService
+public interface StorageService
 {
     /**
      * Store data into storage and return related metadata.
