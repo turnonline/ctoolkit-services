@@ -16,16 +16,6 @@ import java.util.Map;
 public interface PropertyService
 {
     /**
-     * Binding property for needs of the DI frameworks.
-     */
-    String PRODUCTION_APP_ID = "_ctoolkit_common_Production_App_Identification";
-
-    /**
-     * Binding property for needs of the DI frameworks.
-     */
-    String TEST_APP_ID = "_ctoolkit_common_Test_App_Identification";
-
-    /**
      * Creates a Cache instance using the namespace parameter with default configuration.
      * <p/>
      * Returns the fake Cache instance in case of the Cache instance creation failure (logged) with no real cache

@@ -17,12 +17,17 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Property service implementation of {@link PropertyService}.
+ * Property service implementation of {@link PropertyService} for AppEngine.
+ * <p>
+ * If no configuration instance {@link PropertyConfig} is being provided in module, default behavior is:
+ * <ul>
+ * <li>Development: {@link #isDevelopmentEnvironment()} returns true</li>
+ * <li>AppEngine: {@link #isTestEnvironment()} returns true</li>
+ * </ul>
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -51,35 +56,26 @@ class PropertyServiceBean
     private boolean isDevelopmentEnvironment = false;
 
     @Inject
-    PropertyServiceBean( @Named( PropertyService.PRODUCTION_APP_ID ) String productionAppId,
-                         @Named( PropertyService.TEST_APP_ID ) String testAppId,
-                         CacheFactory factory )
+    PropertyServiceBean( CacheFactory factory, @Configuration Map<String, String> configuration )
     {
         this.factory = factory;
         cache = create( PROPERTY_CACHE_NAMESPACE );
 
-        if ( Strings.isNullOrEmpty( testAppId ) )
-        {
-            String msg = "Test AppId cannot be null or empty! To configure test environment add this line to" +
-                    " #configure() method of your guice module: bind( String.class ).annotatedWith( Names.named( \""
-                    + PropertyService.TEST_APP_ID + "\" ) ).toInstance( \"YOUR_TEST_APP_ID\" );";
-
-            throw new IllegalArgumentException( msg );
-        }
-
-        if ( Strings.isNullOrEmpty( productionAppId ) )
-        {
-            String msg = "Production AppId cannot be null or empty! To configure production environment add this line" +
-                    " to #configure() method of your guice module: bind( String.class ).annotatedWith( Names.named( \""
-                    + PropertyService.PRODUCTION_APP_ID + "\" ) ).toInstance( \"YOUR_PRODUCTION_APP_ID\" );";
-
-            throw new IllegalArgumentException( msg );
-        }
+        String productionAppId = configuration.get( "service.property.appId.production" );
+        String testAppId = configuration.get( "service.property.appId.test" );
 
         if ( SystemProperty.environment.value() == SystemProperty.Environment.Value.Production )
         {
             // means running on the app engine environment under an applicationId
             isTestEnvironment = SystemProperty.applicationId.get().equals( testAppId );
+
+            if ( Strings.isNullOrEmpty( testAppId ) )
+            {
+                // If testAppId is not being set and running on AppEngine, we assume it is TEST environment.
+                // Unless overridden by production AppId configuration
+                isTestEnvironment = true;
+            }
+
             isProductionEnvironment = !isTestEnvironment;
             isDevelopmentEnvironment = false;
         }

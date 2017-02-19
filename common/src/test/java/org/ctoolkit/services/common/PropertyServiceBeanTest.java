@@ -5,6 +5,8 @@ import net.sf.jsr107cache.CacheFactory;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The fully functional backend property service test.
@@ -14,6 +16,10 @@ import javax.inject.Inject;
 public class PropertyServiceBeanTest
         extends GuiceBerryTestNgCase
 {
+    private static final String PRODUCTION_PROPERTY = "service.property.appId.production";
+
+    private static final String TEST_PROPERTY = "service.property.appId.test";
+
     @Inject
     CacheFactory factory;
 
@@ -101,58 +107,41 @@ public class PropertyServiceBeanTest
     @Test
     public void isTestingEnvironment()
     {
+        Map<String, String> config = new HashMap<>();
+        config.put( PRODUCTION_PROPERTY, "localhost" );
+        config.put( TEST_PROPERTY, "localhostAsProd" );
+
         // test application is running on testing environment
-        PropertyServiceBean psb = new PropertyServiceBean( "localhost", "localhostAsProd", factory );
+        PropertyServiceBean psb = new PropertyServiceBean( factory, config );
+
         Assert.assertFalse( psb.isTestEnvironment() );
         Assert.assertFalse( psb.isProductionEnvironment() );
         Assert.assertTrue( psb.isDevelopmentEnvironment() );
 
         // test application is running on production environment with ID as localhostAsProd
+        config.clear();
+        config.put( PRODUCTION_PROPERTY, "localhostAsProd" );
+        config.put( TEST_PROPERTY, "localhostAsTest" );
+
         System.setProperty( "com.google.appengine.runtime.environment", "Production" );
         System.setProperty( "com.google.appengine.application.id", "localhostAsProd" );
-        psb = new PropertyServiceBean( "localhostAsProd", "localhostAsTest", factory );
+        psb = new PropertyServiceBean( factory, config );
+
         Assert.assertFalse( psb.isTestEnvironment() );
         Assert.assertTrue( psb.isProductionEnvironment() );
         Assert.assertFalse( psb.isDevelopmentEnvironment() );
 
         // test application is running on production environment with ID as localhostAsTest
+        config.clear();
+        config.put( PRODUCTION_PROPERTY, "localhostAsProd" );
+        config.put( TEST_PROPERTY, "localhostAsTest" );
+
         System.setProperty( "com.google.appengine.runtime.environment", "Production" );
         System.setProperty( "com.google.appengine.application.id", "localhostAsTest" );
-        psb = new PropertyServiceBean( "localhostAsProd", "localhostAsTest", factory );
+        psb = new PropertyServiceBean( factory, config );
+
         Assert.assertTrue( psb.isTestEnvironment() );
         Assert.assertFalse( psb.isProductionEnvironment() );
         Assert.assertFalse( psb.isDevelopmentEnvironment() );
-    }
-
-    @Test
-    public void preconditions()
-    {
-        try
-        {
-            new PropertyServiceBean( null, null, factory );
-            Assert.fail( IllegalArgumentException.class.getName() + " should be thrown!" );
-        }
-        catch ( Exception e )
-        {
-            Assert.assertEquals( IllegalArgumentException.class, e.getClass() );
-        }
-        try
-        {
-            new PropertyServiceBean( null, "localhostAsProd", factory );
-            Assert.fail( IllegalArgumentException.class.getName() + " should be thrown!" );
-        }
-        catch ( Exception e )
-        {
-            Assert.assertEquals( IllegalArgumentException.class, e.getClass() );
-        }
-        try
-        {
-            new PropertyServiceBean( "localhost", null, factory );
-            Assert.fail( IllegalArgumentException.class.getName() + " should be thrown!" );
-        }
-        catch ( Exception e )
-        {
-            Assert.assertEquals( IllegalArgumentException.class, e.getClass() );
-        }
     }
 }

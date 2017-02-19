@@ -24,13 +24,12 @@ import com.google.appengine.tools.development.testing.LocalModulesServiceTestCon
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
-import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import org.ctoolkit.services.guice.appengine.CtoolkitServicesAppEngineModule;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
-import javax.inject.Named;
 import java.lang.reflect.Method;
 
 /**
@@ -69,19 +68,10 @@ public class GuiceBerryTestNgCase
         System.setProperty( "com.google.appengine.runtime.environment", "Development" );
         install( new CtoolkitServicesAppEngineModule() );
         install( new CommonServicesModule() );
-    }
 
-    @Provides
-    @Named( PropertyService.TEST_APP_ID )
-    String provideTestEnvironmentNamespace()
-    {
-        return "localhost";
-    }
-
-    @Provides
-    @Named( PropertyService.PRODUCTION_APP_ID )
-    String provideProductionNamespace()
-    {
-        return "localhostAsProd";
+        PropertyConfig config = new PropertyConfig();
+        config.setTestAppI( "localhost" );
+        config.setProductionAppI( "localhostAsProd" );
+        Names.bindProperties( binder(), config );
     }
 }
