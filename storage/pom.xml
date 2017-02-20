@@ -34,6 +34,18 @@
     <name>CtoolkiT Services - AppEngine Storage</name>
     <description>CtoolkiT Services - Google AppEngine Storage Implementation</description>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <workingDirectory>${basedir}/target</workingDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>org.ctoolkit.services</groupId>
