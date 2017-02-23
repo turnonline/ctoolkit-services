@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class CommonServicesModule
+public class CtoolkitCommonServicesModule
         extends AbstractModule
 {
     @Override

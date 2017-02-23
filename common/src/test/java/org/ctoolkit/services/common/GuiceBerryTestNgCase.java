@@ -67,7 +67,7 @@ public class GuiceBerryTestNgCase
         // setting the SystemProperty.Environment.Value.Development
         System.setProperty( "com.google.appengine.runtime.environment", "Development" );
         install( new CtoolkitServicesAppEngineModule() );
-        install( new CommonServicesModule() );
+        install( new CtoolkitCommonServicesModule() );
 
         PropertyConfig config = new PropertyConfig();
         config.setTestAppI( "localhost" );
