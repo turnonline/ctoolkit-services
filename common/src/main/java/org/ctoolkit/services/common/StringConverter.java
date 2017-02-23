@@ -18,6 +18,8 @@
 
 package org.ctoolkit.services.common;
 
+import com.google.appengine.api.datastore.Text;
+
 /**
  * Internal helper class to convert input object to {@link String}.
  *
@@ -44,6 +46,10 @@ class StringConverter
         if ( object == null )
         {
             return null;
+        }
+        else if ( object instanceof Text )
+        {
+            return ( ( Text ) object ).getValue();
         }
 
         return object.toString();

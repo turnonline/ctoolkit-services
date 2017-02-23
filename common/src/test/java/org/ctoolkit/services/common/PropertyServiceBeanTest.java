@@ -18,11 +18,14 @@
 
 package org.ctoolkit.services.common;
 
+import com.google.common.base.Charsets;
 import junit.framework.Assert;
 import net.sf.jsr107cache.CacheFactory;
+import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +71,20 @@ public class PropertyServiceBeanTest
 
         // test if property is null
         Assert.assertNull( propertyService.getString( key ) );
+    }
+
+    @Test
+    public void setLongStringProperty() throws Exception
+    {
+        String key = "long-string-property";
+        InputStream stream = PropertyServiceBeanTest.class.getResourceAsStream( "text.properties" );
+        String value = IOUtils.toString( stream, Charsets.UTF_8.name() );
+
+        // set property
+        propertyService.setString( key, value );
+
+        // test get property
+        Assert.assertEquals( value, propertyService.getString( key ) );
     }
 
     @Test

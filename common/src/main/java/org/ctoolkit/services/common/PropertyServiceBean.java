@@ -23,6 +23,7 @@ import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.common.base.Strings;
@@ -301,7 +302,18 @@ class PropertyServiceBean
             property = new Entity( ENTITY_PROPERTY, key );
         }
 
-        property.setProperty( ENTITY_PROPERTY_VALUE, value );
+        Object valueToStore;
+        if ( value instanceof String && ( ( String ) value ).getBytes().length > 1500 )
+        {
+            // Converted to AppEngine native text as limit to store short string is up to 1500 bytes, then throws exception
+            valueToStore = new Text( value.toString() );
+        }
+        else
+        {
+            valueToStore = value;
+        }
+
+        property.setProperty( ENTITY_PROPERTY_VALUE, valueToStore );
 
         // put property entity to data-store
         datastoreService.put( property );
