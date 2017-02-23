@@ -22,6 +22,7 @@ import com.google.common.base.Strings;
 import org.ctoolkit.restapi.client.TokenVerifier;
 import org.ctoolkit.restapi.client.identity.Identity;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
@@ -29,13 +30,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * An helper class to wrap identity verification in to a standalone class.
+ * A handler class to wrap identity verification in to a standalone class and provide convenient methods.
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 @Singleton
-public class IdentityResolver
+public final class IdentityHandler
 {
     /**
      * Default cookie name of the identity toolkit token
@@ -45,30 +48,25 @@ public class IdentityResolver
     private final TokenVerifier<Identity> tokenVerifier;
 
     @Inject
-    public IdentityResolver( TokenVerifier<Identity> tokenVerifier )
+    public IdentityHandler( TokenVerifier<Identity> tokenVerifier )
     {
 
         this.tokenVerifier = tokenVerifier;
     }
 
-    public Identity resolve( HttpServletRequest httpRequest )
+    /**
+     * Verifies identity token taken from the request against public certs.
+     * Once verification is successful returns populated identity instance.
+     * If verification fails or token has expired returns <code>null</code>.
+     *
+     * @param request the HTTP request
+     * @return the successfully verified identity instance or null
+     */
+    public Identity resolve( @Nonnull HttpServletRequest request )
     {
-        Cookie[] cookies = httpRequest.getCookies();
+        checkNotNull( request );
 
-        if ( cookies == null )
-        {
-            return null;
-        }
-
-        String token = null;
-
-        for ( Cookie cookie : cookies )
-        {
-            if ( GTOKEN.equals( cookie.getName() ) )
-            {
-                token = cookie.getValue();
-            }
-        }
+        String token = getToken( request );
 
         if ( !Strings.isNullOrEmpty( token ) )
         {
@@ -84,13 +82,51 @@ public class IdentityResolver
     }
 
     /**
+     * Returns the identity token from the request. Searched either in headers (first) or cookies.
+     * If not found returns <code>null</code>.
+     *
+     * @param request the HTTP request
+     * @return the identity token
+     */
+    public final String getToken( @Nonnull HttpServletRequest request )
+    {
+        checkNotNull( request );
+
+        String token = request.getHeader( GTOKEN );
+        if ( !Strings.isNullOrEmpty( token ) )
+        {
+            return token;
+        }
+
+        // not found in header thus search in cookies
+        Cookie[] cookies = request.getCookies();
+
+        if ( cookies == null )
+        {
+            return null;
+        }
+
+        for ( Cookie cookie : cookies )
+        {
+            if ( GTOKEN.equals( cookie.getName() ) )
+            {
+                token = cookie.getValue();
+            }
+        }
+        return token;
+    }
+
+    /**
      * Delete identity toolkit token cookie.
      *
      * @param request  the HTTP servlet request
      * @param response the HTTP servlet response
      */
-    public void delete( HttpServletRequest request, HttpServletResponse response )
+    public void delete( @Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response )
     {
+        checkNotNull( request );
+        checkNotNull( response );
+
         Cookie[] cookies = request.getCookies();
 
         if ( cookies == null )

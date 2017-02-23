@@ -81,7 +81,7 @@ public class IdentityToolkitCheckSessionFilter
      */
     public static String IGNORE_PATHS = "_identity_filter_IGNORE_PATHS";
 
-    private final IdentityResolver identityResolver;
+    private final IdentityHandler identityHandler;
 
     private final Set<IdentityLoginListener> listeners;
 
@@ -96,9 +96,9 @@ public class IdentityToolkitCheckSessionFilter
     private Set<String> ignorePaths = new HashSet<>();
 
     @Inject
-    public IdentityToolkitCheckSessionFilter( IdentityResolver identityResolver, Set<IdentityLoginListener> listeners )
+    public IdentityToolkitCheckSessionFilter( IdentityHandler identityHandler, Set<IdentityLoginListener> listeners )
     {
-        this.identityResolver = identityResolver;
+        this.identityHandler = identityHandler;
         this.listeners = listeners;
     }
 
@@ -147,7 +147,7 @@ public class IdentityToolkitCheckSessionFilter
             return;
         }
 
-        Identity identity = identityResolver.resolve( httpRequest );
+        Identity identity = identityHandler.resolve( httpRequest );
         String signedEmail = identity != null ? identity.getEmail() : null;
 
         if ( signedEmail != null )

@@ -54,7 +54,7 @@ public class IdentityToolkitCheckSessionFilterTest
     private IdentityToolkitCheckSessionFilter tested;
 
     @Injectable
-    private IdentityResolver identityResolver;
+    private IdentityHandler identityHandler;
 
     @SuppressWarnings( "MismatchedQueryAndUpdateOfCollection" )
     @Injectable
@@ -97,7 +97,7 @@ public class IdentityToolkitCheckSessionFilterTest
         new Verifications()
         {
             {
-                identityResolver.resolve( ( HttpServletRequest ) any );
+                identityHandler.resolve( ( HttpServletRequest ) any );
                 times = 0;
 
                 chain.doFilter( request, response );
@@ -121,7 +121,7 @@ public class IdentityToolkitCheckSessionFilterTest
         new Expectations()
         {
             {
-                identityResolver.resolve( ( HttpServletRequest ) any );
+                identityHandler.resolve( ( HttpServletRequest ) any );
                 result = identity;
 
                 identity.getEmail();
@@ -167,7 +167,7 @@ public class IdentityToolkitCheckSessionFilterTest
         new Expectations()
         {
             {
-                identityResolver.resolve( ( HttpServletRequest ) any );
+                identityHandler.resolve( ( HttpServletRequest ) any );
                 result = identity;
 
                 identity.getEmail();
