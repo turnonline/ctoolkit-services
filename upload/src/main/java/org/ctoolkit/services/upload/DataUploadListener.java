@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage;
+package org.ctoolkit.services.upload;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

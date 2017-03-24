@@ -31,8 +31,8 @@ import mockit.Mocked;
 import mockit.NonStrictExpectations;
 import mockit.Tested;
 import mockit.Verifications;
-import org.ctoolkit.services.storage.DataUploadHandler;
-import org.ctoolkit.services.storage.DataUploadListener;
+import org.ctoolkit.services.upload.DataUploadHandler;
+import org.ctoolkit.services.upload.DataUploadListener;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

@@ -25,6 +25,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.googlecode.objectify.ObjectifyService;
+import org.ctoolkit.services.storage.CtoolkitServicesAppEngineStorageModule;
 import org.ctoolkit.services.storage.appengine.datastore.FakeEntity;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;

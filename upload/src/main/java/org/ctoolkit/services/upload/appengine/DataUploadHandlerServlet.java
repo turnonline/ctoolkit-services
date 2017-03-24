@@ -30,8 +30,8 @@ import com.google.appengine.repackaged.com.google.gson.GsonBuilder;
 import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import com.google.common.base.Charsets;
 import com.google.common.net.MediaType;
-import org.ctoolkit.services.storage.DataUploadHandler;
-import org.ctoolkit.services.storage.DataUploadListener;
+import org.ctoolkit.services.upload.DataUploadHandler;
+import org.ctoolkit.services.upload.DataUploadListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
