@@ -36,11 +36,6 @@
     <dependencies>
         <dependency>
             <groupId>org.ctoolkit.services</groupId>
-            <artifactId>ctoolkit-services-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.ctoolkit.services</groupId>
             <artifactId>ctoolkit-services-guice</artifactId>
             <version>${project.version}</version>
         </dependency>

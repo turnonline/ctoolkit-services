@@ -18,6 +18,8 @@
 
 package org.ctoolkit.services.storage;
 
+import com.google.cloud.storage.Blob;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -32,74 +34,57 @@ public interface StorageService
      * Store data into storage and return related metadata.
      * The file name will be generated and stored within default bucket container.
      *
-     * @param data     the array of bytes of the file (document) to be stored
-     * @param mimeType the media type of the data representation
+     * @param data        the array of bytes of the file (blob document) to be stored
+     * @param contentType the media type of the data representation
      * @return the file record metadata
      */
-    BlobInfo store( @Nonnull byte[] data, @Nonnull String mimeType );
+    Blob store( @Nonnull byte[] data, @Nonnull String contentType );
 
     /**
      * Store data into storage and return related metadata.
      *
-     * @param data       the array of bytes of the file (document) to be stored
-     * @param mimeType   the media type of the data representation
-     * @param fileName   the intended name of the file in storage
-     * @param bucketName the name of the bucket, the specified or default container to hold given data
+     * @param data        the array of bytes of the file (blob document) to be stored
+     * @param contentType the media type of the data representation
+     * @param bucketName  the name of the bucket, the specified or default container to hold given data
+     * @param blobName    the intended name of the blob file in storage
      * @return the file record metadata
      */
-    BlobInfo store( @Nonnull byte[] data,
-                    @Nonnull String mimeType,
-                    @Nonnull String fileName,
-                    @Nonnull String bucketName );
+    Blob store( @Nonnull byte[] data,
+                @Nonnull String contentType,
+                @Nonnull String bucketName,
+                @Nonnull String blobName );
 
     /**
-     * Return the file (document) from default bucket container.
+     * Return the file (blob document) from default bucket container.
      *
-     * @param fileName the name of the file (document) in storage to get
+     * @param blobName the name of the file (blob document) in storage to get
      * @return the array of bytes of the file
      */
-    byte[] serve( @Nonnull String fileName );
+    byte[] readAllBytes( @Nonnull String blobName );
 
     /**
-     * Return the file (document).
+     * Return the file (blob document).
      *
-     * @param fileName   the name of the file (document) in storage to get
      * @param bucketName the name of the bucket container
+     * @param blobName   the name of the file (blob document) in storage to get
      * @return the array of bytes of the file
      */
-    byte[] serve( @Nonnull String fileName, @Nonnull String bucketName );
+    byte[] readAllBytes( @Nonnull String bucketName, @Nonnull String blobName );
 
     /**
-     * Delete the file (document) from default bucket container.
+     * Delete the file (blob document) from default bucket container.
      *
-     * @param fileName the name of the file (document) in storage to delete
-     * @return true if file (document) has been deleted, false if not found
+     * @param blobName the name of the file (blob document) in storage to delete
+     * @return true if file (blob document) has been deleted, false if not found
      */
-    boolean delete( @Nonnull String fileName );
+    boolean delete( @Nonnull String blobName );
 
     /**
-     * Delete the file (document).
+     * Delete the file (blob document).
      *
-     * @param fileName   the name of the file (document) in storage to delete
      * @param bucketName the name of the bucket container
-     * @return true if file (document) has been deleted, false if not found
+     * @param blobName   the name of the file (blob document) in storage to delete
+     * @return true if file (blob document) has been deleted, false if not found
      */
-    boolean delete( @Nonnull String fileName, @Nonnull String bucketName );
-
-    /**
-     * Return the file (document) record metadata for default bucket container.
-     *
-     * @param fileName the name of the file (document) in storage to read the metadata of
-     * @return the file record metadata
-     */
-    BlobInfo getBlobInfo( @Nonnull String fileName );
-
-    /**
-     * Return the file (document) record metadata.
-     *
-     * @param fileName   the name of the file (document) in storage to read the metadata of
-     * @param bucketName the name of the bucket container
-     * @return the file record metadata
-     */
-    BlobInfo getBlobInfo( @Nonnull String fileName, @Nonnull String bucketName );
+    boolean delete( @Nonnull String bucketName, @Nonnull String blobName );
 }

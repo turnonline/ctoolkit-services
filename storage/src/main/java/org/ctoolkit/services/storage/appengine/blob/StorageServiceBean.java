@@ -19,25 +19,15 @@
 package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
-import com.google.appengine.api.appidentity.AppIdentityServiceFactory;
-import com.google.appengine.tools.cloudstorage.GcsFileMetadata;
-import com.google.appengine.tools.cloudstorage.GcsFileOptions;
-import com.google.appengine.tools.cloudstorage.GcsFilename;
-import com.google.appengine.tools.cloudstorage.GcsInputChannel;
-import com.google.appengine.tools.cloudstorage.GcsOutputChannel;
-import com.google.appengine.tools.cloudstorage.GcsService;
-import com.google.appengine.tools.cloudstorage.GcsServiceFactory;
-import org.ctoolkit.services.storage.BlobInfo;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
 import org.ctoolkit.services.storage.StorageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.text.MessageFormat;
-import java.util.Date;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -52,174 +42,70 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StorageServiceBean
         implements StorageService
 {
-    private static final Logger log = LoggerFactory.getLogger( StorageServiceBean.class );
+    private final Storage storage;
 
-    private static final GcsService gcsService = GcsServiceFactory.createGcsService();
+    private final AppIdentityService appIdentityService;
 
-    private AppIdentityService appIdentityService = AppIdentityServiceFactory.getAppIdentityService();
-
-    public StorageServiceBean()
+    @Inject
+    public StorageServiceBean( Storage storage, AppIdentityService appIdentityService )
     {
+        this.storage = storage;
+        this.appIdentityService = appIdentityService;
     }
 
     @Override
-    public BlobInfo store( @Nonnull byte[] data, @Nonnull String mimeType )
+    public Blob store( @Nonnull byte[] data, @Nonnull String contentType )
     {
-        return store( data, mimeType, UUID.randomUUID().toString(), appIdentityService.getDefaultGcsBucketName() );
+        return store( data, contentType, appIdentityService.getDefaultGcsBucketName(), UUID.randomUUID().toString() );
     }
 
     @Override
-    public BlobInfo store( @Nonnull byte[] data,
-                           @Nonnull String mimeType,
-                           @Nonnull String fileName,
-                           @Nonnull String bucketName )
+    public Blob store( @Nonnull byte[] data,
+                       @Nonnull String contentType,
+                       @Nonnull String bucketName,
+                       @Nonnull String blobName )
     {
         checkNotNull( data );
-        checkNotNull( mimeType );
-        checkNotNull( fileName );
+        checkNotNull( contentType );
+        checkNotNull( blobName );
         checkNotNull( bucketName );
 
-        BlobInfo info = null;
+        BlobId blobId = BlobId.of( bucketName, blobName );
+        BlobInfo blobInfo = BlobInfo.newBuilder( blobId ).setContentType( contentType ).build();
 
-        try
-        {
-            GcsFilename gcsFileName = new GcsFilename( bucketName, fileName );
-
-            GcsFileOptions fileOptions = new GcsFileOptions.Builder().mimeType( mimeType ).build();
-            GcsOutputChannel outputChannel = gcsService.createOrReplace( gcsFileName, fileOptions );
-            outputChannel.write( ByteBuffer.wrap( data ) );
-            outputChannel.close();
-
-            // populate metadata of the blob
-            info = new BlobInfo();
-            info.setFileName( gcsFileName.getObjectName() );
-            info.setBucketName( gcsFileName.getBucketName() );
-            info.setMimeType( fileOptions.getMimeType() );
-            info.setLength( data.length );
-            info.setLastModified( new Date() );
-        }
-        catch ( Exception e )
-        {
-            String builder = "Error has occurred while storing blob:" +
-                    " Bucket name: " + bucketName +
-                    " File name " + fileName +
-                    " Mime Type: " + mimeType +
-                    " Data length: " + data.length;
-
-            log.error( builder, e );
-        }
-
-        return info;
-    }
-
-    private String getGcsFullName( String fileName, String bucketName )
-    {
-        return MessageFormat.format( "/gs/{0}/{1}", bucketName, fileName );
+        return storage.create( blobInfo, data );
     }
 
     @Override
-    public byte[] serve( @Nonnull String fileName )
+    public byte[] readAllBytes( @Nonnull String blobName )
     {
-        return serve( fileName, appIdentityService.getDefaultGcsBucketName() );
+        checkNotNull( blobName );
+        return readAllBytes( blobName, appIdentityService.getDefaultGcsBucketName() );
     }
 
     @Override
-    public byte[] serve( @Nonnull String fileName, @Nonnull String bucketName )
+    public byte[] readAllBytes( @Nonnull String blobName, @Nonnull String bucketName )
     {
-        checkNotNull( bucketName, "In order to serve blob a bucket name must be provided." );
-        checkNotNull( fileName, "In order to serve blob a file name must be provided." );
+        checkNotNull( bucketName, "In order to readAllBytes blob a bucket name must be provided." );
+        checkNotNull( blobName, "In order to readAllBytes blob a file name must be provided." );
 
-        BlobInfo metadata = getBlobInfo( fileName, bucketName );
-        if ( metadata == null )
-        {
-            throw new IllegalArgumentException( "No GCS metadata has found fo bucket name '"
-                    + bucketName + "'" + " file name '" + fileName + "'" );
-        }
-
-        byte[] data = null;
-
-        try
-        {
-            GcsFilename gcsName = new GcsFilename( bucketName, fileName );
-            long length = metadata.getLength();
-            ByteBuffer result = ByteBuffer.allocate( Long.valueOf( length ).intValue() );
-
-            GcsInputChannel readChannel = gcsService.openReadChannel( gcsName, 0 );
-            readChannel.read( result );
-            data = result.array();
-        }
-        catch ( IOException e )
-        {
-            log.error( "Error has occurred while deleting blob. Bucket name '"
-                    + bucketName + "'" + " File name '" + fileName + "'", e );
-        }
-
-        return data;
+        return storage.readAllBytes( bucketName, blobName );
     }
 
     @Override
-    public boolean delete( @Nonnull String fileName )
+    public boolean delete( @Nonnull String blobName )
     {
-        return delete( fileName, appIdentityService.getDefaultGcsBucketName() );
+        return delete( blobName, appIdentityService.getDefaultGcsBucketName() );
     }
 
     @Override
-    public boolean delete( @Nonnull String fileName, @Nonnull String bucketName )
+    public boolean delete( @Nonnull String blobName, @Nonnull String bucketName )
     {
         checkNotNull( bucketName, "In order to delete blob a bucket name must be provided." );
-        checkNotNull( fileName, "In order to delete blob a file name must be provided." );
+        checkNotNull( blobName, "In order to delete blob a file name must be provided." );
 
-        try
-        {
-            // delete blob object
-            return gcsService.delete( new GcsFilename( bucketName, fileName ) );
-        }
-        catch ( IOException e )
-        {
-            log.error( "Error has occurred during blob deletion in storage. Bucket name '"
-                    + bucketName + "'" + " File name '" + fileName + "'", e );
+        BlobId blobId = BlobId.of( bucketName, blobName );
 
-            return false;
-        }
-    }
-
-    @Override
-    public BlobInfo getBlobInfo( @Nonnull String fileName )
-    {
-        return getBlobInfo( fileName, appIdentityService.getDefaultGcsBucketName() );
-    }
-
-    @Override
-    public BlobInfo getBlobInfo( @Nonnull String fileName, @Nonnull String bucketName )
-    {
-        checkNotNull( fileName, "In order to get metadata a file name must be provided." );
-        checkNotNull( bucketName, "In order to get metadata a bucket name must be provided." );
-
-        BlobInfo info = null;
-
-        try
-        {
-            GcsFilename gcsName = new GcsFilename( bucketName, fileName );
-            GcsFileMetadata metadata = gcsService.getMetadata( gcsName );
-
-            if ( metadata != null )
-            {
-                info = new BlobInfo();
-                info.setMimeType( metadata.getOptions().getMimeType() );
-                info.setContentEncoding( metadata.getOptions().getContentEncoding() );
-                info.setLastModified( metadata.getLastModified() );
-                info.setBucketName( metadata.getFilename().getBucketName() );
-                info.setFileName( metadata.getFilename().getObjectName() );
-                info.setLength( metadata.getLength() );
-                info.setEtag( metadata.getEtag() );
-            }
-        }
-        catch ( IOException e )
-        {
-            log.error( "Error has occurred while getting GCS metadata. Bucket name '"
-                    + bucketName + "'" + " File name '" + fileName + "'", e );
-        }
-
-        return info;
+        return storage.delete( blobId );
     }
 }
