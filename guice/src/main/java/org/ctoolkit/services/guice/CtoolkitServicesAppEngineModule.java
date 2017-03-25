@@ -16,45 +16,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.blob;
+package org.ctoolkit.services.guice;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
 import com.google.appengine.api.appidentity.AppIdentityServiceFactory;
-import com.google.cloud.storage.BucketInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.testing.RemoteStorageHelper;
+import com.google.appengine.api.blobstore.BlobstoreService;
+import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import net.sf.jsr107cache.CacheException;
-import org.ctoolkit.services.storage.StorageService;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 
 import javax.inject.Singleton;
 
 /**
- * Test module to initialize test {@link Storage} instance.
+ * The ctoolkit services guice module with AppEngine services instance providers.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class StorageTestModule
+public class CtoolkitServicesAppEngineModule
         extends AbstractModule
 {
-    private static final String BUCKET = RemoteStorageHelper.generateBucketName();
-
     @Override
     protected void configure()
     {
-        bind( StorageService.class ).to( StorageServiceBean.class );
     }
 
     @Provides
     @Singleton
-    Storage provideCloudStorage() throws CacheException
+    BlobstoreService provideBlobstoreService()
     {
-        RemoteStorageHelper helper = RemoteStorageHelper.create();
-        Storage storage = helper.getOptions().toBuilder().setProjectId( "test" ).build().getService();
-        storage.create( BucketInfo.of( BUCKET ) );
+        return BlobstoreServiceFactory.getBlobstoreService();
+    }
 
-        return storage;
+    @Provides
+    @Singleton
+    ImagesService provideImagesService()
+    {
+        return ImagesServiceFactory.getImagesService();
     }
 
     @Provides
@@ -63,5 +65,11 @@ public class StorageTestModule
     {
         return AppIdentityServiceFactory.getAppIdentityService();
     }
-}
 
+    @Provides
+    @Singleton
+    CacheFactory provideCacheFactory() throws CacheException
+    {
+        return CacheManager.getInstance().getCacheFactory();
+    }
+}

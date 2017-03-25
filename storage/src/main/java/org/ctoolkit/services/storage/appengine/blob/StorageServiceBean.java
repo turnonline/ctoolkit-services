@@ -84,10 +84,10 @@ public class StorageServiceBean
     }
 
     @Override
-    public byte[] readAllBytes( @Nonnull String blobName, @Nonnull String bucketName )
+    public byte[] readAllBytes( @Nonnull String bucketName, @Nonnull String blobName )
     {
-        checkNotNull( bucketName, "In order to readAllBytes blob a bucket name must be provided." );
-        checkNotNull( blobName, "In order to readAllBytes blob a file name must be provided." );
+        checkNotNull( bucketName, "In order to read blob a bucket name must be provided." );
+        checkNotNull( blobName, "In order to read blob a blob name must be provided." );
 
         return storage.readAllBytes( bucketName, blobName );
     }
@@ -99,7 +99,7 @@ public class StorageServiceBean
     }
 
     @Override
-    public boolean delete( @Nonnull String blobName, @Nonnull String bucketName )
+    public boolean delete( @Nonnull String bucketName, @Nonnull String blobName )
     {
         checkNotNull( bucketName, "In order to delete blob a bucket name must be provided." );
         checkNotNull( blobName, "In order to delete blob a file name must be provided." );

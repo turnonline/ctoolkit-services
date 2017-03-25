@@ -25,7 +25,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.google.inject.name.Names;
-import org.ctoolkit.services.guice.appengine.CtoolkitServicesAppEngineModule;
+import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;

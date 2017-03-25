@@ -16,24 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.upload;
+package org.ctoolkit.services.storage;
 
-import com.google.inject.multibindings.Multibinder;
-import com.google.inject.servlet.ServletModule;
-import org.ctoolkit.services.upload.appengine.DataUploadHandlerServlet;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
+
+import javax.inject.Provider;
 
 /**
- * The ctoolkit services AppEngine upload guice servlet module.
+ * The cloud storage service instance provider with default configuration.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class CtoolkitServicesAppEngineUploadServletModule
-        extends ServletModule
+public class DefaultStorageProvider
+        implements Provider<Storage>
 {
     @Override
-    protected void configureServlets()
+    public Storage get()
     {
-        Multibinder.newSetBinder( binder(), DataUploadListener.class );
-        serve( DataUploadHandler.DATA_HANDLER_UPLOAD_URL ).with( DataUploadHandlerServlet.class );
+        return StorageOptions.getDefaultInstance().getService();
     }
 }

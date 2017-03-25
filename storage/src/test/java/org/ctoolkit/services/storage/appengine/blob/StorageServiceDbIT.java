@@ -19,13 +19,22 @@
 package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.testing.RemoteStorageHelper;
 import com.google.common.io.ByteStreams;
 import org.ctoolkit.services.storage.StorageService;
 import org.ctoolkit.services.storage.appengine.GuiceBerryTestNgCase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import java.io.InputStream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
+import static org.ctoolkit.services.storage.appengine.blob.TestStorageProvider.BUCKET;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -35,20 +44,36 @@ import static org.testng.Assert.assertTrue;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class StorageServiceDbTest
+public class StorageServiceDbIT
         extends GuiceBerryTestNgCase
 {
+    private static final Logger log = LoggerFactory.getLogger( StorageServiceDbIT.class );
+
+    private static final String BLOB_NAME = "thismac";
+
     @Inject
     private StorageService tested;
 
-    //@Test
-    public void storeAndServe() throws Exception
+    @Inject
+    private Storage storage;
+
+    @AfterClass
+    private void after() throws ExecutionException, InterruptedException
     {
-        InputStream stream = StorageServiceDbTest.class.getResourceAsStream( "thismac.png" );
+        if ( !RemoteStorageHelper.forceDelete( storage, BUCKET, 5, TimeUnit.SECONDS ) )
+        {
+            log.warn( "Deletion of bucket " + BUCKET + " timed out, bucket is not empty" );
+        }
+    }
+
+    @Test
+    public void readAllBytes() throws Exception
+    {
+        InputStream stream = StorageServiceDbIT.class.getResourceAsStream( "thismac.png" );
         byte[] dataInput = ByteStreams.toByteArray( stream );
         String contentType = "image/png";
 
-        Blob info = tested.store( dataInput, contentType );
+        Blob info = tested.store( dataInput, contentType, BUCKET, BLOB_NAME );
 
         assertNotNull( info, "Blob info instance is being expected," );
         assertNotNull( info.getName() );
@@ -56,19 +81,19 @@ public class StorageServiceDbTest
         assertNotNull( info.getCreateTime() );
         assertEquals( info.getContentType(), contentType );
 
-        byte[] served = tested.readAllBytes( info.getName() );
+        byte[] served = tested.readAllBytes( BUCKET, info.getName() );
 
         assertEquals( served, dataInput );
     }
 
-    //@Test
+    @Test
     public void delete() throws Exception
     {
-        InputStream stream = StorageServiceDbTest.class.getResourceAsStream( "thismac.png" );
+        InputStream stream = StorageServiceDbIT.class.getResourceAsStream( "thismac.png" );
         byte[] dataInput = ByteStreams.toByteArray( stream );
         String contentType = "image/png";
 
-        Blob info = tested.store( dataInput, contentType );
-        assertTrue( tested.delete( info.getName() ) );
+        Blob info = tested.store( dataInput, contentType, BUCKET, BLOB_NAME );
+        assertTrue( tested.delete( BUCKET, info.getName() ) );
     }
 }

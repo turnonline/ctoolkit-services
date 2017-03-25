@@ -19,11 +19,13 @@
 package org.ctoolkit.services.storage;
 
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Storage;
 
 import javax.annotation.Nonnull;
 
 /**
- * The service API to store and manage large objects (blobs) up to TBs in size.
+ * The storage service API as an extension to {@link Storage} with set of convenient methods.
+ * If you need something else simply use directly {@link Storage} instance.
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -31,19 +33,19 @@ import javax.annotation.Nonnull;
 public interface StorageService
 {
     /**
-     * Store data into storage and return related metadata.
-     * The file name will be generated and stored within default bucket container.
+     * Store data into storage and return cloud storage object.
+     * The file name will be generated (UUID) and stored within default bucket container.
      *
-     * @param data        the array of bytes of the file (blob document) to be stored
+     * @param data        the array of bytes of the blob document to be stored
      * @param contentType the media type of the data representation
      * @return the file record metadata
      */
     Blob store( @Nonnull byte[] data, @Nonnull String contentType );
 
     /**
-     * Store data into storage and return related metadata.
+     * Store data into storage and return cloud storage object.
      *
-     * @param data        the array of bytes of the file (blob document) to be stored
+     * @param data        the array of bytes of the blob document to be stored
      * @param contentType the media type of the data representation
      * @param bucketName  the name of the bucket, the specified or default container to hold given data
      * @param blobName    the intended name of the blob file in storage
@@ -55,36 +57,36 @@ public interface StorageService
                 @Nonnull String blobName );
 
     /**
-     * Return the file (blob document) from default bucket container.
+     * Return the blob document from default bucket container.
      *
-     * @param blobName the name of the file (blob document) in storage to get
-     * @return the array of bytes of the file
+     * @param blobName the name of the blob document in storage to get
+     * @return the array of bytes of the blob
      */
     byte[] readAllBytes( @Nonnull String blobName );
 
     /**
-     * Return the file (blob document).
+     * Return the blob document.
      *
      * @param bucketName the name of the bucket container
-     * @param blobName   the name of the file (blob document) in storage to get
-     * @return the array of bytes of the file
+     * @param blobName   the name of the blob document in storage to get
+     * @return the array of bytes of the blob
      */
     byte[] readAllBytes( @Nonnull String bucketName, @Nonnull String blobName );
 
     /**
-     * Delete the file (blob document) from default bucket container.
+     * Delete the blob document from default bucket container.
      *
-     * @param blobName the name of the file (blob document) in storage to delete
-     * @return true if file (blob document) has been deleted, false if not found
+     * @param blobName the name of the blob document in storage to delete
+     * @return true if blob document has been deleted, false if not found
      */
     boolean delete( @Nonnull String blobName );
 
     /**
-     * Delete the file (blob document).
+     * Delete the blob document.
      *
      * @param bucketName the name of the bucket container
-     * @param blobName   the name of the file (blob document) in storage to delete
-     * @return true if file (blob document) has been deleted, false if not found
+     * @param blobName   the name of the blob document in storage to delete
+     * @return true if blob document has been deleted, false if not found
      */
     boolean delete( @Nonnull String bucketName, @Nonnull String blobName );
 }

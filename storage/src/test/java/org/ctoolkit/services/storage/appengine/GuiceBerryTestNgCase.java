@@ -18,20 +18,21 @@
 
 package org.ctoolkit.services.storage.appengine;
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalModulesServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.cloud.storage.Storage;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.googlecode.objectify.ObjectifyService;
-import org.ctoolkit.services.storage.CtoolkitServicesAppEngineStorageModule;
-import org.ctoolkit.services.storage.appengine.blob.StorageTestModule;
+import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
+import org.ctoolkit.services.storage.CtoolkitServicesStorageModule;
+import org.ctoolkit.services.storage.appengine.blob.TestStorageProvider;
 import org.ctoolkit.services.storage.appengine.datastore.FakeEntity;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+import javax.inject.Singleton;
 import java.lang.reflect.Method;
 
 /**
@@ -47,9 +48,7 @@ public class GuiceBerryTestNgCase
 
     public GuiceBerryTestNgCase()
     {
-        construct( new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig(),
-                new LocalModulesServiceTestConfig(),
-                new LocalDatastoreServiceTestConfig().setDefaultHighRepJobPolicyUnappliedJobPercentage( 0 ) ) );
+        construct( new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig() ) );
     }
 
     @BeforeMethod
@@ -70,9 +69,11 @@ public class GuiceBerryTestNgCase
     @Override
     public void configureTestBinder()
     {
+        bind( Storage.class ).toProvider( TestStorageProvider.class ).in( Singleton.class );
+
         // setting the SystemProperty.Environment.Value.Development
         System.setProperty( "com.google.appengine.runtime.environment", "Development" );
-        install( new StorageTestModule() );
-        install( new CtoolkitServicesAppEngineStorageModule() );
+        install( new CtoolkitServicesAppEngineModule() );
+        install( new CtoolkitServicesStorageModule() );
     }
 }

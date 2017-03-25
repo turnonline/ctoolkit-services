@@ -16,24 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage;
+package org.ctoolkit.services.upload;
 
-import com.google.inject.AbstractModule;
-import org.ctoolkit.services.storage.appengine.blob.StorageServiceBean;
-import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.servlet.ServletModule;
+import org.ctoolkit.services.upload.appengine.DataUploadHandlerServlet;
 
 /**
- * The ctoolkit services AppEngine datastore module.
+ * The ctoolkit services AppEngine upload guice servlet module.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class CtoolkitServicesAppEngineStorageModule
-        extends AbstractModule
+public class CtoolkitServicesUploadServletModule
+        extends ServletModule
 {
     @Override
-    protected void configure()
+    protected void configureServlets()
     {
-        bind( EntityExecutor.class ).to( ObjectifyEntityExecutor.class );
-        bind( StorageService.class ).to( StorageServiceBean.class );
+        Multibinder.newSetBinder( binder(), DataUploadListener.class );
+        serve( DataUploadHandler.DATA_HANDLER_UPLOAD_URL ).with( DataUploadHandlerServlet.class );
     }
 }
