@@ -80,7 +80,7 @@ public class StorageServiceBean
     public byte[] readAllBytes( @Nonnull String blobName )
     {
         checkNotNull( blobName );
-        return readAllBytes( blobName, appIdentityService.getDefaultGcsBucketName() );
+        return readAllBytes( appIdentityService.getDefaultGcsBucketName(), blobName );
     }
 
     @Override
@@ -95,7 +95,7 @@ public class StorageServiceBean
     @Override
     public boolean delete( @Nonnull String blobName )
     {
-        return delete( blobName, appIdentityService.getDefaultGcsBucketName() );
+        return delete( appIdentityService.getDefaultGcsBucketName(), blobName );
     }
 
     @Override

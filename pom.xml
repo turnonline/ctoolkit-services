@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
                 <artifactId>ctoolkit-library-bom</artifactId>
-                <version>3</version>
+                <version>4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -93,12 +93,12 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>ctoolkit-rest-facade-api</artifactId>
-                <version>0.14</version>
+                <version>0.15</version>
             </dependency>
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>ctoolkit-rest-facade-appengine</artifactId>
-                <version>0.20</version>
+                <version>0.22</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.jdo</groupId>
@@ -113,13 +113,31 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>ctoolkit-client-identity-toolkit</artifactId>
-                <version>0.20</version>
+                <version>0.22</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
                 <groupId>org.ctoolkit.test</groupId>
                 <artifactId>ctoolkit-test</artifactId>
                 <version>1.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-labs</artifactId>
+                <version>${gae.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-api-stubs</artifactId>
+                <version>${gae.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.google.appengine</groupId>
+                <artifactId>appengine-testing</artifactId>
+                <version>${gae.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -138,7 +156,7 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.38</gae.version>
+        <gae.version>1.9.50</gae.version>
         <jmockit.version>1.19</jmockit.version>
         <testng.version>6.9.10</testng.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
