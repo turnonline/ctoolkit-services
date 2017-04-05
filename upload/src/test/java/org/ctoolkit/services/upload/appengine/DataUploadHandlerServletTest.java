@@ -19,6 +19,7 @@
 package org.ctoolkit.services.upload.appengine;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.FileInfo;
 import com.google.appengine.api.blobstore.UploadOptions;
@@ -57,7 +58,9 @@ import static org.testng.Assert.assertEquals;
 public class DataUploadHandlerServletTest
 {
 
-    private static final String KEY = "StorageKey-1239j";
+    private static final String STORAGE_NAME = "StorageKey-1239j";
+
+    private static final String BLOB_KEY = "blob-key-1239j";
 
     private static final String SERVING_URL = "https://www.ctoolkit.org/logo.png";
 
@@ -116,6 +119,7 @@ public class DataUploadHandlerServletTest
     @Test
     public void doPost( @Mocked final HttpServletRequest request,
                         @Mocked final HttpServletResponse response,
+                        @Mocked final BlobKey blobKey,
                         @Mocked final FileInfo fileInfo )
             throws Exception
     {
@@ -126,11 +130,20 @@ public class DataUploadHandlerServletTest
 
         infos.put( DataUploadHandler.UPLOAD_NAME_FIELD_MARKER, Collections.singletonList( fileInfo ) );
 
+        final Map<String, List<BlobKey>> blobs = new HashMap<>();
+        blobs.put( DataUploadHandler.UPLOAD_NAME_FIELD_MARKER, Collections.singletonList( blobKey ) );
+
         new NonStrictExpectations()
         {
             {
                 blobstoreService.getFileInfos( request );
                 result = infos;
+
+                blobstoreService.getUploads( request );
+                result = blobs;
+
+                blobKey.getKeyString();
+                result = BLOB_KEY;
 
                 request.getParameter( DataUploadHandler.PARAMETER_IMAGE_SIZE );
                 result = "125";
@@ -147,7 +160,7 @@ public class DataUploadHandlerServletTest
                 response.getWriter();
                 result = new PrintWriter( writer );
 
-                listener.onDataUpload( KEY, reqImageSize, SERVING_URL, ARBITRARY_NAME, ct, "a", 9, "b" );
+                listener.onDataUpload( STORAGE_NAME, blobKey, reqImageSize, SERVING_URL, ARBITRARY_NAME, ct, "a", 9, "b" );
                 result = new Exception( "This exception needs to be logged only as a WARNING." );
 
                 fileInfo.getContentType();
@@ -163,7 +176,7 @@ public class DataUploadHandlerServletTest
                 result = "b";
 
                 fileInfo.getGsObjectName();
-                result = KEY;
+                result = STORAGE_NAME;
             }
         };
 
@@ -172,14 +185,15 @@ public class DataUploadHandlerServletTest
         Gson gson = new GsonBuilder().create();
         JsonOutput output = gson.fromJson( writer.getBuffer().toString(), JsonOutput.class );
 
-        assertEquals( KEY, output.key );
+        assertEquals( STORAGE_NAME, output.storageName );
+        assertEquals( BLOB_KEY, output.blobKey );
         assertEquals( SERVING_URL, output.servingUrl );
         assertEquals( ARBITRARY_NAME, output.customName );
 
         new Verifications()
         {
             {
-                listener.onDataUpload( KEY, reqImageSize, SERVING_URL, ARBITRARY_NAME, ct, "a", 9, "b" );
+                listener.onDataUpload( STORAGE_NAME, blobKey, reqImageSize, SERVING_URL, ARBITRARY_NAME, ct, "a", 9, "b" );
                 times = 1;
 
                 response.setContentType( "application/json; charset=utf-8" );
@@ -227,7 +241,9 @@ public class DataUploadHandlerServletTest
     @SuppressWarnings( "unused" )
     static class JsonOutput
     {
-        private String key;
+        private String storageName;
+
+        private String blobKey;
 
         private String servingUrl;
 

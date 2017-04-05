@@ -19,6 +19,7 @@
 package org.ctoolkit.services.upload.appengine;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
+import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.FileInfo;
 import com.google.appengine.api.blobstore.UploadOptions;
@@ -53,9 +54,10 @@ import java.util.Set;
  * <p/>
  * Successful result returns following JSON:
  * <ul>
+ * <li>storageName</li>
  * <li>blobKey</li>
  * <li>servingUrl</li>
- * <li>uploadName</li>
+ * <li>customName</li>
  * </ul>
  * POST parameters to serve data upload
  * <ul>
@@ -126,6 +128,8 @@ public class DataUploadHandlerServlet
 
         if ( list == null )
         {
+            response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+
             String message = "Incorrect upload form 'name' field, requested: " + UPLOAD_NAME_FIELD_MARKER;
             message = message + " " + String.valueOf( fileInfos );
 
@@ -181,7 +185,7 @@ public class DataUploadHandlerServlet
                 Gson gson = builder.create();
 
                 JsonObject jsonEntry = new JsonObject();
-                jsonEntry.addProperty( "key", gStorageName );
+                jsonEntry.addProperty( "storageName", gStorageName );
 
                 if ( !Strings.isNullOrEmpty( servingUrl ) )
                 {
@@ -193,6 +197,20 @@ public class DataUploadHandlerServlet
                     jsonEntry.addProperty( "customName", customName );
                 }
 
+                // blob key retrieval
+                Map<String, List<BlobKey>> blobs = blobstoreService.getUploads( request );
+                BlobKey blobKey = blobs.get( UPLOAD_NAME_FIELD_MARKER ).get( 0 );
+
+                if ( blobKey == null )
+                {
+                    response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+
+                    String message = "Blob key is null for fileInfos: " + String.valueOf( fileInfos );
+                    throw new IllegalArgumentException( message );
+                }
+
+                jsonEntry.addProperty( "blobKey", blobKey.getKeyString() );
+
                 // return blob key and serving URL as JSON
                 gson.toJson( jsonEntry, response.getWriter() );
 
@@ -201,7 +219,7 @@ public class DataUploadHandlerServlet
                 {
                     try
                     {
-                        listener.onDataUpload( gStorageName, size, servingUrl, customName,
+                        listener.onDataUpload( gStorageName, blobKey, size, servingUrl, customName,
                                 info.getContentType(), info.getFilename(), info.getSize(), info.getMd5Hash() );
                     }
                     catch ( Exception e )

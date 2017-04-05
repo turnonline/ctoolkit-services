@@ -18,6 +18,8 @@
 
 package org.ctoolkit.services.upload;
 
+import com.google.appengine.api.blobstore.BlobKey;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -36,7 +38,8 @@ public interface DataUploadListener
     /**
      * Called right after data upload has done.
      *
-     * @param key         the key, cloud storage name
+     * @param storageName the cloud storage name
+     * @param blobKey     the blobstore key reference of the uploaded file in cloud storage
      * @param imageSize   the optional image size, -1 if not requested
      * @param servingUrl  the serving CDN URL in case of the image data, otherwise null
      * @param customName  the optional custom name
@@ -45,7 +48,8 @@ public interface DataUploadListener
      * @param size        the size in bytes
      * @param md5Hash     the md5 hash
      */
-    void onDataUpload( @Nonnull String key,
+    void onDataUpload( @Nonnull String storageName,
+                       @Nonnull BlobKey blobKey,
                        int imageSize,
                        @Nullable String servingUrl,
                        @Nullable String customName,
