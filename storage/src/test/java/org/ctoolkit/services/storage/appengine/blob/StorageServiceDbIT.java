@@ -40,7 +40,7 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
- * The blob service tested with storage.
+ * The blob service tested against cloud storage.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -81,7 +81,7 @@ public class StorageServiceDbIT
         assertNotNull( info.getCreateTime() );
         assertEquals( info.getContentType(), contentType );
 
-        byte[] served = tested.readAllBytes( BUCKET, info.getName() );
+        byte[] served = tested.read( BUCKET, info.getName() );
 
         assertEquals( served, dataInput );
     }

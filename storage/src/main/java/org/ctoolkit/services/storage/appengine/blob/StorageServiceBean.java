@@ -19,6 +19,9 @@
 package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -28,6 +31,7 @@ import org.ctoolkit.services.storage.StorageService;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.text.MessageFormat;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,21 +46,61 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StorageServiceBean
         implements StorageService
 {
+    private static final String STORAGE_NAME_PATTERN = "/gs/{0}/{1}";
+
     private final Storage storage;
 
     private final AppIdentityService appIdentityService;
 
+    private final ImagesService imagesService;
+
     @Inject
-    public StorageServiceBean( Storage storage, AppIdentityService appIdentityService )
+    public StorageServiceBean( Storage storage, AppIdentityService appIdentityService, ImagesService imagesService )
     {
         this.storage = storage;
         this.appIdentityService = appIdentityService;
+        this.imagesService = imagesService;
+    }
+
+    @Override
+    public BlobId fromFullStorageName( @Nonnull String fullName )
+    {
+        checkNotNull( fullName );
+
+        String[] split = fullName.split( "/" );
+        if ( split.length == 4 && "gs".equals( split[1] ) )
+        {
+            String bucket = split[2];
+            String name = split[3];
+
+            return BlobId.of( bucket, name );
+        }
+        else
+        {
+            String message = "The full storage name does not follow expected pattern '" + STORAGE_NAME_PATTERN
+                    + "' for given argument: '" + fullName + "' Fill: {0} - bucket name and {1} file name.";
+
+            throw new IllegalArgumentException( message );
+        }
+    }
+
+    @Override
+    public String getFullStorageName( @Nonnull Blob blob )
+    {
+        checkNotNull( blob );
+        return MessageFormat.format( STORAGE_NAME_PATTERN, blob.getBucket(), blob.getName() );
     }
 
     @Override
     public Blob store( @Nonnull byte[] data, @Nonnull String contentType )
     {
         return store( data, contentType, appIdentityService.getDefaultGcsBucketName(), UUID.randomUUID().toString() );
+    }
+
+    @Override
+    public Blob store( @Nonnull byte[] data, @Nonnull String contentType, @Nonnull String blobName )
+    {
+        return store( data, contentType, appIdentityService.getDefaultGcsBucketName(), blobName );
     }
 
     @Override
@@ -77,19 +121,42 @@ public class StorageServiceBean
     }
 
     @Override
-    public byte[] readAllBytes( @Nonnull String blobName )
+    public byte[] readByFullStorageName( @Nonnull String fullName )
     {
-        checkNotNull( blobName );
-        return readAllBytes( appIdentityService.getDefaultGcsBucketName(), blobName );
+        checkNotNull( fullName );
+
+        BlobId blobId = fromFullStorageName( fullName );
+        return storage.readAllBytes( blobId );
     }
 
     @Override
-    public byte[] readAllBytes( @Nonnull String bucketName, @Nonnull String blobName )
+    public byte[] read( @Nonnull BlobId blobId )
+    {
+        checkNotNull( blobId );
+        return storage.readAllBytes( blobId );
+    }
+
+    @Override
+    public byte[] read( @Nonnull String blobName )
+    {
+        checkNotNull( blobName );
+        return read( appIdentityService.getDefaultGcsBucketName(), blobName );
+    }
+
+    @Override
+    public byte[] read( @Nonnull String bucketName, @Nonnull String blobName )
     {
         checkNotNull( bucketName, "In order to read blob a bucket name must be provided." );
         checkNotNull( blobName, "In order to read blob a blob name must be provided." );
 
         return storage.readAllBytes( bucketName, blobName );
+    }
+
+    @Override
+    public boolean delete( @Nonnull BlobId blobId )
+    {
+        checkNotNull( blobId );
+        return storage.delete( blobId );
     }
 
     @Override
@@ -107,5 +174,59 @@ public class StorageServiceBean
         BlobId blobId = BlobId.of( bucketName, blobName );
 
         return storage.delete( blobId );
+    }
+
+    @Override
+    public String getSecureServingUrl( @Nonnull String fullName )
+    {
+        checkNotNull( fullName );
+
+        ServingUrlOptions options;
+        options = ServingUrlOptions.Builder.withGoogleStorageFileName( fullName )
+                .crop( false )
+                .secureUrl( true );
+
+        return imagesService.getServingUrl( options );
+    }
+
+    @Override
+    public String getSecureServingUrl( @Nonnull String fullName, int imageSize )
+    {
+        checkNotNull( fullName );
+
+        ServingUrlOptions options;
+        options = ServingUrlOptions.Builder.withGoogleStorageFileName( fullName )
+                .imageSize( imageSize )
+                .crop( false )
+                .secureUrl( true );
+
+        return imagesService.getServingUrl( options );
+    }
+
+    @Override
+    public String getSecureServingUrl( @Nonnull BlobKey blobKey )
+    {
+        checkNotNull( blobKey );
+
+        ServingUrlOptions options;
+        options = ServingUrlOptions.Builder.withBlobKey( blobKey )
+                .crop( false )
+                .secureUrl( true );
+
+        return imagesService.getServingUrl( options );
+    }
+
+    @Override
+    public String getSecureServingUrl( @Nonnull BlobKey blobKey, int imageSize )
+    {
+        checkNotNull( blobKey );
+
+        ServingUrlOptions options;
+        options = ServingUrlOptions.Builder.withBlobKey( blobKey )
+                .imageSize( imageSize )
+                .crop( false )
+                .secureUrl( true );
+
+        return imagesService.getServingUrl( options );
     }
 }

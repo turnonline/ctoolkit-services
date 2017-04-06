@@ -38,10 +38,10 @@ public interface DataUploadListener
     /**
      * Called right after data upload has done.
      *
-     * @param storageName the cloud storage name
-     * @param blobKey     the blobstore key reference of the uploaded file in cloud storage
+     * @param storageName the cloud storage full name in form '/gs/{bucket}/{name}'
+     * @param blobKey     the App Engine blobstore key reference of the uploaded file in cloud storage
      * @param imageSize   the optional image size, -1 if not requested
-     * @param servingUrl  the serving CDN URL in case of the image data, otherwise null
+     * @param servingUrl  the CDN static serving URL in case of the image data, otherwise null
      * @param customName  the optional custom name
      * @param contentType the content type provided in the HTTP header during upload
      * @param filename    the file name included in the HTTP header during upload

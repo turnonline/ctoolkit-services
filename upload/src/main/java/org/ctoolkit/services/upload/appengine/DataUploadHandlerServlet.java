@@ -54,10 +54,10 @@ import java.util.Set;
  * <p/>
  * Successful result returns following JSON:
  * <ul>
- * <li>storageName</li>
- * <li>blobKey</li>
- * <li>servingUrl</li>
- * <li>customName</li>
+ * <li>storageName - full storage path in form '/gs/{bucket}/{name}'</li>
+ * <li>blobKey - App Engine blobstore key</li>
+ * <li>servingUrl - CDN static URL</li>
+ * <li>customName - client defined name by {@link DataUploadHandler#PARAMETER_CUSTOM_NAME}</li>
  * </ul>
  * POST parameters to serve data upload
  * <ul>

@@ -18,7 +18,10 @@
 
 package org.ctoolkit.services.storage;
 
+import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 
 import javax.annotation.Nonnull;
@@ -33,6 +36,23 @@ import javax.annotation.Nonnull;
 public interface StorageService
 {
     /**
+     * Parse and create {@link BlobId} instance as an unique blob document identification within cloud storage.
+     *
+     * @param fullName the cloud storage full name in form '/gs/{bucket}/{name}'
+     * @return the unique blob document identification
+     * @throws IllegalArgumentException if given argument does not follow expected pattern
+     */
+    BlobId fromFullStorageName( @Nonnull String fullName );
+
+    /**
+     * Extract and return full storage name for given blob in form '/gs/{bucket}/{name}'.
+     *
+     * @param blob the cloud storage blob instance
+     * @return the full storage name
+     */
+    String getFullStorageName( @Nonnull Blob blob );
+
+    /**
      * Store data into storage and return cloud storage object.
      * The file name will be generated (UUID) and stored within default bucket container.
      *
@@ -41,6 +61,18 @@ public interface StorageService
      * @return the file record metadata
      */
     Blob store( @Nonnull byte[] data, @Nonnull String contentType );
+
+    /**
+     * Store data into storage under default bucket container and return cloud storage object.
+     *
+     * @param data        the array of bytes of the blob document to be stored
+     * @param contentType the media type of the data representation
+     * @param blobName    the intended name of the blob file in storage
+     * @return the file record metadata
+     */
+    Blob store( @Nonnull byte[] data,
+                @Nonnull String contentType,
+                @Nonnull String blobName );
 
     /**
      * Store data into storage and return cloud storage object.
@@ -57,21 +89,45 @@ public interface StorageService
                 @Nonnull String blobName );
 
     /**
-     * Return the blob document from default bucket container.
+     * Returns the blob document from bucket container.
+     *
+     * @param fullName the full name of the blob stored in the cloud storage in form '/gs/{bucket}/{name}'
+     * @return the array of bytes of the blob
+     */
+    byte[] readByFullStorageName( @Nonnull String fullName );
+
+    /**
+     * Returns the blob document from bucket container.
+     *
+     * @param blobId the unique blob identification to retrieve desired blob
+     * @return the array of bytes of the blob
+     */
+    byte[] read( @Nonnull BlobId blobId );
+
+    /**
+     * Returns the blob document from default bucket container.
      *
      * @param blobName the name of the blob document in storage to get
      * @return the array of bytes of the blob
      */
-    byte[] readAllBytes( @Nonnull String blobName );
+    byte[] read( @Nonnull String blobName );
 
     /**
-     * Return the blob document.
+     * Returns the blob document.
      *
      * @param bucketName the name of the bucket container
      * @param blobName   the name of the blob document in storage to get
      * @return the array of bytes of the blob
      */
-    byte[] readAllBytes( @Nonnull String bucketName, @Nonnull String blobName );
+    byte[] read( @Nonnull String bucketName, @Nonnull String blobName );
+
+    /**
+     * Delete the blob document from bucket container.
+     *
+     * @param blobId the unique blob identification to delete desired blob
+     * @return true if blob document has been deleted, false if not found
+     */
+    boolean delete( @Nonnull BlobId blobId );
 
     /**
      * Delete the blob document from default bucket container.
@@ -89,4 +145,46 @@ public interface StorageService
      * @return true if blob document has been deleted, false if not found
      */
     boolean delete( @Nonnull String bucketName, @Nonnull String blobName );
+
+    /**
+     * Returns the secure (SSL) CDN static serving URL.
+     * The name must represent image otherwise exception will be thrown.
+     *
+     * @param fullName the full name of the image stored in the cloud storage in form '/gs/{bucket}/{name}'
+     * @return the CDN static URL
+     */
+    String getSecureServingUrl( @Nonnull String fullName );
+
+    /**
+     * Returns the secure (SSL) CDN static serving URL for specific image size.
+     * The name must represent image otherwise exception will be thrown.
+     *
+     * @param fullName  the full name of the image stored in the cloud storage in form '/gs/{bucket}/{name}'
+     * @param imageSize the desired image size between 0 and 1600 (including).
+     * @return the CDN static URL
+     */
+    String getSecureServingUrl( @Nonnull String fullName, int imageSize );
+
+    /**
+     * Same as {@link #getSecureServingUrl(BlobKey, int)}  without image size argument.
+     *
+     * @param blobKey the App Engine blobstore key reference of the uploaded file in cloud storage
+     * @return the CDN static URL
+     */
+    String getSecureServingUrl( @Nonnull BlobKey blobKey );
+
+    /**
+     * Returns the secure (SSL) CDN static serving URL for specific image size.
+     * The name must represent image otherwise exception will be thrown.
+     * <p>
+     * If blob key {@link BlobKey} is available, call to retrieve serving URL
+     * {@link com.google.appengine.api.images.ImagesService#getServingUrl(ServingUrlOptions)}
+     * will save one remote call  {@link com.google.appengine.api.blobstore.BlobstoreService#createGsBlobKey(String)}
+     * in order to create that {@link BlobKey} instance.
+     *
+     * @param blobKey   the App Engine blobstore key reference of the uploaded file in cloud storage
+     * @param imageSize the desired image size between 0 and 1600 (including).
+     * @return the CDN static URL
+     */
+    String getSecureServingUrl( @Nonnull BlobKey blobKey, int imageSize );
 }
