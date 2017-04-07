@@ -19,6 +19,7 @@
 package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
+import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.images.ImagesService;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
@@ -27,6 +28,7 @@ import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
+import mockit.Verifications;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -51,25 +53,28 @@ public class StorageServiceBeanTest
     @Injectable
     private ImagesService imagesService;
 
+    @Injectable
+    private BlobstoreService blobstoreService;
+
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void fromFullStorageNameWrongArg() throws Exception
+    public void createBlobIdWrongArg() throws Exception
     {
         String fullName = "/gs/fileName";
-        tested.fromFullStorageName( fullName );
+        tested.createBlobId( fullName );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void fromFullStorageNameWrongPrefix() throws Exception
+    public void createBlobIdWrongPrefix() throws Exception
     {
         String fullName = "/haha/bucketName-12/fileName-23";
-        tested.fromFullStorageName( fullName );
+        tested.createBlobId( fullName );
     }
 
     @Test
-    public void fromFullStorageName() throws Exception
+    public void createBlobId() throws Exception
     {
         String fullName = "/gs/bucketName-12/fileName-23";
-        BlobId blobId = tested.fromFullStorageName( fullName );
+        BlobId blobId = tested.createBlobId( fullName );
 
         assertNotNull( blobId );
         assertEquals( blobId.getBucket(), "bucketName-12" );
@@ -92,5 +97,88 @@ public class StorageServiceBeanTest
 
         String fullStorageName = tested.getFullStorageName( blob );
         assertEquals( fullStorageName, "/gs/bucketName-42/fileName-53" );
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void createBlobKeyWrongPrefix() throws Exception
+    {
+        String fullName = "/haha/bucketName-12/fileName-23";
+        tested.createBlobKey( fullName );
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void createBlobKeyWrongArg() throws Exception
+    {
+        String fullName = "/gs/fileName";
+        tested.createBlobKey( fullName );
+    }
+
+    @Test
+    public void createBlobKey() throws Exception
+    {
+        final String fullName = "/gs/bucketName-12/fileName-23";
+        tested.createBlobKey( fullName );
+
+        new Verifications()
+        {
+            {
+                blobstoreService.createGsBlobKey( fullName );
+            }
+        };
+    }
+
+    @Test
+    public void createBlobKeyFromBlob( @Mocked final Blob blob ) throws Exception
+    {
+        new Expectations()
+        {
+            {
+                blob.getBucket();
+                result = "bucketName-12";
+
+                blob.getName();
+                result = "fileName-23";
+            }
+        };
+
+        tested.createBlobKey( blob );
+
+        new Verifications()
+        {
+            {
+                blobstoreService.createGsBlobKey( "/gs/bucketName-12/fileName-23" );
+            }
+        };
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void readByFullStorageNameWrongArg() throws Exception
+    {
+        String fullName = "/gs/fileName";
+        tested.readByFullStorageName( fullName );
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void readByFullStorageNameWrongPrefix() throws Exception
+    {
+        String fullName = "/haha/bucketName-12/fileName-23";
+        tested.readByFullStorageName( fullName );
+    }
+
+    @Test
+    public void readByFullStorageName() throws Exception
+    {
+        final String fullName = "/gs/bucketName-12/fileName-23";
+        tested.readByFullStorageName( fullName );
+
+        new Verifications()
+        {
+            {
+                BlobId blobId;
+                storage.readAllBytes( blobId = withCapture() );
+                assertEquals( blobId.getBucket(), "bucketName-12" );
+                assertEquals( blobId.getName(), "fileName-23" );
+            }
+        };
     }
 }

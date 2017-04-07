@@ -20,6 +20,7 @@ package org.ctoolkit.services.storage.appengine.blob;
 
 import com.google.appengine.api.appidentity.AppIdentityService;
 import com.google.appengine.api.blobstore.BlobKey;
+import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.cloud.storage.Blob;
@@ -54,16 +55,27 @@ public class StorageServiceBean
 
     private final ImagesService imagesService;
 
+    private final BlobstoreService blobstoreService;
+
     @Inject
-    public StorageServiceBean( Storage storage, AppIdentityService appIdentityService, ImagesService imagesService )
+    public StorageServiceBean( Storage storage,
+                               AppIdentityService appIdentityService,
+                               ImagesService imagesService,
+                               BlobstoreService blobstoreService )
     {
         this.storage = storage;
         this.appIdentityService = appIdentityService;
         this.imagesService = imagesService;
+        this.blobstoreService = blobstoreService;
     }
 
-    @Override
-    public BlobId fromFullStorageName( @Nonnull String fullName )
+    /**
+     * Parse bucket name and file name from the full storage name.
+     *
+     * @param fullName the cloud storage file full name
+     * @return the bucket name and file name
+     */
+    private BucketName parseBucketAndName( @Nonnull String fullName )
     {
         checkNotNull( fullName );
 
@@ -73,7 +85,7 @@ public class StorageServiceBean
             String bucket = split[2];
             String name = split[3];
 
-            return BlobId.of( bucket, name );
+            return new BucketName( bucket, name );
         }
         else
         {
@@ -85,10 +97,37 @@ public class StorageServiceBean
     }
 
     @Override
+    public BlobId createBlobId( @Nonnull String fullName )
+    {
+        checkNotNull( fullName );
+
+        BucketName bn = parseBucketAndName( fullName );
+        String bucket = bn.bucket;
+        String name = bn.name;
+
+        return BlobId.of( bucket, name );
+    }
+
+    @Override
     public String getFullStorageName( @Nonnull Blob blob )
     {
         checkNotNull( blob );
         return MessageFormat.format( STORAGE_NAME_PATTERN, blob.getBucket(), blob.getName() );
+    }
+
+    @Override
+    public BlobKey createBlobKey( @Nonnull String fullName )
+    {
+        // storage full name validation, in case of failure it throws IllegalArgumentException
+        parseBucketAndName( fullName );
+        return blobstoreService.createGsBlobKey( fullName );
+    }
+
+    @Override
+    public BlobKey createBlobKey( @Nonnull Blob blob )
+    {
+        String fullName = this.getFullStorageName( blob );
+        return blobstoreService.createGsBlobKey( fullName );
     }
 
     @Override
@@ -125,7 +164,7 @@ public class StorageServiceBean
     {
         checkNotNull( fullName );
 
-        BlobId blobId = fromFullStorageName( fullName );
+        BlobId blobId = createBlobId( fullName );
         return storage.readAllBytes( blobId );
     }
 
@@ -228,5 +267,18 @@ public class StorageServiceBean
                 .secureUrl( true );
 
         return imagesService.getServingUrl( options );
+    }
+
+    private static class BucketName
+    {
+        String bucket;
+
+        String name;
+
+        BucketName( String bucket, String name )
+        {
+            this.bucket = bucket;
+            this.name = name;
+        }
     }
 }

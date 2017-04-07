@@ -38,11 +38,11 @@ public interface StorageService
     /**
      * Parse and create {@link BlobId} instance as an unique blob document identification within cloud storage.
      *
-     * @param fullName the cloud storage full name in form '/gs/{bucket}/{name}'
+     * @param fullName the cloud storage blob full name in form '/gs/{bucket}/{name}'
      * @return the unique blob document identification
      * @throws IllegalArgumentException if given argument does not follow expected pattern
      */
-    BlobId fromFullStorageName( @Nonnull String fullName );
+    BlobId createBlobId( @Nonnull String fullName );
 
     /**
      * Extract and return full storage name for given blob in form '/gs/{bucket}/{name}'.
@@ -51,6 +51,23 @@ public interface StorageService
      * @return the full storage name
      */
     String getFullStorageName( @Nonnull Blob blob );
+
+    /**
+     * Creates the App Engine blobstore key reference of the file referenced by cloud storage blob full name.
+     *
+     * @param fullName the cloud storage blob full name in form '/gs/{bucket}/{name}'
+     * @return the App Engine blobstore key reference
+     * @throws IllegalArgumentException in case of invalid format of the storage full name
+     */
+    BlobKey createBlobKey( @Nonnull String fullName );
+
+    /**
+     * Creates the App Engine blobstore key reference of the file represented by given blob.
+     *
+     * @param blob the cloud storage blob instance
+     * @return the App Engine blobstore key reference
+     */
+    BlobKey createBlobKey( @Nonnull Blob blob );
 
     /**
      * Store data into storage and return cloud storage object.
@@ -93,6 +110,7 @@ public interface StorageService
      *
      * @param fullName the full name of the blob stored in the cloud storage in form '/gs/{bucket}/{name}'
      * @return the array of bytes of the blob
+     * @throws IllegalArgumentException in case of invalid format of the storage full name
      */
     byte[] readByFullStorageName( @Nonnull String fullName );
 
