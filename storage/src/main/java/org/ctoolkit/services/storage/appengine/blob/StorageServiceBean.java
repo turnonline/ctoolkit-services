@@ -80,7 +80,7 @@ public class StorageServiceBean
         checkNotNull( fullName );
 
         String[] split = fullName.split( "/" );
-        if ( split.length == 4 && "gs".equals( split[1] ) )
+        if ( split.length >= 4 && "gs".equals( split[1] ) )
         {
             String bucket = split[2];
             String name = split[3];
@@ -160,7 +160,7 @@ public class StorageServiceBean
     }
 
     @Override
-    public byte[] readByFullStorageName( @Nonnull String fullName )
+    public byte[] read( @Nonnull String fullName )
     {
         checkNotNull( fullName );
 
@@ -173,13 +173,6 @@ public class StorageServiceBean
     {
         checkNotNull( blobId );
         return storage.readAllBytes( blobId );
-    }
-
-    @Override
-    public byte[] read( @Nonnull String blobName )
-    {
-        checkNotNull( blobName );
-        return read( appIdentityService.getDefaultGcsBucketName(), blobName );
     }
 
     @Override
@@ -199,9 +192,10 @@ public class StorageServiceBean
     }
 
     @Override
-    public boolean delete( @Nonnull String blobName )
+    public boolean delete( @Nonnull String fullName )
     {
-        return delete( appIdentityService.getDefaultGcsBucketName(), blobName );
+        BlobId blobId = createBlobId( fullName );
+        return delete( blobId );
     }
 
     @Override

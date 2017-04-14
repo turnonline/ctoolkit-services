@@ -112,7 +112,7 @@ public interface StorageService
      * @return the array of bytes of the blob
      * @throws IllegalArgumentException in case of invalid format of the storage full name
      */
-    byte[] readByFullStorageName( @Nonnull String fullName );
+    byte[] read( @Nonnull String fullName );
 
     /**
      * Returns the blob document from bucket container.
@@ -121,14 +121,6 @@ public interface StorageService
      * @return the array of bytes of the blob
      */
     byte[] read( @Nonnull BlobId blobId );
-
-    /**
-     * Returns the blob document from default bucket container.
-     *
-     * @param blobName the name of the blob document in storage to get
-     * @return the array of bytes of the blob
-     */
-    byte[] read( @Nonnull String blobName );
 
     /**
      * Returns the blob document.
@@ -150,10 +142,10 @@ public interface StorageService
     /**
      * Delete the blob document from default bucket container.
      *
-     * @param blobName the name of the blob document in storage to delete
+     * @param fullName the full name of the blob in form '/gs/{bucket}/{name}'
      * @return true if blob document has been deleted, false if not found
      */
-    boolean delete( @Nonnull String blobName );
+    boolean delete( @Nonnull String fullName );
 
     /**
      * Delete the blob document.

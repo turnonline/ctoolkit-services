@@ -116,7 +116,7 @@ public class StorageServiceBeanTest
     @Test
     public void createBlobKey() throws Exception
     {
-        final String fullName = "/gs/bucketName-12/fileName-23";
+        final String fullName = "/gs/bucketName-12/file/Name-23";
         tested.createBlobKey( fullName );
 
         new Verifications()
@@ -137,7 +137,7 @@ public class StorageServiceBeanTest
                 result = "bucketName-12";
 
                 blob.getName();
-                result = "fileName-23";
+                result = "file/Name-23/AbV";
             }
         };
 
@@ -146,7 +146,7 @@ public class StorageServiceBeanTest
         new Verifications()
         {
             {
-                blobstoreService.createGsBlobKey( "/gs/bucketName-12/fileName-23" );
+                blobstoreService.createGsBlobKey( "/gs/bucketName-12/file/Name-23/AbV" );
             }
         };
     }
@@ -155,21 +155,21 @@ public class StorageServiceBeanTest
     public void readByFullStorageNameWrongArg() throws Exception
     {
         String fullName = "/gs/fileName";
-        tested.readByFullStorageName( fullName );
+        tested.read( fullName );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
     public void readByFullStorageNameWrongPrefix() throws Exception
     {
         String fullName = "/haha/bucketName-12/fileName-23";
-        tested.readByFullStorageName( fullName );
+        tested.read( fullName );
     }
 
     @Test
     public void readByFullStorageName() throws Exception
     {
         final String fullName = "/gs/bucketName-12/fileName-23";
-        tested.readByFullStorageName( fullName );
+        tested.read( fullName );
 
         new Verifications()
         {
