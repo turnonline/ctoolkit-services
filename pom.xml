@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.services</groupId>
     <artifactId>ctoolkit-services</artifactId>
-    <version>0.8</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>CtoolkiT Services - Parent</name>
     <description>CtoolkiT Services - Parent Project</description>
@@ -38,7 +38,7 @@
         <connection>scm:git:[fetch=]git@github.com:turnonline/ctoolkit-services.git</connection>
         <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-services.git</developerConnection>
         <url>https://github.com/turnonline/ctoolkit-services</url>
-        <tag>ctoolkit-services-0.8</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
