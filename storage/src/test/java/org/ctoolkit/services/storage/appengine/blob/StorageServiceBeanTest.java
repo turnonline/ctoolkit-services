@@ -165,10 +165,17 @@ public class StorageServiceBeanTest
         tested.read( fullName );
     }
 
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void readByFullStorageNameBucketEmpty() throws Exception
+    {
+        String fullName = "/gs//file/Name-23";
+        tested.read( fullName );
+    }
+
     @Test
     public void readByFullStorageName() throws Exception
     {
-        final String fullName = "/gs/bucketName-12/fileName-23";
+        final String fullName = "/gs/bucketName-12/file/Name-2/3.pdf";
         tested.read( fullName );
 
         new Verifications()
@@ -177,7 +184,7 @@ public class StorageServiceBeanTest
                 BlobId blobId;
                 storage.readAllBytes( blobId = withCapture() );
                 assertEquals( blobId.getBucket(), "bucketName-12" );
-                assertEquals( blobId.getName(), "fileName-23" );
+                assertEquals( blobId.getName(), "file/Name-2/3.pdf" );
             }
         };
     }

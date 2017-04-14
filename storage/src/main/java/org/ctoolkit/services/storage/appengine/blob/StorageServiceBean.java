@@ -27,6 +27,8 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import org.ctoolkit.services.storage.StorageService;
 
 import javax.annotation.Nonnull;
@@ -83,7 +85,15 @@ public class StorageServiceBean
         if ( split.length >= 4 && "gs".equals( split[1] ) )
         {
             String bucket = split[2];
-            String name = split[3];
+
+            if ( Strings.isNullOrEmpty( bucket ) )
+            {
+                throw new IllegalArgumentException( "The bucket has no value: '" + fullName + "'" );
+            }
+
+            Joiner joiner = Joiner.on( "/" );
+            String prefix = joiner.join( split[0], split[1], split[2] );
+            String name = fullName.substring( prefix.length() + 1 );
 
             return new BucketName( bucket, name );
         }
