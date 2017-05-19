@@ -157,7 +157,7 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.50</gae.version>
+        <gae.version>1.9.53</gae.version>
         <jmockit.version>1.19</jmockit.version>
         <testng.version>6.9.10</testng.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
