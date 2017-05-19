@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.task;
 
+import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnSave;
@@ -30,7 +31,7 @@ import java.util.TreeSet;
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@com.googlecode.objectify.annotation.Entity
+@Entity
 public class TaskWaitingList
 {
     @Id
@@ -121,7 +122,7 @@ public class TaskWaitingList
      * <code>createdDate</code> will be set up otherwise <code>updatedDate</code> will be updated.
      */
     @OnSave
-    public void prePersist()
+    public void onSave()
     {
         if ( id == null )
         {
@@ -136,11 +137,9 @@ public class TaskWaitingList
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder( "TaskWaitingList{" );
-        sb.append( "id=" ).append( id );
-        sb.append( ", updatedDate=" ).append( updatedDate );
-        sb.append( ", createdDate=" ).append( createdDate );
-        sb.append( '}' );
-        return sb.toString();
+        return "TaskWaitingList{" + "id=" + id +
+                ", updatedDate=" + updatedDate +
+                ", createdDate=" + createdDate +
+                '}';
     }
 }

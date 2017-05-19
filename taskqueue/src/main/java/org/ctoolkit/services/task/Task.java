@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.task;
 
+import javax.annotation.Nonnull;
 import java.io.Serializable;
 
 /**
@@ -158,7 +159,7 @@ public abstract class Task
      * The method takes into account 'order', 'method' and #equals. It evaluates these values in that order.
      */
     @Override
-    public int compareTo( Task task )
+    public int compareTo( @Nonnull Task task )
     {
         int thisOrder = this.order;
         int anotherOrder = task.getOrder();
@@ -191,6 +192,7 @@ public abstract class Task
         Task task = ( Task ) o;
 
         if ( order != task.order ) return false;
+        //noinspection RedundantIfStatement
         if ( !method.equals( task.method ) ) return false;
 
         return true;

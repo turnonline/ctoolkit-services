@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public abstract class CronTaskRegistrar
 {
-    private final Map<String, Class<? extends CronTask>> map = new HashMap<String, Class<? extends CronTask>>();
+    private final Map<String, Class<? extends CronTask>> map = new HashMap<>();
 
     /**
      * Implement to register CronTask Classes.

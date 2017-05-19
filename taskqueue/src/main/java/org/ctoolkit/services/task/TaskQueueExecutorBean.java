@@ -50,7 +50,7 @@ class TaskQueueExecutorBean
 
     private final Injector injector;
 
-    private final Map<String, Class<? extends CronTask>> map = new HashMap<String, Class<? extends CronTask>>();
+    private final Map<String, Class<? extends CronTask>> map = new HashMap<>();
 
     private ModulesService modulesService = ModulesServiceFactory.getModulesService();
 
@@ -128,7 +128,7 @@ class TaskQueueExecutorBean
 
         if ( parameters == null )
         {
-            parameters = new HashMap<String, String>();
+            parameters = new HashMap<>();
         }
 
         if ( clazz == null )
