@@ -49,14 +49,4 @@ public interface TaskExecutorService
     void execute( String cronUri );
 
     void execute( String cronUri, Map<String, String> parameters );
-
-    /**
-     * Returns <code>true</code> if at least one of the specified task is executing or is waiting for execution - operator 'OR',
-     * <code>false</code> otherwise
-     *
-     * @param tasks {@link Task} to check for execution
-     * @return <code>true</code> if tasks are executing, <code>false</code> otherwise
-     */
-    boolean isExecuting( Task[] tasks );
-
 }

@@ -19,7 +19,6 @@
 package org.ctoolkit.services.task;
 
 import com.google.guiceberry.junit4.GuiceBerryRule;
-import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -318,28 +317,5 @@ public class TaskQueueExecutorBeanTest
         task.setOwnerId( 1254L );
         executor.execute( task );
 
-    }
-
-    @Test
-    public void testIsExecuting() throws Exception
-    {
-        // test isExecuting = false
-        Assert.assertFalse( executor.isExecuting( new Task[]{} ) );
-        Assert.assertFalse( executor.isExecuting( new Task[]{new FakeTask( "proc", 19 )} ) );
-
-        FakeTask task = new FakeTask( "proc", 19 );
-        task.setOwnerId( 1L );
-        Assert.assertFalse( executor.isExecuting( new Task[]{task} ) );
-
-        // test isExecuting = true
-        task = new FakeTask( "process", 19 );
-        task.setOwnerId( 1L );
-        executor.execute( task );
-        Assert.assertTrue( executor.isExecuting( new Task[]{task} ) );
-
-        task = new FakeTask( "process", -1 );
-        task.setOwnerId( 1L );
-        executor.execute( task );
-        Assert.assertTrue( executor.isExecuting( new Task[]{task} ) );
     }
 }

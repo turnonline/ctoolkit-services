@@ -34,8 +34,6 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.googlecode.objectify.ObjectifyService.ofy;
-
 
 /**
  * GAE Task Queue implementation of {@link Executor}
@@ -78,36 +76,8 @@ class TaskQueueExecutorBean
     @Override
     public final void execute( Task task, Arrangement arrangement )
     {
-        logger.info( "Input Task: " + task );
-
-        TaskWaitingList tasks = ofy().load().type( TaskWaitingList.class ).id( task.getOwnerId() ).now();
-
-        if ( tasks == null )
-        {
-            tasks = new TaskWaitingList( task );
-        }
-        else
-        {
-            tasks.add( task );
-        }
-
-        if ( task.getOrder() == -1 )
-        {
-            // if order == -1 -> no priority thus may be enqueued immediately
-            logger.info( "Task to execute: " + task );
-            addPayload( task );
-            tasks.queued( task );
-        }
-        else if ( arrangement.done( tasks.getTasks() ) )
-        {
-            logger.info( "Tasks to execute: " + tasks.getTasks() );
-            for ( Task t : tasks.getTasks() )
-            {
-                addPayload( t );
-            }
-            tasks.queued();
-        }
-        ofy().save().entity( tasks ).now();
+        addPayload( task );
+        logger.info( "Task to execute: " + task );
     }
 
     public void register( CronTaskRegistrar registrar )
@@ -156,34 +126,6 @@ class TaskQueueExecutorBean
         addPayload( task );
     }
 
-    @Override
-    public boolean isExecuting( Task[] tasks )
-    {
-        for ( Task taskToCheck : tasks )
-        {
-            if ( taskToCheck.getOwnerId() == null )
-            { // no owner specified, continue to next one
-                continue;
-            }
-
-            TaskWaitingList waitingList = ofy().load().type( TaskWaitingList.class ).id( taskToCheck.getOwnerId() ).now();
-            if ( waitingList == null )
-            { // no waiting list for task, continue to next one
-                continue;
-            }
-
-            for ( Task taskInList : waitingList.getQueue() )
-            {
-                if ( taskInList.equals( taskToCheck ) )
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     private void addPayload( Task task )
     {
         Queue queue = getQueue( task );
@@ -201,7 +143,7 @@ class TaskQueueExecutorBean
         logger.info( "Enqueued in queue: " + task.getQueueName() + ",  module: " + module + ", version: " + version
                 + ", Module hostname: " + hostname );
 
-        queue.add( options.payload( new TaskWrapper( task, new TaskFinalizer() ) ) );
+        queue.add( options.payload( task ) );
     }
 
     private void addPayload( CronTask task )

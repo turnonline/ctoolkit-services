@@ -18,8 +18,9 @@
 
 package org.ctoolkit.services.task;
 
+import com.google.appengine.api.taskqueue.DeferredTask;
+
 import javax.annotation.Nonnull;
-import java.io.Serializable;
 
 /**
  * A job standalone definition to be executed asynchronously. Task represents a small, discrete unit of work to be
@@ -28,7 +29,7 @@ import java.io.Serializable;
  * Vocabulary:
  * <lo>
  * <li>Owner Id: ID of the owner in favor of whom will be a task executed.</li>
- * <li>Method: a name (usual verb) for the job.</li>
+ * <li>Method: a name of the job.</li>
  * <li>Order: a number that represents the execution order. 0 means the first (highest priority).</li>
  * <li>Queue name: is a queue defined by the execution environment where task will be placed in.</li>
  * </lo>
@@ -44,7 +45,7 @@ import java.io.Serializable;
  * @see TaskExecutorService
  */
 public abstract class Task
-        implements Comparable<Task>, Runnable, Serializable
+        implements Comparable<Task>, DeferredTask
 {
     private Long ownerId;
 

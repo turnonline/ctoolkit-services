@@ -21,7 +21,6 @@ package org.ctoolkit.services.task;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
-import com.googlecode.objectify.ObjectifyService;
 
 import javax.inject.Singleton;
 import java.util.Set;
@@ -39,8 +38,6 @@ public class TaskModule
     {
         // bind cron task
         Multibinder.newSetBinder( binder(), CronTaskRegistrar.class );
-        requestStaticInjection( TaskFinalizer.class );
-        ObjectifyService.register( TaskWaitingList.class );
     }
 
     @Provides
