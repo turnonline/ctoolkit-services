@@ -33,7 +33,7 @@
     <packaging>pom</packaging>
     <name>CtoolkiT Services - Google App Engine</name>
     <description>
-        Cloud Toolkit Services, backend libraries to support microservices on Google App Engine standard.
+        Cloud Toolkit Services, backend libraries for microservices deployed on the Google App Engine standard.
     </description>
     <url>https://github.com/turnonline/ctoolkit-services</url>
 
@@ -96,12 +96,12 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>ctoolkit-rest-facade-api</artifactId>
-                <version>0.15</version>
+                <version>0.19</version>
             </dependency>
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>ctoolkit-rest-facade-appengine</artifactId>
-                <version>0.22</version>
+                <version>0.24</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.jdo</groupId>
@@ -116,7 +116,7 @@
             <dependency>
                 <groupId>org.ctoolkit.restapi</groupId>
                 <artifactId>ctoolkit-client-identity-toolkit</artifactId>
-                <version>0.22</version>
+                <version>0.24</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
@@ -159,7 +159,7 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.53</gae.version>
+        <gae.version>1.9.56</gae.version>
         <jmockit.version>1.19</jmockit.version>
         <testng.version>6.9.10</testng.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
