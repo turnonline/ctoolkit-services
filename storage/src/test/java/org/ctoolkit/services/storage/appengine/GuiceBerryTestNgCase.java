@@ -33,6 +33,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import javax.inject.Singleton;
+import java.io.Closeable;
 import java.lang.reflect.Method;
 
 /**
@@ -46,6 +47,8 @@ public class GuiceBerryTestNgCase
 {
     private TearDown toTearDown;
 
+    private Closeable session;
+
     public GuiceBerryTestNgCase()
     {
         construct( new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig() ) );
@@ -56,6 +59,7 @@ public class GuiceBerryTestNgCase
     {
         // Make this the call to TestNgGuiceBerry.setUp as early as possible
         toTearDown = TestNgGuiceBerry.setUp( this, m, GuiceBerryTestNgCase.class );
+        session = ObjectifyService.begin();
         ObjectifyService.register( FakeEntity.class );
     }
 
@@ -64,6 +68,7 @@ public class GuiceBerryTestNgCase
     {
         // Make this the call to TestNgGuiceBerry.tearDown as late as possible
         toTearDown.tearDown();
+        session.close();
     }
 
     @Override

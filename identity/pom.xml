@@ -38,12 +38,12 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ctoolkit.restapi</groupId>
-            <artifactId>ctoolkit-rest-facade-api</artifactId>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.ctoolkit.restapi</groupId>
-            <artifactId>ctoolkit-client-identity-toolkit</artifactId>
+            <groupId>com.google.firebase</groupId>
+            <artifactId>firebase-admin</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>

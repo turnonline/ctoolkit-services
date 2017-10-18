@@ -19,10 +19,11 @@
 package org.ctoolkit.services.identity;
 
 import com.google.common.base.Strings;
-import org.ctoolkit.restapi.client.identity.Identity;
+import com.google.firebase.auth.FirebaseToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
@@ -38,21 +39,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * The application's session filter to manage authenticated identity toolkit user instance.
- * If there is an instance that's not presented in the session (filter config value value of the
+ * The application's session filter to manage authenticated session.
+ * If there is an valid token and unauthenticated session (filter config value value of the
  * {@link #SESSION_AUTH_USER_ATTRIBUTE}) filter will call
- * {@link IdentityLoginListener#processIdentity(HttpServletRequest, HttpServletResponse, Identity, String)}
- * to manage its presence (client's implementation responsibility).
- * If session has a non null user instance presented but no current authenticated identity user instance,
- * session will be invalidated.
+ * {@link IdentityLoginListener#processIdentity(HttpServletRequest, HttpServletResponse, FirebaseToken, String)}
+ * to make it authenticated (client's implementation responsibility).
+ * Once session become authenticated, token cookie will be removed.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
-public class IdentityToolkitCheckSessionFilter
+@ThreadSafe
+public class IdentityCheckSessionFilter
         implements Filter
 {
-    private static final Logger logger = LoggerFactory.getLogger( IdentityToolkitCheckSessionFilter.class );
+    private static final Logger logger = LoggerFactory.getLogger( IdentityCheckSessionFilter.class );
 
     /**
      * The filter config attribute to configure key where authenticated identity user will be placed in session
@@ -96,7 +97,7 @@ public class IdentityToolkitCheckSessionFilter
     private Set<String> ignorePaths = new HashSet<>();
 
     @Inject
-    public IdentityToolkitCheckSessionFilter( IdentityHandler identityHandler, Set<IdentityLoginListener> listeners )
+    public IdentityCheckSessionFilter( IdentityHandler identityHandler, Set<IdentityLoginListener> listeners )
     {
         this.identityHandler = identityHandler;
         this.listeners = listeners;
@@ -147,36 +148,31 @@ public class IdentityToolkitCheckSessionFilter
             return;
         }
 
-        Identity identity = identityHandler.resolve( httpRequest );
-        String signedEmail = identity != null ? identity.getEmail() : null;
-
-        if ( signedEmail != null )
+        if ( httpRequest.getSession().getAttribute( sessionAttribute ) == null )
         {
-            // the user is logged in google but not in application yet
-            if ( httpRequest.getSession().getAttribute( sessionAttribute ) == null )
+            FirebaseToken identity = identityHandler.resolveVerifyToken( httpRequest );
+            String signedEmail = identity != null ? identity.getEmail() : null;
+
+            if ( signedEmail != null )
             {
+                // the user is logged in but authenticated session has not been created yet
                 for ( IdentityLoginListener listener : listeners )
                 {
                     listener.processIdentity( httpRequest, httpResponse, identity, sessionAttribute );
                 }
-            }
-            else
-            {
-                if ( !Strings.isNullOrEmpty( loggedInRedirect ) &&
-                        ( httpRequest.getRequestURI().startsWith( signUpPath )
-                                || httpRequest.getRequestURI().startsWith( loginPath ) ) )
-                {
-                    // if user is being logged in redirect him for these pages to my account
-                    httpResponse.sendRedirect( loggedInRedirect );
-                }
+
+                // identity cookie is not needed now
+                identityHandler.delete( httpRequest, httpResponse );
             }
         }
         else
         {
-            // user is logged out in google but not in application -> invalidate session
-            if ( httpRequest.getSession().getAttribute( sessionAttribute ) != null )
+            if ( !Strings.isNullOrEmpty( loggedInRedirect ) &&
+                    ( httpRequest.getRequestURI().startsWith( signUpPath )
+                            || httpRequest.getRequestURI().startsWith( loginPath ) ) )
             {
-                httpRequest.getSession().invalidate();
+                // if user is logged in redirect him for these pages
+                httpResponse.sendRedirect( loggedInRedirect );
             }
         }
 

@@ -18,7 +18,7 @@
 
 package org.ctoolkit.services.identity;
 
-import org.ctoolkit.restapi.client.identity.Identity;
+import com.google.firebase.auth.FirebaseToken;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -38,12 +38,12 @@ public interface IdentityLoginListener
      *
      * @param request   the current HTTP request
      * @param response  the current HTTP response
-     * @param identity  the identity instance of the logged in user
+     * @param identity  the Firebase token of the logged in user
      * @param attribute the session attribute where parent filter will check authenticated user presence
      * @throws IOException
      */
     void processIdentity( @Nonnull HttpServletRequest request,
                           @Nonnull HttpServletResponse response,
-                          @Nonnull Identity identity,
+                          @Nonnull FirebaseToken identity,
                           @Nonnull String attribute ) throws IOException;
 }

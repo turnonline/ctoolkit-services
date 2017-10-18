@@ -19,21 +19,22 @@
 package org.ctoolkit.services.identity;
 
 import com.google.common.base.Strings;
-import org.ctoolkit.restapi.client.TokenVerifier;
-import org.ctoolkit.restapi.client.identity.Identity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A handler class to wrap identity verification in to a standalone class and provide convenient methods.
+ * Google Firebase token verification wrapper with convenient methods.
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
@@ -41,58 +42,59 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class IdentityHandler
 {
     /**
-     * Default cookie name of the identity toolkit token
+     * Default cookie name of the Firebase token.
      */
-    public static final String GTOKEN = "gtoken";
+    public static final String FTOKEN = "ftoken";
 
-    private final TokenVerifier<Identity> tokenVerifier;
+    private static final Logger logger = LoggerFactory.getLogger( IdentityHandler.class );
 
-    @Inject
-    public IdentityHandler( TokenVerifier<Identity> tokenVerifier )
+    public IdentityHandler()
     {
-
-        this.tokenVerifier = tokenVerifier;
     }
 
     /**
-     * Verifies identity token taken from the request against public certs.
+     * Verifies firebase token taken from the request.
      * Once verification is successful returns populated identity instance.
      * If verification fails or token has expired returns <code>null</code>.
      *
      * @param request the HTTP request
-     * @return the successfully verified identity instance or null
+     * @return the successfully verified firebase token instance or null
      */
-    public Identity resolve( @Nonnull HttpServletRequest request )
+    public FirebaseToken resolveVerifyToken( @Nonnull HttpServletRequest request )
     {
         checkNotNull( request );
 
         String token = getToken( request );
+        FirebaseToken decodedToken = null;
 
         if ( !Strings.isNullOrEmpty( token ) )
         {
-            Identity json = tokenVerifier.verifyAndGet( token );
-
-            if ( json.getExpiration().after( new Date() ) )
+            try
             {
-                return json;
+                decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync( token ).get();
+            }
+            catch ( InterruptedException | ExecutionException e )
+            {
+                decodedToken = null;
+                logger.error( "Token verifycation has failed.", e );
             }
         }
 
-        return null;
+        return decodedToken;
     }
 
     /**
-     * Returns the identity token from the request. Searched either in headers (first) or cookies.
+     * Returns the firebase token from the request. Searched either in headers (first) or cookies.
      * If not found returns <code>null</code>.
      *
      * @param request the HTTP request
-     * @return the identity token
+     * @return the firebase token
      */
     public final String getToken( @Nonnull HttpServletRequest request )
     {
         checkNotNull( request );
 
-        String token = request.getHeader( GTOKEN );
+        String token = request.getHeader( FTOKEN );
         if ( !Strings.isNullOrEmpty( token ) )
         {
             return token;
@@ -108,7 +110,7 @@ public final class IdentityHandler
 
         for ( Cookie cookie : cookies )
         {
-            if ( GTOKEN.equals( cookie.getName() ) )
+            if ( FTOKEN.equals( cookie.getName() ) )
             {
                 token = cookie.getValue();
             }
@@ -117,7 +119,7 @@ public final class IdentityHandler
     }
 
     /**
-     * Delete identity toolkit token cookie.
+     * Delete firebase token cookie.
      *
      * @param request  the HTTP servlet request
      * @param response the HTTP servlet response
@@ -136,7 +138,7 @@ public final class IdentityHandler
 
         for ( Cookie cookie : cookies )
         {
-            if ( GTOKEN.equals( cookie.getName() ) )
+            if ( FTOKEN.equals( cookie.getName() ) )
             {
                 //the zero value causes the cookie to be deleted
                 cookie.setMaxAge( 0 );

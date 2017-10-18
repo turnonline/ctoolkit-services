@@ -18,12 +18,12 @@
 
 package org.ctoolkit.services.identity;
 
+import com.google.firebase.auth.FirebaseToken;
 import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
-import org.ctoolkit.restapi.client.identity.Identity;
 import org.testng.annotations.Test;
 
 import javax.servlet.FilterChain;
@@ -34,24 +34,24 @@ import javax.servlet.http.HttpSession;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.IGNORE_PATHS;
-import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.LOGIN_PATH;
-import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.REDIRECT_PATH;
-import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.SESSION_AUTH_USER_ATTRIBUTE;
-import static org.ctoolkit.services.identity.IdentityToolkitCheckSessionFilter.SIGN_UP_PATH;
+import static org.ctoolkit.services.identity.IdentityCheckSessionFilter.IGNORE_PATHS;
+import static org.ctoolkit.services.identity.IdentityCheckSessionFilter.LOGIN_PATH;
+import static org.ctoolkit.services.identity.IdentityCheckSessionFilter.REDIRECT_PATH;
+import static org.ctoolkit.services.identity.IdentityCheckSessionFilter.SESSION_AUTH_USER_ATTRIBUTE;
+import static org.ctoolkit.services.identity.IdentityCheckSessionFilter.SIGN_UP_PATH;
 
 
 /**
- * Testing of {@link IdentityToolkitCheckSessionFilter}.
+ * Testing of {@link IdentityCheckSessionFilter}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class IdentityToolkitCheckSessionFilterTest
+public class IdentityCheckSessionFilterTest
 {
     private final static String SESSION_ATTR_VALUE = "session_attribute_value";
 
     @Tested
-    private IdentityToolkitCheckSessionFilter tested;
+    private IdentityCheckSessionFilter tested;
 
     @Injectable
     private IdentityHandler identityHandler;
@@ -97,7 +97,7 @@ public class IdentityToolkitCheckSessionFilterTest
         new Verifications()
         {
             {
-                identityHandler.resolve( ( HttpServletRequest ) any );
+                identityHandler.resolveVerifyToken( ( HttpServletRequest ) any );
                 times = 0;
 
                 chain.doFilter( request, response );
@@ -111,7 +111,7 @@ public class IdentityToolkitCheckSessionFilterTest
                                  final @Mocked HttpSession session,
                                  final @Mocked FilterChain chain,
                                  final @Mocked FilterConfig config,
-                                 final @Mocked Identity identity,
+                                 final @Mocked FirebaseToken token,
                                  final @Mocked IdentityLoginListener listener ) throws Exception
     {
         listeners.add( listener );
@@ -121,10 +121,10 @@ public class IdentityToolkitCheckSessionFilterTest
         new Expectations()
         {
             {
-                identityHandler.resolve( ( HttpServletRequest ) any );
-                result = identity;
+                identityHandler.resolveVerifyToken( ( HttpServletRequest ) any );
+                result = token;
 
-                identity.getEmail();
+                token.getEmail();
                 result = "identity.test@ctoolkit.org";
 
                 session.getAttribute( SESSION_ATTR_VALUE );
@@ -138,13 +138,15 @@ public class IdentityToolkitCheckSessionFilterTest
         new Verifications()
         {
             {
-                listener.processIdentity( request, response, identity, SESSION_ATTR_VALUE );
+                listener.processIdentity( request, response, token, SESSION_ATTR_VALUE );
 
                 response.sendRedirect( anyString );
                 times = 0;
 
                 session.invalidate();
                 times = 0;
+
+                identityHandler.delete( request, response );
 
                 chain.doFilter( request, response );
             }
@@ -157,7 +159,6 @@ public class IdentityToolkitCheckSessionFilterTest
                               final @Mocked HttpSession session,
                               final @Mocked FilterChain chain,
                               final @Mocked FilterConfig config,
-                              final @Mocked Identity identity,
                               final @Mocked IdentityLoginListener listener ) throws Exception
     {
         listeners.add( listener );
@@ -167,12 +168,6 @@ public class IdentityToolkitCheckSessionFilterTest
         new Expectations()
         {
             {
-                identityHandler.resolve( ( HttpServletRequest ) any );
-                result = identity;
-
-                identity.getEmail();
-                result = "identity.test@ctoolkit.org";
-
                 session.getAttribute( SESSION_ATTR_VALUE );
                 result = "non null value";
 
@@ -188,52 +183,13 @@ public class IdentityToolkitCheckSessionFilterTest
         {
             {
                 listener.processIdentity( ( HttpServletRequest ) any, ( HttpServletResponse ) any,
-                        ( Identity ) any, anyString );
+                        ( FirebaseToken ) any, anyString );
                 times = 0;
 
                 session.invalidate();
                 times = 0;
 
                 response.sendRedirect( FilterConfigExpectations.REDIRECT_VALUE );
-                chain.doFilter( request, response );
-            }
-        };
-    }
-
-    @Test
-    public void invalidateSession( final @Mocked HttpServletRequest request,
-                                   final @Mocked HttpServletResponse response,
-                                   final @Mocked HttpSession session,
-                                   final @Mocked FilterChain chain,
-                                   final @Mocked FilterConfig config,
-                                   final @Mocked IdentityLoginListener listener ) throws Exception
-    {
-        listeners.add( listener );
-
-        new FilterConfigExpectations( config );
-
-        new Expectations()
-        {
-            {
-                session.getAttribute( SESSION_ATTR_VALUE );
-                result = "non null value";
-            }
-        };
-
-        tested.init( config );
-        tested.doFilter( request, response, chain );
-
-        new Verifications()
-        {
-            {
-                listener.processIdentity( ( HttpServletRequest ) any, ( HttpServletResponse ) any,
-                        ( Identity ) any, anyString );
-                times = 0;
-
-                response.sendRedirect( FilterConfigExpectations.REDIRECT_VALUE );
-                times = 0;
-
-                session.invalidate();
                 chain.doFilter( request, response );
             }
         };

@@ -23,7 +23,7 @@ import com.google.inject.servlet.ServletModule;
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class TaskServletModule
+public class CtoolkitServicesTaskServletModule
         extends ServletModule
 {
     @Override

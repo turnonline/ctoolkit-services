@@ -66,7 +66,7 @@ public class ServiceEnvironment
     @Override
     public void configureTestBinder()
     {
-        install( new TaskModule() );
-        install( new TaskServletModule() );
+        install( new CtoolkitServicesTaskModule() );
+        install( new CtoolkitServicesTaskServletModule() );
     }
 }

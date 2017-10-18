@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class TaskModule
+public class CtoolkitServicesTaskModule
         extends AbstractModule
 {
     private TaskQueueExecutorBean executorBean;

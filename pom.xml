@@ -76,7 +76,7 @@
             <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
                 <artifactId>ctoolkit-library-bom</artifactId>
-                <version>4</version>
+                <version>6-20171018.175839-1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -92,31 +92,10 @@
                 <version>${gae.version}</version>
                 <scope>provided</scope>
             </dependency>
-            <!-- CToolkiT dependencies -->
             <dependency>
-                <groupId>org.ctoolkit.restapi</groupId>
-                <artifactId>ctoolkit-rest-facade-api</artifactId>
-                <version>0.19</version>
-            </dependency>
-            <dependency>
-                <groupId>org.ctoolkit.restapi</groupId>
-                <artifactId>ctoolkit-rest-facade-appengine</artifactId>
-                <version>0.24</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.jdo</groupId>
-                        <artifactId>jdo2-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.http-client</groupId>
-                        <artifactId>google-http-client-jdo</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.ctoolkit.restapi</groupId>
-                <artifactId>ctoolkit-client-identity-toolkit</artifactId>
-                <version>0.24</version>
+                <groupId>com.google.firebase</groupId>
+                <artifactId>firebase-admin</artifactId>
+                <version>5.4.0</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
