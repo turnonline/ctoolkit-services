@@ -63,6 +63,7 @@
 
     <modules>
         <module>guice</module>
+        <module>endpoints</module>
         <module>common</module>
         <module>taskqueue</module>
         <module>identity</module>
@@ -96,6 +97,27 @@
                 <groupId>com.google.firebase</groupId>
                 <artifactId>firebase-admin</artifactId>
                 <version>5.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.endpoints</groupId>
+                <artifactId>endpoints-framework</artifactId>
+                <version>2.0.8</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-nop</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.google.endpoints</groupId>
+                <artifactId>endpoints-framework-guice</artifactId>
+                <version>2.0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.endpoints</groupId>
+                <artifactId>endpoints-management-control-appengine-all</artifactId>
+                <version>1.0.5</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
@@ -131,7 +153,7 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>${testng.version}</version>
+                <version>6.9.10</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
@@ -140,7 +162,6 @@
     <properties>
         <gae.version>1.9.56</gae.version>
         <jmockit.version>1.19</jmockit.version>
-        <testng.version>6.9.10</testng.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar

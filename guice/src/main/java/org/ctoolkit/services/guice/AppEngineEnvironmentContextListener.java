@@ -38,16 +38,19 @@ public abstract class AppEngineEnvironmentContextListener
     {
         if ( SystemProperty.environment.value() == SystemProperty.Environment.Value.Production )
         {
+            // The app is running on App Engine...
             return getProductionInjector();
         }
         else
         {
+            // The app is running on local development SDK...
             return getDevelopmentInjector();
         }
     }
 
     /**
      * Initializes dedicated {@link Injector} intended for development use.
+     * Override this method to create injector running on local App Engine SDK.
      *
      * @return the guice injector
      */
@@ -55,6 +58,7 @@ public abstract class AppEngineEnvironmentContextListener
 
     /**
      * Initializes dedicated {@link Injector} intended for production use.
+     * Override this method to create injector aimed to be used on Google Cloud - App Engine.
      *
      * @return the guice injector
      */

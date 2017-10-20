@@ -76,7 +76,7 @@ public final class IdentityHandler
             catch ( InterruptedException | ExecutionException e )
             {
                 decodedToken = null;
-                logger.error( "Token verifycation has failed.", e );
+                logger.error( "Token verification has failed.", e );
             }
         }
 
