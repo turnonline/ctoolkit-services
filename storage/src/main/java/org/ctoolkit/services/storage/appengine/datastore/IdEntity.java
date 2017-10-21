@@ -20,18 +20,63 @@ package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Id;
 import org.ctoolkit.services.storage.EntityIdentity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * The objectified id entity (not GWT compatible). The @Id as 'id', type of <code>Long</code>. If 'id' is not set
+ * The objectified id entity. The @Id as 'id', type of <code>Long</code>. If 'id' is not set
  * (null value), will be set automatically by datastore engine.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public abstract class IdEntity<P extends EntityIdentity>
-        extends GwtIdEntity<P>
+        extends BaseEntity<P>
 {
     private static final long serialVersionUID = 1L;
+
+    @Id
+    protected Long id;
+
+    /**
+     * Constructs a new instance.
+     */
+    public IdEntity()
+    {
+    }
+
+    /**
+     * Constructs a new instance with given ID as instance identification.
+     *
+     * @param id the entity ID to be set
+     */
+    public IdEntity( Long id )
+    {
+        this.id = checkNotNull( id );
+    }
+
+    @Override
+    public String getName()
+    {
+        return null;
+    }
+
+    @Override
+    public Long getId()
+    {
+        return id;
+    }
+
+    /**
+     * Manually sets the ID of this entity instance.
+     *
+     * @param id the instance ID to be set
+     */
+    protected void setId( Long id )
+    {
+        this.id = id;
+    }
 
     /**
      * Returns the unique string identification unique across all entities.
@@ -40,7 +85,7 @@ public abstract class IdEntity<P extends EntityIdentity>
      */
     public String getKey()
     {
-        if ( super.id == null )
+        if ( this.id == null )
         {
             return null;
         }
@@ -56,7 +101,7 @@ public abstract class IdEntity<P extends EntityIdentity>
     @SuppressWarnings( "unchecked" )
     <T extends IdEntity> Ref<T> ref()
     {
-        if ( super.id == null )
+        if ( this.id == null )
         {
             return null;
         }
@@ -68,5 +113,28 @@ public abstract class IdEntity<P extends EntityIdentity>
     public String getKind()
     {
         return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Override if needed.
+     */
+    @Override
+    public P getParent()
+    {
+        return null;
+    }
+
+    /**
+     * Override if needed.
+     */
+    @Override
+    public void setParent( P parent )
+    {
+    }
+
+    @Override
+    public String toString()
+    {
+        return "{id=" + id + "} " + super.toString();
     }
 }

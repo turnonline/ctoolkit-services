@@ -24,6 +24,8 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Id;
 import org.ctoolkit.services.storage.EntityIdentity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * The objectified name entity (not GWT compatible). The @Id as 'name', type of <code>String</code>.
  * The 'name' must be set manually, it's application responsibility to make it unique.
@@ -53,7 +55,7 @@ public abstract class NameEntity<P extends EntityIdentity>
      */
     public NameEntity( String name )
     {
-        this.name = name;
+        this.name = checkNotNull( name );
     }
 
     @Override
@@ -93,6 +95,23 @@ public abstract class NameEntity<P extends EntityIdentity>
     public String getKind()
     {
         return this.getClass().getSimpleName();
+    }
+
+    /**
+     * Override if needed.
+     */
+    @Override
+    public P getParent()
+    {
+        return null;
+    }
+
+    /**
+     * Override if needed.
+     */
+    @Override
+    public void setParent( P parent )
+    {
     }
 
     /**
