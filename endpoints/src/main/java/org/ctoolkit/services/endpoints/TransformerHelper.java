@@ -32,7 +32,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-class TransformerHelper
+public class TransformerHelper
 {
     /**
      * Converts to <code>Boolean</code> value if presented.
@@ -41,7 +41,7 @@ class TransformerHelper
      * @param key the JSON property as a key
      * @return the optional <code>Boolean</code> value
      */
-    static Optional<Boolean> toBoolean( Map<String, Object> map, String key )
+    public static Optional<Boolean> toBoolean( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( Boolean ) map.get( key ) );
@@ -54,7 +54,7 @@ class TransformerHelper
      * @param key the JSON property as a key
      * @return the optional <code>String</code> value
      */
-    static Optional<String> getString( Map<String, Object> map, String key )
+    public static Optional<String> getString( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( String ) map.get( key ) );
@@ -67,7 +67,7 @@ class TransformerHelper
      * @param key the JSON property as a key
      * @return the optional <code>Integer</code> value
      */
-    static Optional<Integer> toInteger( Map<String, Object> map, String key )
+    public static Optional<Integer> toInteger( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( Integer ) map.get( key ) );
@@ -80,7 +80,7 @@ class TransformerHelper
      * @param key the JSON property as a key
      * @return the optional <code>Long</code> value
      */
-    static Optional<Long> toLong( Map<String, Object> map, String key )
+    public static Optional<Long> toLong( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( Long ) map.get( key ) );
@@ -93,7 +93,7 @@ class TransformerHelper
      * @param key the JSON property as a key
      * @return the optional <code>Double</code> value
      */
-    static Optional<Double> toDouble( Map<String, Object> map, String key )
+    public static Optional<Double> toDouble( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( Double ) map.get( key ) );
@@ -106,7 +106,7 @@ class TransformerHelper
      * @param key the JSON property as a key
      * @return the optional <code>Date</code> value
      */
-    static Optional<Date> toDate( Map<String, Object> map, String key )
+    public static Optional<Date> toDate( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( Date ) map.get( key ) );
@@ -120,7 +120,7 @@ class TransformerHelper
      * @return the optional <code>Map<String, String></code> map
      */
     @SuppressWarnings( "unchecked" )
-    static Optional<Map<String, String>> toMap( Map<String, Object> map, String key )
+    public static Optional<Map<String, String>> toMap( Map<String, Object> map, String key )
     {
         checkNotNull( key );
         return Optional.fromNullable( ( Map<String, String> ) map.get( key ) );
@@ -133,7 +133,7 @@ class TransformerHelper
      * @param key   the JSON property as a key
      * @param value the JSON property value
      */
-    static void put( Map<String, Object> map, String key, Object value )
+    public static void put( Map<String, Object> map, String key, Object value )
     {
         checkNotNull( map );
         checkNotNull( key );
@@ -153,7 +153,7 @@ class TransformerHelper
      * }
      * </pre>
      */
-    static <K, V> TypeToken<Map<K, V>> mapOf( TypeToken<K> keyToken, TypeToken<V> valueToken )
+    public static <K, V> TypeToken<Map<K, V>> mapOf( TypeToken<K> keyToken, TypeToken<V> valueToken )
     {
         return new TypeToken<Map<K, V>>()
         {
