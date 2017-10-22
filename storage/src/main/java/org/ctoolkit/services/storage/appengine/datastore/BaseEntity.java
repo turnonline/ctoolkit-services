@@ -30,7 +30,7 @@ import java.util.Date;
  * The entity with common properties to all its children:
  * <ul>
  * <li><b>createdDate</b> - the date of entity creation, set only once</li>
- * <li><b>updatedDate</b> - the date of entity update</li>
+ * <li><b>modificationDate</b> - the date of the last modification of the entity values</li>
  * <li><b>version</b> - </li>
  * <li><b>dbModelVersion</b> - the model update time in milliseconds, the date when the model has been first time used
  * in the code. The value is being hardcoded, evaluated by developer.</li>
@@ -49,7 +49,7 @@ public abstract class BaseEntity<P extends EntityIdentity>
     private Date createdDate;
 
     @Index
-    private Date updatedDate;
+    private Date modificationDate;
 
     /**
      * The model version persisted in datastore as a time stamp.
@@ -79,13 +79,13 @@ public abstract class BaseEntity<P extends EntityIdentity>
     }
 
     /**
-     * Returns the date of entity update.
+     * Returns the date of the last modification of the entity values.
      *
-     * @return the date of entity update
+     * @return the date of the last modification
      */
-    public Date getUpdatedDate()
+    public Date getModificationDate()
     {
-        return updatedDate;
+        return modificationDate;
     }
 
     /**
@@ -100,8 +100,8 @@ public abstract class BaseEntity<P extends EntityIdentity>
     }
 
     /**
-     * This method is called before every update.
-     * It evaluates <code>createdDate</code>or <code>updatedDate</code>.
+     * This method will be called before every update.
+     * It evaluates <code>createdDate</code>or <code>modificationDate</code>.
      */
     @OnSave
     private void onSave()
@@ -123,7 +123,7 @@ public abstract class BaseEntity<P extends EntityIdentity>
         }
         else
         {
-            updatedDate = new Date();
+            modificationDate = new Date();
             version++;
         }
     }
@@ -162,7 +162,7 @@ public abstract class BaseEntity<P extends EntityIdentity>
         return "BaseEntity{" +
                 "modelVersion=" + dbModelVersion +
                 ", version=" + version +
-                ", updatedDate=" + updatedDate +
+                ", modificationDate=" + modificationDate +
                 ", createdDate=" + createdDate +
                 '}';
     }
