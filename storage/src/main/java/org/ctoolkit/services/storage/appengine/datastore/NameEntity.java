@@ -27,7 +27,7 @@ import org.ctoolkit.services.storage.EntityIdentity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The objectified name entity (not GWT compatible). The @Id as 'name', type of <code>String</code>.
+ * The objectified name entity. The @Id as 'name', type of <code>String</code>.
  * The 'name' must be set manually, it's application responsibility to make it unique.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>

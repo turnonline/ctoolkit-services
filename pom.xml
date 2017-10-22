@@ -33,7 +33,7 @@
     <packaging>pom</packaging>
     <name>CtoolkiT Services - Google App Engine</name>
     <description>
-        Cloud Toolkit Services, backend libraries for microservices deployed on the Google App Engine standard.
+        The supporting backend libraries for microservices designed for Google App Engine standard environment.
     </description>
     <url>https://github.com/turnonline/ctoolkit-services</url>
 
