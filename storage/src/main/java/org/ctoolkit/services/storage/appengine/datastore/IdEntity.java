@@ -34,8 +34,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class IdEntity<P extends EntityIdentity>
         extends BaseEntity<P>
 {
-    private static final long serialVersionUID = 1L;
-
     @Id
     protected Long id;
 

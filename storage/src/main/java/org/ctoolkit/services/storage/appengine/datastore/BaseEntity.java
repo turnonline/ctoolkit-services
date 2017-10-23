@@ -23,7 +23,6 @@ import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
 import org.ctoolkit.services.storage.EntityIdentity;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -39,10 +38,8 @@ import java.util.Date;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public abstract class BaseEntity<P extends EntityIdentity>
-        implements EntityIdentity<P>, Serializable
+        implements EntityIdentity<P>
 {
-    private static final long serialVersionUID = 1L;
-
     private Integer version;
 
     @Index
