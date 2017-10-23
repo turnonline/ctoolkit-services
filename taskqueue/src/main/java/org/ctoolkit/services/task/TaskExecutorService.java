@@ -18,6 +18,8 @@
 
 package org.ctoolkit.services.task;
 
+import com.google.appengine.api.taskqueue.TaskHandle;
+
 import java.util.Map;
 
 /**
@@ -34,7 +36,7 @@ public interface TaskExecutorService
      *
      * @param task the runnable task
      */
-    void execute( Task task );
+    TaskHandle execute( Task task );
 
     /**
      * Executes the given command at some time in the future. Arrangement implementation may cause this task
@@ -44,9 +46,9 @@ public interface TaskExecutorService
      * @param task        the runnable task
      * @param arrangement the object to better specify the task execution point
      */
-    void execute( Task task, Arrangement arrangement );
+    TaskHandle execute( Task task, Arrangement arrangement );
 
-    void execute( String cronUri );
+    TaskHandle execute( String cronUri );
 
-    void execute( String cronUri, Map<String, String> parameters );
+    TaskHandle execute( String cronUri, Map<String, String> parameters );
 }

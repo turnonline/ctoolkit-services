@@ -22,6 +22,7 @@ import com.google.appengine.api.modules.ModulesService;
 import com.google.appengine.api.modules.ModulesServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskHandle;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.inject.Injector;
 
@@ -61,9 +62,9 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public void execute( Task task )
+    public TaskHandle execute( Task task )
     {
-        execute( task, new Arrangement()
+        return execute( task, new Arrangement()
         {
             @Override
             public boolean done( Collection<Task> tasks )
@@ -74,10 +75,11 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public final void execute( Task task, Arrangement arrangement )
+    public final TaskHandle execute( Task task, Arrangement arrangement )
     {
-        addPayload( task );
+        TaskHandle handler = addPayload( task );
         logger.info( "Task to execute: " + task );
+        return handler;
     }
 
     public void register( CronTaskRegistrar registrar )
@@ -86,13 +88,13 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public void execute( String cronUri )
+    public TaskHandle execute( String cronUri )
     {
-        execute( cronUri, null );
+        return execute( cronUri, null );
     }
 
     @Override
-    public final void execute( String cronUri, Map<String, String> parameters )
+    public final TaskHandle execute( String cronUri, Map<String, String> parameters )
     {
         Class<? extends CronTask> clazz = map.get( cronUri );
 
@@ -107,7 +109,7 @@ class TaskQueueExecutorBean
             {
                 logger.warning( "No CronTask impl. class registered for cron URI: " + cronUri );
             }
-            return;
+            return null;
         }
 
         CronTask task = injector.getInstance( clazz );
@@ -123,10 +125,10 @@ class TaskQueueExecutorBean
             logger.info( "Creating cron: " + task );
         }
 
-        addPayload( task );
+        return addPayload( task );
     }
 
-    private void addPayload( Task task )
+    private TaskHandle addPayload( Task task )
     {
         Queue queue = getQueue( task );
 
@@ -143,10 +145,10 @@ class TaskQueueExecutorBean
         logger.info( "Enqueued in queue: " + task.getQueueName() + ",  module: " + module + ", version: " + version
                 + ", Module hostname: " + hostname );
 
-        queue.add( options.payload( task ) );
+        return queue.add( options.payload( task ) );
     }
 
-    private void addPayload( CronTask task )
+    private TaskHandle addPayload( CronTask task )
     {
         Queue queue = getQueue( task );
 
@@ -163,7 +165,7 @@ class TaskQueueExecutorBean
         logger.info( "Enqueued in queue: " + task.getQueueName() + ",  module: " + module + ", version: " + version
                 + ", Module hostname: " + hostname );
 
-        queue.add( options.payload( new CronTaskWrapper( task ) ) );
+        return queue.add( options.payload( new CronTaskWrapper( task ) ) );
     }
 
     private Queue getQueue( Task task )

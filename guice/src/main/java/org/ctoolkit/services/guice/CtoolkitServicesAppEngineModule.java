@@ -33,7 +33,15 @@ import net.sf.jsr107cache.CacheManager;
 import javax.inject.Singleton;
 
 /**
- * The ctoolkit services guice module with AppEngine services instance providers.
+ * The ctoolkit services guice module with App Engine's services providers.
+ * This module is being required with all of the modules using following App Engine services:
+ * <ul>
+ * <li>{@link BlobstoreService}</li>
+ * <li>{@link ImagesService}</li>
+ * <li>{@link AppIdentityService}</li>
+ * <li>{@link CacheFactory}</li>
+ * </ul>
+ * ..or bind it on your won.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

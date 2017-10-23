@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import java.util.Set;
 
 /**
+ * The CtoolkiT Services - Google AppEngine standard task queue extension module.
+ * In order to configure see {@link CronTaskRegistrar}.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class CtoolkitServicesTaskModule
