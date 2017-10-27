@@ -33,6 +33,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * The CtoolkiT Services Google Firebase based identity module.
@@ -104,7 +105,14 @@ public class CtoolkitServicesIdentityModule
                 throw new IllegalArgumentException( msg );
             }
 
-            FileInputStream serviceAccount = new FileInputStream( init.fileName );
+            URL url = CtoolkitServicesIdentityModule.class.getResource( init.fileName );
+            if ( url == null )
+            {
+                String msg = "The file defined by property 'credential.identity.fileName' "
+                        + init.fileName + " has not been found.";
+                throw new IllegalArgumentException( msg );
+            }
+            FileInputStream serviceAccount = new FileInputStream( url.getPath() );
 
             options = new FirebaseOptions.Builder()
                     .setCredentials( GoogleCredentials.fromStream( serviceAccount ) )
