@@ -32,7 +32,7 @@ import java.util.Map;
  * It configures following filter properties:
  * <ul>
  * <li>endpoints.projectId: taken in runtime {@code SystemProperty.applicationId.get()}</li>
- * <li>endpoints.serviceName: constructed like {@code ${endpoints.projectId}.appspot.com}</li>
+ * <li>endpoints.serviceName: constructed like {@code System.getenv( "ENDPOINTS_SERVICE_NAME" )}</li>
  * </ul>
  * Once added in local development, will connect remotely to the cloud console with 'endpoints.serviceName'
  * and all activities will be monitored. Keep in mind access must be granted to the 'endpoints.serviceName'
@@ -53,9 +53,11 @@ public class EndpointsMonitorConfig
         filter( ENDPOINTS_SERVLET_PATH ).through( ServiceManagementConfigFilter.class );
 
         String projectId = SystemProperty.applicationId.get();
+        String serviceName = System.getenv( "ENDPOINTS_SERVICE_NAME" );
+
         Map<String, String> apiController = new HashMap<>();
         apiController.put( "endpoints.projectId", projectId );
-        apiController.put( "endpoints.serviceName", projectId + ".appspot.com" );
+        apiController.put( "endpoints.serviceName", serviceName );
 
         bind( GoogleAppEngineControlFilter.class ).in( Singleton.class );
         filter( ENDPOINTS_SERVLET_PATH ).through( GoogleAppEngineControlFilter.class, apiController );
