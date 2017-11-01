@@ -18,11 +18,14 @@
 
 package org.ctoolkit.services.storage.appengine.datastore;
 
+import com.google.common.base.Strings;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
 import org.ctoolkit.services.storage.EntityIdentity;
 
+import javax.annotation.Nullable;
+import java.text.Normalizer;
 import java.util.Date;
 
 /**
@@ -83,6 +86,23 @@ public abstract class BaseEntity<P extends EntityIdentity>
     public Date getModificationDate()
     {
         return modificationDate;
+    }
+
+    /**
+     * Normalize string value.
+     * <b>Example:</b><code> Kľačany Village</code> -> <code>klacany village</code>
+     *
+     * @param value the string to be normalized
+     * @return the normalized string or empty string for null input value
+     */
+    public String normalize( @Nullable String value )
+    {
+        if ( Strings.isNullOrEmpty( value ) )
+        {
+            return "";
+        }
+        String normalized = Normalizer.normalize( value.toLowerCase(), Normalizer.Form.NFD );
+        return normalized.replaceAll( "[^\\p{ASCII}]", "" );
     }
 
     /**
