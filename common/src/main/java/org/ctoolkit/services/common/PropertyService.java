@@ -35,7 +35,7 @@ public interface PropertyService
 {
     /**
      * Creates a Cache instance using the namespace parameter with default configuration.
-     * <p/>
+     * <p>
      * Returns the fake Cache instance in case of the Cache instance creation failure (logged) with no real cache
      * functionality.
      * <p>

@@ -24,14 +24,28 @@ import java.util.Map;
 /**
  * Implement {@link #configure()} to register your own implementation of cron task classes with executor service
  * in order to be able execute scheduled task.
- * <p/>
- * As client you are required to bind your own implementation of <code>CronTaskRegistrar</code> in guice module as following:
+ * <p>
+ * As client you are required to register your {@link CronTask} implementation and bind your registration
+ * {@link CronTaskRegistrar} in guice module as following:
  * <pre>
- * Multibinder<CronTask> registrar = Multibinder.newSetBinder( binder(), CronTask.class );
- * registrar.addBinding().to( CronTaskRegistration.class );
+ *  public class MyCronTaskRegistration
+ *          extends CronTaskRegistrar
+ *  {
+ *      &#064;Override
+ *      public void configure()
+ *      {
+ *          register( "/cron/my-own-cron-task", MyOwnCronTask.class );
+ *      }
+ *  }
+ *
+ *  // finally add your registration binding in your application guice module
+ *  Multibinder<CronTaskRegistrar> registrar = Multibinder.newSetBinder( binder(), CronTaskRegistrar.class );
+ *  registrar.addBinding().to( MyCronTaskRegistration.class );
  * </pre>
+ * The cron task scheduling definition takes place in cron.xml
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see <a href="https://cloud.google.com/appengine/docs/standard/java/config/cron">Scheduling Tasks With Cron for Java</a>
  */
 public abstract class CronTaskRegistrar
 {

@@ -29,10 +29,10 @@ import java.util.Map;
 
 /**
  * Cron servlet handler to add scheduled task to the configured queue.
- * <p/>
- * For correct functionality is being required to follow convention how to compose an URL configured in GAE queue.xml
- * configuration file.
- * <p/>
+ * <p>
+ * For correct functionality (security constraint) is being required to follow convention how to compose an URL
+ * configured in App Engine queue.xml configuration file.
+ * <p>
  * The contract: it consists from, for example: '/cron/whatever1/whatever2'
  * <ul>
  * <li>part 1: 'cron' as a default namespace as servlet mapping for the <code>CronServlet</code></li>

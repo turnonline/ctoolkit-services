@@ -51,7 +51,7 @@ import java.util.Set;
  * The data upload handler servlet AppEngine implementation. The successfully uploaded data are stored
  * in to the Cloud Storage under given bucket name (provided name or the default one).
  * To make it work correctly serve this servlet with {@link DataUploadHandler#DATA_HANDLER_UPLOAD_URL}
- * <p/>
+ * <p>
  * Successful result returns following JSON:
  * <ul>
  * <li>storageName - full storage path in form '/gs/{bucket}/{name}'</li>
@@ -69,7 +69,7 @@ import java.util.Set;
  * <ul>
  * <li>{@link DataUploadHandler#PARAMETER_GCS_BUCKET_NAME}</li>
  * </ul>
- * <p/>
+ * <p>
  * In order to be notified about uploads register {@link DataUploadListener} listener via guice, example in the javadoc.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>

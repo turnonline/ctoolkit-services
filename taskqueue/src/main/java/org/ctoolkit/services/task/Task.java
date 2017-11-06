@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 /**
  * A job standalone definition to be executed asynchronously. Task represents a small, discrete unit of work to be
  * performed by the {@link TaskExecutorService} in asynchronous manner.
- * <p/>
+ * <p>
  * Vocabulary:
  * <lo>
  * <li>Owner Id: ID of the owner in favor of whom will be a task executed.</li>
@@ -33,10 +33,10 @@ import javax.annotation.Nonnull;
  * <li>Order: a number that represents the execution order. 0 means the first (highest priority).</li>
  * <li>Queue name: is a queue defined by the execution environment where task will be placed in.</li>
  * </lo>
- * <p/>
+ * <p>
  * Notice: Override {@link #equals(Object)} } and {@link #hashCode()} methods to make <code>Comparator</code> work
  * correctly and don't forget to call its super as well because <code>Task</code> properties must be taken into account.
- * <p/>
+ * <p>
  * Note: Queue, and task names must be a combination of one or more digits, letters a-z, underscores, and/or dashes,
  * satisfying the following regular expression:
  * [0-9a-zA-Z\-\_]+

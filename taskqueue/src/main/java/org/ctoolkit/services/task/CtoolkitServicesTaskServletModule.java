@@ -21,7 +21,7 @@ package org.ctoolkit.services.task;
 import com.google.inject.servlet.ServletModule;
 
 /**
- * Install this module if you need to employ cron task queue service.
+ * Install this module if you need to employ cron task (asynchronously executed in defined time) queue service.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see CronServlet
