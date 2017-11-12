@@ -35,7 +35,7 @@ public abstract class IdEntity<P extends EntityIdentity>
         extends BaseEntity<P>
 {
     @Id
-    protected Long id;
+    private Long id;
 
     /**
      * Constructs a new instance.

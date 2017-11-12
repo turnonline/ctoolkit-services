@@ -47,7 +47,24 @@ import java.util.Map.Entry;
 
 /**
  * The endpoints servlet that makes {@link EndpointsContext} available via guice static injection for later processing.
- * In order to make it available use this:
+ * In order to employ this servlet, change your Guice configuration, for example:
+ * <pre>
+ * {@code
+ * public class MyEndpointsModule
+ *          extends EndpointsModule
+ * {
+ *    @literal @Override
+ *     protected void configureEndpoints( String urlPattern,
+ *                                        ServletInitializationParameters initParameters,
+ *                                        boolean useLegacyServlet )
+ *     {
+ *         ...
+ *         super.serve( urlPattern ).with( EndpointsContextAwareServlet.class, initParameters.asMap() );
+ *     }
+ * }
+ * }
+ * </pre>
+ * In order to make it available use static injection, for example:
  * <pre>
  * {@code
  * @literal @Inject
@@ -56,14 +73,14 @@ import java.util.Map.Entry;
  * @literal @Inject
  * private Provider<ServletContext> context;
  *
- * // in constructor
+ * // before use of EndpointsContext, call injector
  * injector.injectMembers( this );
  *
  * // then
  * EndpointsContext ec = EndpointsContext.class.cast( context.get().getAttribute( EndpointsContext.class.getName() ) );
  * }
  * </pre>
- * Don't forget {@link com.google.inject.AbstractModule#requestInjection(Object)};
+ * And don't forget {@link com.google.inject.AbstractModule#requestInjection(Object)};
  *
  * @see com.google.api.server.spi.EndpointsServlet
  * @see com.google.api.server.spi.guice.GuiceEndpointsServlet
@@ -73,6 +90,8 @@ import java.util.Map.Entry;
 public class EndpointsContextAwareServlet
         extends HttpServlet
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String EXPLORER_PATH = "explorer";
 
     private final ServiceMap services;
