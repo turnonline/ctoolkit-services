@@ -39,8 +39,6 @@ import java.util.Set;
 public class CtoolkitServicesTaskModule
         extends AbstractModule
 {
-    private TaskQueueExecutorBean executorBean;
-
     @Override
     protected void configure()
     {
@@ -50,21 +48,14 @@ public class CtoolkitServicesTaskModule
 
     @Provides
     @Singleton
-    TaskExecutorService provideExecutorService( TaskQueueExecutorBean bean, Set<CronTaskRegistrar> registrar )
+    TaskExecutorService provideExecutorService( TaskQueueExecutorBean executor, Set<CronTaskRegistrar> registrar )
     {
-        if ( executorBean != null )
-        {
-            return executorBean;
-        }
-
         for ( CronTaskRegistrar next : registrar )
         {
             next.configure();
-            bean.register( next );
+            executor.register( next );
         }
 
-        executorBean = bean;
-
-        return bean;
+        return executor;
     }
 }
