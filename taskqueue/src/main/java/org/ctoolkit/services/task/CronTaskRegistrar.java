@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * <strong>It's recommended to prefix URI with '/cron' as it's an accepted declaration
+ * for security-constraint within web.xml</strong>
+ * <p>
  * Implement {@link #configure()} to register your own implementation of cron task classes with executor service
  * in order to be able execute scheduled task.
  * <p>
@@ -31,7 +34,7 @@ import java.util.Map;
  *  public class MyCronTaskRegistration
  *          extends CronTaskRegistrar
  *  {
- *      &#064;Override
+ *      {@literal @}Override
  *      public void configure()
  *      {
  *          register( "/cron/my-own-cron-task", MyOwnCronTask.class );

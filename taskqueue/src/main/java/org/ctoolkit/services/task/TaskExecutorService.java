@@ -19,36 +19,70 @@
 package org.ctoolkit.services.task;
 
 import com.google.appengine.api.taskqueue.TaskHandle;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 import java.util.Map;
 
 /**
- * A service that executes submitted {@link Task} tasks. The Task may be buffered until certain conditions in
- * {@link Arrangement} will be met.
+ * The set of convenient methods for App Engine Task Queue (Push Queues).
+ * <p>
+ * All task queue tasks are performed asynchronously. The application that creates the task is not notified
+ * whether or not the task completed, or if it was successful. The task queue service provides a retry mechanism,
+ * so if a task fails it can be retried a finite number of times.
+ * <p>
+ * Note: Although App Engine might appear to process tasks in the order in which they are enqueued,
+ * it is normal for tasks to be executed in arbitrary order, so your implementation should not assume
+ * that tasks are executed serially or in any other order.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see <a href="https://cloud.google.com/appengine/docs/standard/java/taskqueue">Task Queue Overview</a>
  */
 public interface TaskExecutorService
 {
     /**
-     * Executes the given command at some time in the future. The task's order value -1 causes putting the task into
-     * the target queue immediately.
+     * Enqueue task to be executed asynchronously at some time in near future.
      *
-     * @param task the runnable task
+     * @param task the asynchronously runnable task
+     * @return the task definition (given or computed) already in queue
      */
     TaskHandle execute( Task task );
 
     /**
-     * Executes the given command at some time in the future. Arrangement implementation may cause this task
-     * will be buffered while it will be put in to the queue until certain conditions in Arrangement will be met.
-     * The task's order value -1 causes putting the task into the target queue immediately.
+     * Enqueue task to be executed asynchronously with customized countdown.
+     * Maximum countdown for a task	30 days from the current date and time.
      *
-     * @param task        the runnable task
-     * @param arrangement the object to better specify the task execution point
+     * @param task        the asynchronously runnable task
+     * @param postponeFor the number of milliseconds to be added to current time,
+     *                    that's a time when the task will be started. Max 30 days.
+     * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( Task task, Arrangement arrangement );
+    TaskHandle execute( Task task, long postponeFor );
 
+    /**
+     * Enqueue task to be executed asynchronously at some time in near future.
+     *
+     * @param task    the asynchronously runnable task
+     * @param options the task configuration
+     * @return the task definition (given or computed) already in queue
+     */
+    TaskHandle execute( Task task, TaskOptions options );
+
+    /**
+     * Enqueue cron task to be executed asynchronously registered under cronUri,
+     * see {@link CronTaskRegistrar}.
+     *
+     * @param cronUri the URI under which is cron task registered
+     * @return the task definition (given or computed) already in queue
+     */
     TaskHandle execute( String cronUri );
 
+    /**
+     * Enqueue cron task to be executed asynchronously registered under cronUri,
+     * see {@link CronTaskRegistrar}.
+     *
+     * @param cronUri    the URI under which is cron task registered
+     * @param parameters the additional parameters to be added to registered task
+     * @return the task definition (given or computed) already in queue
+     */
     TaskHandle execute( String cronUri, Map<String, String> parameters );
 }

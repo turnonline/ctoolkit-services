@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.common;
 
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalModulesServiceTestConfig;
@@ -65,7 +66,7 @@ public class GuiceBerryTestNgCase
     public void configureTestBinder()
     {
         // setting the SystemProperty.Environment.Value.Development
-        System.setProperty( "com.google.appengine.runtime.environment", "Development" );
+        SystemProperty.environment.set( "Development" );
         install( new CtoolkitServicesAppEngineModule() );
         install( new CtoolkitCommonServicesModule() );
 

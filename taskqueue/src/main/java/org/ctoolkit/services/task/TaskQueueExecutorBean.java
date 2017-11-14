@@ -28,16 +28,14 @@ import com.google.inject.Injector;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 /**
- * GAE Task Queue implementation of {@link Executor}
+ * Google App Engine Task Queue (Push Queues) convenient methods implementation.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org>Aurel Medvegy</a>"
  */
@@ -64,20 +62,22 @@ class TaskQueueExecutorBean
     @Override
     public TaskHandle execute( Task task )
     {
-        return execute( task, new Arrangement()
-        {
-            @Override
-            public boolean done( Collection<Task> tasks )
-            {
-                return true;
-            }
-        } );
+        return execute( task, TaskOptions.Builder.withDefaults() );
     }
 
     @Override
-    public final TaskHandle execute( Task task, Arrangement arrangement )
+    public TaskHandle execute( Task task, long postponeFor )
     {
-        TaskHandle handler = addPayload( task );
+        TaskOptions options = TaskOptions.Builder.withDefaults();
+        options.etaMillis( System.currentTimeMillis() + postponeFor );
+
+        return execute( task, TaskOptions.Builder.withDefaults() );
+    }
+
+    @Override
+    public final TaskHandle execute( Task task, TaskOptions options )
+    {
+        TaskHandle handler = addPayload( task, options );
         logger.info( "Task to execute: " + task );
         return handler;
     }
@@ -128,11 +128,9 @@ class TaskQueueExecutorBean
         return addPayload( task );
     }
 
-    private TaskHandle addPayload( Task task )
+    private TaskHandle addPayload( Task task, TaskOptions options )
     {
         Queue queue = getQueue( task );
-
-        TaskOptions options = TaskOptions.Builder.withDefaults();
 
         String module = modulesService.getCurrentModule();
         String version = modulesService.getCurrentVersion();
@@ -142,7 +140,7 @@ class TaskQueueExecutorBean
         // see https://code.google.com/p/googleappengine/issues/detail?id=10457
         options.header( "Host", hostname );
 
-        logger.info( "Enqueued in queue: " + task.getQueueName() + ",  module: " + module + ", version: " + version
+        logger.info( "Enqueued in: " + task.getQueueName() + ",  module: " + module + ", version: " + version
                 + ", Module hostname: " + hostname );
 
         return queue.add( options.payload( task ) );
@@ -162,7 +160,7 @@ class TaskQueueExecutorBean
         // see https://code.google.com/p/googleappengine/issues/detail?id=10457
         options.header( "Host", hostname );
 
-        logger.info( "Enqueued in queue: " + task.getQueueName() + ",  module: " + module + ", version: " + version
+        logger.info( "Enqueued in: " + task.getQueueName() + ",  module: " + module + ", version: " + version
                 + ", Module hostname: " + hostname );
 
         return queue.add( options.payload( new CronTaskWrapper( task ) ) );
