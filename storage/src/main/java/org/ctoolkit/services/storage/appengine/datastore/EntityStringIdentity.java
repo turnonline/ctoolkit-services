@@ -67,7 +67,7 @@ public abstract class EntityStringIdentity
      *
      * @param id the instance ID to be set
      */
-    protected void setId( String id )
+    public void setId( String id )
     {
         this.id = id;
     }

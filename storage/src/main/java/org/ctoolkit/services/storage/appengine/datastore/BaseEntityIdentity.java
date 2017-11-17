@@ -33,11 +33,11 @@ import java.util.Date;
 /**
  * The objectify entity with common properties to all its children:
  * <ul>
- * <li><b>createdDate</b> - the date of entity creation, set only once</li>
- * <li><b>modificationDate</b> - the date of the last modification of the entity values</li>
- * <li><b>version</b> - </li>
- * <li><b>dbModelVersion</b> - the model update time in milliseconds, the date when the model has been first time used
- * in the code. The value is being hardcoded, evaluated by developer.</li>
+ * <li><b>createdDate</b> - Indexed; the date of entity creation, set only once</li>
+ * <li><b>modificationDate</b> - Indexed; the date of the last modification of the entity values</li>
+ * <li><b>version</b> - the number of how many times the entity has been updated</li>
+ * <li><b>dbModelVersion</b> - Indexed; the model update time in milliseconds, the date when the model
+ * has been first time used in the code. The value is being hardcoded, evaluated by developer.</li>
  * </ul>
  *
  * @param <ID_TYPE> the type of the ID of this entity, supported generic values are {@link Long} and {@link String}.
