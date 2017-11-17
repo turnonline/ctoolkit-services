@@ -18,67 +18,44 @@
 
 package org.ctoolkit.services.storage.appengine;
 
+import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.cloud.storage.Storage;
-import com.google.common.testing.TearDown;
-import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.googlecode.objectify.ObjectifyService;
-import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
-import org.ctoolkit.services.storage.CtoolkitServicesStorageModule;
-import org.ctoolkit.services.storage.appengine.blob.TestStorageProvider;
 import org.ctoolkit.services.storage.appengine.datastore.FakeEntity;
-import org.ctoolkit.test.appengine.ServiceConfigModule;
+import org.ctoolkit.services.storage.appengine.datastore.ParentFakeEntity;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
-import javax.inject.Singleton;
 import java.io.Closeable;
 import java.lang.reflect.Method;
 
 /**
- * The Guice Berry testng module configuring datastore for tests.
+ * The base class for App Engine backend services local testing.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@SuppressWarnings( "WeakerAccess" )
-public class GuiceBerryTestNgCase
-        extends ServiceConfigModule
+public class ServiceTestNgCase
 {
-    private TearDown toTearDown;
+    private LocalServiceTestHelper helper = new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig() );
 
     private Closeable session;
-
-    public GuiceBerryTestNgCase()
-    {
-        construct( new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig() ) );
-    }
 
     @BeforeMethod
     public void setUp( Method m )
     {
-        // Make this the call to TestNgGuiceBerry.setUp as early as possible
-        toTearDown = TestNgGuiceBerry.setUp( this, m, GuiceBerryTestNgCase.class );
+        SystemProperty.environment.set( "Development" );
+
+        helper.setUp();
         session = ObjectifyService.begin();
         ObjectifyService.register( FakeEntity.class );
+        ObjectifyService.register( ParentFakeEntity.class );
     }
 
     @AfterMethod
     public void tearDown() throws Exception
     {
-        // Make this the call to TestNgGuiceBerry.tearDown as late as possible
-        toTearDown.tearDown();
         session.close();
-    }
-
-    @Override
-    public void configureTestBinder()
-    {
-        bind( Storage.class ).toProvider( TestStorageProvider.class ).in( Singleton.class );
-
-        // setting the SystemProperty.Environment.Value.Development
-        System.setProperty( "com.google.appengine.runtime.environment", "Development" );
-        install( new CtoolkitServicesAppEngineModule() );
-        install( new CtoolkitServicesStorageModule() );
+        helper.tearDown();
     }
 }

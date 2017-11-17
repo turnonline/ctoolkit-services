@@ -18,33 +18,25 @@
 
 package org.ctoolkit.services.storage.appengine.datastore;
 
-import com.googlecode.objectify.annotation.Entity;
-
-import static com.googlecode.objectify.ObjectifyService.ofy;
+import org.ctoolkit.services.storage.appengine.ServiceTestNgCase;
+import org.testng.annotations.Test;
 
 /**
- * The fake entity for test purpose.
+ * Parent/Child entity group saving.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@Entity
-public class FakeEntity
-        extends EntityLongChildOf<ParentFakeEntity>
+public class ParentChildDbTest
+        extends ServiceTestNgCase
 {
-    @Override
-    protected long getModelVersion()
-    {
-        return 1;
-    }
-
-    @Override
+    @Test
     public void save()
     {
-        ofy().save().entity( this ).now();
-    }
+        ParentFakeEntity parent = new ParentFakeEntity();
+        parent.save();
 
-    @Override
-    public void delete()
-    {
+        FakeEntity child = new FakeEntity();
+        child.setParent( parent );
+        child.save();
     }
 }

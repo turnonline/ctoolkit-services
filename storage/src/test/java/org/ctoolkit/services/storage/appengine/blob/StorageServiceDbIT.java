@@ -23,7 +23,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.testing.RemoteStorageHelper;
 import com.google.common.io.ByteStreams;
 import org.ctoolkit.services.storage.StorageService;
-import org.ctoolkit.services.storage.appengine.GuiceBerryTestNgCase;
+import org.ctoolkit.services.storage.appengine.ServiceTestNgCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -45,7 +45,7 @@ import static org.testng.Assert.assertTrue;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class StorageServiceDbIT
-        extends GuiceBerryTestNgCase
+        extends ServiceTestNgCase
 {
     private static final Logger log = LoggerFactory.getLogger( StorageServiceDbIT.class );
 

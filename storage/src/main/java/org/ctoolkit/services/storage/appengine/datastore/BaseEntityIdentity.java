@@ -19,6 +19,8 @@
 package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.google.common.base.Strings;
+import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
@@ -29,7 +31,7 @@ import java.text.Normalizer;
 import java.util.Date;
 
 /**
- * The entity with common properties to all its children:
+ * The objectify entity with common properties to all its children:
  * <ul>
  * <li><b>createdDate</b> - the date of entity creation, set only once</li>
  * <li><b>modificationDate</b> - the date of the last modification of the entity values</li>
@@ -38,10 +40,11 @@ import java.util.Date;
  * in the code. The value is being hardcoded, evaluated by developer.</li>
  * </ul>
  *
+ * @param <ID_TYPE> the type of the ID of this entity, supported generic values are {@link Long} and {@link String}.
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public abstract class BaseEntity<P extends EntityIdentity>
-        implements EntityIdentity<P>
+public abstract class BaseEntityIdentity<ID_TYPE>
+        implements EntityIdentity<ID_TYPE>
 {
     private Integer version;
 
@@ -66,6 +69,33 @@ public abstract class BaseEntity<P extends EntityIdentity>
         }
 
         return version;
+    }
+
+    @Override
+    public String getKey()
+    {
+        if ( getId() == null )
+        {
+            return null;
+        }
+
+        return Key.create( this ).getString();
+    }
+
+    /**
+     * Returns the objectify reference of this instance.
+     *
+     * @return the objectify reference
+     */
+    @SuppressWarnings( "unchecked" )
+    public <T extends BaseEntityIdentity> Ref<T> ref()
+    {
+        if ( getId() == null )
+        {
+            return null;
+        }
+
+        return Ref.create( ( T ) this );
     }
 
     /**
@@ -103,6 +133,28 @@ public abstract class BaseEntity<P extends EntityIdentity>
         }
         String normalized = Normalizer.normalize( value.toLowerCase(), Normalizer.Form.NFD );
         return normalized.replaceAll( "[^\\p{ASCII}]", "" );
+    }
+
+    /**
+     * Returns instance taken either fom the entity reference or default instance passed as a second parameter.
+     *
+     * @param ref             the entity reference
+     * @param defaultInstance the default fallback instance if reference is null
+     * @return the entity instance
+     */
+    public <T> T fromRef( @Nullable Ref<T> ref, @Nullable T defaultInstance )
+    {
+        if ( ref == null )
+        {
+            return defaultInstance;
+        }
+        return ref.get();
+    }
+
+    @Override
+    public String getKind()
+    {
+        return this.getClass().getSimpleName();
     }
 
     /**
@@ -176,7 +228,7 @@ public abstract class BaseEntity<P extends EntityIdentity>
 
     private String getToString()
     {
-        return "BaseEntity{" +
+        return "BaseEntityIdentity{" +
                 "modelVersion=" + dbModelVersion +
                 ", version=" + version +
                 ", modificationDate=" + modificationDate +

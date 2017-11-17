@@ -23,13 +23,13 @@ import com.googlecode.objectify.annotation.Entity;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The fake entity for test purpose.
+ * The parent fake entity for test purpose.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Entity
-public class FakeEntity
-        extends EntityLongChildOf<ParentFakeEntity>
+public class ParentFakeEntity
+        extends EntityLongIdentity
 {
     @Override
     protected long getModelVersion()

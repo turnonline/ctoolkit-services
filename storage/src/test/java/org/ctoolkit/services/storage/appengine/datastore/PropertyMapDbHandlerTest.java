@@ -25,14 +25,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.googlecode.objectify.Key;
 import org.ctoolkit.services.storage.EntityExecutor;
-import org.ctoolkit.services.storage.appengine.GuiceBerryTestNgCase;
+import org.ctoolkit.services.storage.appengine.ServiceTestNgCase;
+import org.ctoolkit.services.storage.appengine.TestModule;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.googlecode.objectify.ObjectifyService.ofy;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -42,8 +43,9 @@ import static org.testng.Assert.assertTrue;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
+@Guice( modules = TestModule.class )
 public class PropertyMapDbHandlerTest
-        extends GuiceBerryTestNgCase
+        extends ServiceTestNgCase
 {
     private static final String PROP_1 = "Property1";
 
@@ -59,8 +61,8 @@ public class PropertyMapDbHandlerTest
     @Test
     public void saveAndLoad() throws Exception
     {
-        FakeEntity entity = new FakeEntity();
-        ofy().save().entity( entity ).now();
+        ParentFakeEntity entity = new ParentFakeEntity();
+        entity.save();
         Map<String, Object> map = new HashMap<>();
 
         map.put( PROP_1, 10L );

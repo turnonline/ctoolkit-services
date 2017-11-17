@@ -16,35 +16,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
-
-import com.googlecode.objectify.annotation.Entity;
-
-import static com.googlecode.objectify.ObjectifyService.ofy;
+package org.ctoolkit.services.storage;
 
 /**
- * The fake entity for test purpose.
+ * The entity identity with declared parent relationship.
  *
+ * @param <P>       the type of the parent entity
+ * @param <ID_TYPE> the type of the ID of the child entity
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@Entity
-public class FakeEntity
-        extends EntityLongChildOf<ParentFakeEntity>
+public interface ChildEntityOf<P extends EntityIdentity, ID_TYPE>
+        extends EntityIdentity<ID_TYPE>
 {
-    @Override
-    protected long getModelVersion()
-    {
-        return 1;
-    }
+    /**
+     * Returns the parent instance of this child entity.
+     *
+     * @return the parent entity
+     */
+    P getParent();
 
-    @Override
-    public void save()
-    {
-        ofy().save().entity( this ).now();
-    }
-
-    @Override
-    public void delete()
-    {
-    }
+    /**
+     * Sets the parent instance for this child entity.
+     *
+     * @param parent the parent entity instance to be set
+     */
+    void setParent( P parent );
 }
