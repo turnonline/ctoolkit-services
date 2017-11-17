@@ -51,7 +51,7 @@ public interface PropertyService
 
     /**
      * Same as {@link #create(String)} but with possibility to configure cache behavior.
-     * To configure cache use AppEngine Memcache config API to fill map.
+     * To configure cache use App Engine Memcache config API to fill map.
      *
      * @param config the configuration map.
      * @return the cache instance.
@@ -111,7 +111,7 @@ public interface PropertyService
 
     /**
      * Returns <code>true</code> if current application is running marked as PRODUCTION environment.
-     * That means on exactly defined AppEngine AppId, otherwise returns <code>false</code>.
+     * That means on exactly defined App Engine AppId, otherwise returns <code>false</code>.
      *
      * @return true if current application is running in production environment
      */
@@ -119,7 +119,7 @@ public interface PropertyService
 
     /**
      * Returns <code>true</code> if current application is running marked as TEST environment.
-     * That means on exactly defined AppEngine AppId, otherwise returns <code>false</code>.
+     * That means on exactly defined App Engine AppId, otherwise returns <code>false</code>.
      *
      * @return true if current application is running in test environment
      */
@@ -143,7 +143,7 @@ public interface PropertyService
 
     /**
      * Returns the AppSpot current secure URL at '.appspot.com' with subdomain (application Id).
-     * Optionally with subdomain prefix -> AppEngine module name for example
+     * Optionally with subdomain prefix -> App Engine module name for example
      * with prefix 'rest-api' and application Id 'turn-online' -> http://rest-api-dot-turn-online.appspot.com
      *
      * @param prefix the module prefix

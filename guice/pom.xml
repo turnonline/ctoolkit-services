@@ -29,8 +29,8 @@
 
     <artifactId>ctoolkit-services-guice</artifactId>
     <packaging>jar</packaging>
-    <name>CtoolkiT Services - AppEngine Guice</name>
-    <description>CtoolkiT Services - Google AppEngine Guice Configuration</description>
+    <name>CtoolkiT Services - App Engine Guice</name>
+    <description>CtoolkiT Services - Google App Engine Guice Configuration</description>
 
     <dependencies>
         <dependency>

@@ -29,8 +29,8 @@
 
     <artifactId>ctoolkit-services-upload</artifactId>
     <packaging>jar</packaging>
-    <name>CtoolkiT Services - AppEngine Upload</name>
-    <description>CtoolkiT Services - Google AppEngine Upload to Cloud Storage</description>
+    <name>CtoolkiT Services - App Engine Upload</name>
+    <description>CtoolkiT Services - Google App Engine Upload to Cloud Storage</description>
 
     <dependencies>
         <dependency>

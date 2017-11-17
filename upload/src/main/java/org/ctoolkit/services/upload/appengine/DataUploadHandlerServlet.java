@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The data upload handler servlet AppEngine implementation. The successfully uploaded data are stored
+ * The data upload handler servlet App Engine implementation. The successfully uploaded data are stored
  * in to the Cloud Storage under given bucket name (provided name or the default one).
  * To make it work correctly serve this servlet with {@link DataUploadHandler#DATA_HANDLER_UPLOAD_URL}
  * <p>

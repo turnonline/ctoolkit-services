@@ -23,7 +23,7 @@ import org.ctoolkit.services.storage.appengine.blob.StorageServiceBean;
 import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor;
 
 /**
- * The ctoolkit services AppEngine datastore and storage module.
+ * The ctoolkit services App Engine datastore and storage module.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

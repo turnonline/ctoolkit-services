@@ -30,7 +30,7 @@
     <artifactId>ctoolkit-services-storage</artifactId>
     <packaging>jar</packaging>
     <name>CtoolkiT Services - Cloud Storage</name>
-    <description>CtoolkiT Services - Google AppEngine Cloud Storage Extension</description>
+    <description>CtoolkiT Services - Google App Engine Cloud Storage Extension</description>
 
     <build>
         <plugins>

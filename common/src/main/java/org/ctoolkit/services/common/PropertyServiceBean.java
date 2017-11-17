@@ -40,12 +40,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Property service implementation of {@link PropertyService} for AppEngine.
+ * Property service implementation of {@link PropertyService} for App Engine.
  * <p>
  * If no configuration instance {@link PropertyConfig} is being provided in module, default behavior is:
  * <ul>
  * <li>Development: {@link #isDevelopmentEnvironment()} returns true</li>
- * <li>AppEngine: {@link #isTestEnvironment()} returns true</li>
+ * <li>App Engine: {@link #isTestEnvironment()} returns true</li>
  * </ul>
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
@@ -90,7 +90,7 @@ class PropertyServiceBean
 
             if ( Strings.isNullOrEmpty( testAppId ) )
             {
-                // If testAppId is not being set and running on AppEngine, we assume it is TEST environment.
+                // If testAppId is not being set and running on App Engine, we assume it is TEST environment.
                 // Unless overridden by production AppId configuration
                 isTestEnvironment = true;
             }
@@ -305,7 +305,7 @@ class PropertyServiceBean
         Object valueToStore;
         if ( value instanceof String && ( ( String ) value ).getBytes().length > 1500 )
         {
-            // Converted to AppEngine native text as limit to store short string is up to 1500 bytes, then throws exception
+            // Converted to App Engine native text as limit to store short string is up to 1500 bytes, then throws exception
             valueToStore = new Text( value.toString() );
         }
         else

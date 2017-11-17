@@ -23,7 +23,7 @@ import com.google.inject.servlet.ServletModule;
 import org.ctoolkit.services.upload.appengine.DataUploadHandlerServlet;
 
 /**
- * The ctoolkit services AppEngine upload guice servlet module.
+ * The ctoolkit services App Engine upload guice servlet module.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

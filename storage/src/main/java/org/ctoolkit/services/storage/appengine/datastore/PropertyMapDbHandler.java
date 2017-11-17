@@ -35,7 +35,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The handler that manages saving and loading dynamic properties on top of AppEngine datastore.
+ * The handler that manages saving and loading dynamic properties on top of App Engine datastore.
  * All property values are saved as unindexed properties. There is one more specific property '{@link #DYN_PROPERTIES}'
  * to keep list of current property names for concrete entity.
  * <p>
