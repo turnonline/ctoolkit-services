@@ -20,8 +20,6 @@ package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.annotation.Id;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * The base objectify entity to be used in the client code.
  * The @Id of the entity with type of <code>String</code>.
@@ -37,24 +35,7 @@ public abstract class EntityStringIdentity
      * Objectify checks the explicit type, cannot be generic.
      */
     @Id
-    protected String id;
-
-    /**
-     * Constructs a new instance.
-     */
-    public EntityStringIdentity()
-    {
-    }
-
-    /**
-     * Constructs a new instance with given ID as an instance identification.
-     *
-     * @param id the entity ID to be set
-     */
-    public EntityStringIdentity( String id )
-    {
-        this.id = checkNotNull( id );
-    }
+    private String id;
 
     @Override
     public String getId()

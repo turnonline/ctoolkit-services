@@ -20,8 +20,6 @@ package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.annotation.Id;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * The base objectify entity to be used in the client code.
  * The @Id of the entity with type of <code>Long</code>. If 'Id' is not set (null value)
@@ -38,23 +36,6 @@ public abstract class EntityLongIdentity
      */
     @Id
     private Long id;
-
-    /**
-     * Constructs a new instance.
-     */
-    public EntityLongIdentity()
-    {
-    }
-
-    /**
-     * Constructs a new instance with given ID as an instance identification.
-     *
-     * @param id the entity ID to be set
-     */
-    public EntityLongIdentity( Long id )
-    {
-        this.id = checkNotNull( id );
-    }
 
     @Override
     public Long getId()
