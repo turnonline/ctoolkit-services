@@ -24,6 +24,11 @@ import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor
 
 /**
  * The ctoolkit services App Engine datastore and storage module.
+ * Install this module if you need to inject one of the following services:
+ * <ul>
+ * <li>{@link EntityExecutor}</li>
+ * <li>{@link StorageService}</li>
+ * </ul>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

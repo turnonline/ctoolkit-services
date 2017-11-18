@@ -18,6 +18,8 @@
 
 package org.ctoolkit.services.storage;
 
+import javax.annotation.Nonnull;
+
 /**
  * The entity identity with declared parent relationship.
  *
@@ -37,8 +39,10 @@ public interface ChildEntityOf<P extends EntityIdentity, ID_TYPE>
 
     /**
      * Sets the parent instance for this child entity.
+     * Make sure the instance is already persisted and have an ID,
+     * otherwise exception will be thrown.
      *
      * @param parent the parent entity instance to be set
      */
-    void setParent( P parent );
+    void setParent( @Nonnull P parent );
 }

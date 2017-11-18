@@ -19,11 +19,12 @@
 package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.Ref;
-import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.OnSave;
 import com.googlecode.objectify.annotation.Parent;
 import org.ctoolkit.services.storage.ChildEntityOf;
 import org.ctoolkit.services.storage.EntityIdentity;
+
+import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -31,6 +32,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The base objectify entity to be used in the client code with parent relationship implementation.
  * The @Id of the entity with type of <code>Long</code>. If 'Id' is not set (null value)
  * a numeric value will be generated for you using the standard App Engine allocator.
+ * <p>
+ * Along with the @Id and kind, the @Parent field defines the key (identity) of the entity.
+ * The name of the field is irrelevant and can be changed at any time without modifying stored data.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -41,19 +45,17 @@ public abstract class EntityLongChildOf<P extends EntityIdentity>
     @Parent
     private Ref<P> parent;
 
-    @Ignore
-    private P tParent;
-
     @Override
     public P getParent()
     {
-        return fromRef( parent, tParent );
+        return fromRef( parent, null );
     }
 
     @Override
-    public void setParent( P parent )
+    public void setParent( @Nonnull P parent )
     {
-        this.tParent = parent;
+        checkNotNull( parent );
+        this.parent = Ref.create( parent );
     }
 
     /**
@@ -72,8 +74,7 @@ public abstract class EntityLongChildOf<P extends EntityIdentity>
     {
         if ( parent == null )
         {
-            checkNotNull( tParent, missingParentErrorMessage() );
-            parent = Ref.create( tParent );
+            throw new IllegalArgumentException( missingParentErrorMessage() );
         }
     }
 }
