@@ -46,6 +46,13 @@ public class ObjectifyEntityExecutor
     }
 
     @Override
+    public <T> T first( @Nonnull Criteria<T> criteria )
+    {
+        List<T> list = new ObjectifyCriteriaBuilder<T>().build( criteria ).list();
+        return list.isEmpty() ? null : list.get( 0 );
+    }
+
+    @Override
     public <T> List<Long> fetchIds( @Nonnull Criteria<T> criteria )
     {
         ObjectifyCriteriaBuilder<T> builder = new ObjectifyCriteriaBuilder<>();

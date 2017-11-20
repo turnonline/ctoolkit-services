@@ -18,7 +18,9 @@
 
 package org.ctoolkit.services.storage;
 
+import com.google.cloud.storage.Storage;
 import com.google.inject.AbstractModule;
+import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 import org.ctoolkit.services.storage.appengine.blob.StorageServiceBean;
 import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor;
 
@@ -29,6 +31,15 @@ import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor
  * <li>{@link EntityExecutor}</li>
  * <li>{@link StorageService}</li>
  * </ul>
+ * The {@link CtoolkitServicesAppEngineModule} is being required by this module to be installed.
+ * <p>
+ * The {@link StorageService} implementation requires underlying {@link Storage} instance to be injected.
+ * Either bind the {@link DefaultStorageProvider} or use your own configuration.
+ * <pre>
+ * {@code
+ *      bind( Storage.class ).toProvider( DefaultStorageProvider.class ).in( Singleton.class );
+ * }
+ * </pre>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

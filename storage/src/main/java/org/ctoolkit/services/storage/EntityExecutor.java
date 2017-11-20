@@ -40,6 +40,15 @@ public interface EntityExecutor
     <T> List<T> list( @Nonnull Criteria<T> criteria );
 
     /**
+     * Executes a query based on the given criteria and retrieves the first entity in the result list if any.
+     * If the result does not match any criteria returns <code>null</code>
+     *
+     * @param criteria a criteria holder {@link Criteria}
+     * @return the first entity in the result list
+     */
+    <T> T first( @Nonnull Criteria<T> criteria );
+
+    /**
      * Executes a keys-only query based on given criteria and get the result as a list of entity names.
      * This is more efficient than fetching the actual full result set.
      *
