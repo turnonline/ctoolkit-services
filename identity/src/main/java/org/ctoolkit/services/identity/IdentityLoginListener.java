@@ -27,6 +27,23 @@ import java.io.IOException;
 
 /**
  * The listener to handle notification once an identity toolkit user has logged in.
+ * <pre>
+ * {@code
+ * @literal @Inject
+ *     IdentityHandler handler;
+ *
+ *     public void processIdentity( HttpServletRequest request,
+ *                                  HttpServletResponse response,
+ *                                  FirebaseToken identity,
+ *                                  String sessionAttribute )
+ *             throws IOException
+ *   {
+ *        String signedEmail = identity.getEmail();
+ *        // the verified Firebase ID token (available only for this request)
+ *        String token = handler.getToken( request );
+ *   }
+ * }
+ * </pre>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
