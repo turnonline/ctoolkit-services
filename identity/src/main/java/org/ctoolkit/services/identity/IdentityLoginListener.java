@@ -23,7 +23,6 @@ import com.google.firebase.auth.FirebaseToken;
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * The listener to handle notification once an identity toolkit user has logged in.
@@ -36,7 +35,6 @@ import java.io.IOException;
  *                                  HttpServletResponse response,
  *                                  FirebaseToken identity,
  *                                  String sessionAttribute )
- *             throws IOException
  *   {
  *        String signedEmail = identity.getEmail();
  *        // the verified Firebase ID token (available only for this request)
@@ -57,10 +55,9 @@ public interface IdentityLoginListener
      * @param response  the current HTTP response
      * @param identity  the Firebase token of the logged in user
      * @param attribute the session attribute where parent filter will check authenticated user presence
-     * @throws IOException
      */
     void processIdentity( @Nonnull HttpServletRequest request,
                           @Nonnull HttpServletResponse response,
                           @Nonnull FirebaseToken identity,
-                          @Nonnull String attribute ) throws IOException;
+                          @Nonnull String attribute );
 }
