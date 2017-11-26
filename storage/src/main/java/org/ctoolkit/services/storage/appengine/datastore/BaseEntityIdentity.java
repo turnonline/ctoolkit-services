@@ -31,14 +31,21 @@ import java.text.Normalizer;
 import java.util.Date;
 
 /**
- * The objectify entity with common properties to all its children:
+ * The objectify entity with common properties to all its children (unindexed):
  * <ul>
- * <li><b>createdDate</b> - Indexed; the date of entity creation, set only once</li>
- * <li><b>modificationDate</b> - Indexed; the date of the last modification of the entity values</li>
+ * <li><b>createdDate</b> - the date of entity creation, set only once</li>
+ * <li><b>modificationDate</b> - the date of the last modification of the entity values</li>
  * <li><b>version</b> - the number of how many times the entity has been updated</li>
- * <li><b>dbModelVersion</b> - Indexed; the model update time in milliseconds, the date when the model
+ * <li><b>dbModelVersion</b> - the model update time in milliseconds, the date when the model
  * has been first time used in the code. The value is being hardcoded, evaluated by developer.</li>
  * </ul>
+ * <b>Objectify Note:</b> Do not index properties with monotonically increasing values
+ * (such as a NOW() timestamp). Maintaining such an index could lead to hotspots that impact
+ * Cloud Datastore latency for applications with high read and write rates.
+ * <p>
+ * If the <b>createdDate</b>, <b>modificationDate</b> properties needs to be indexed
+ * let implement your entity either {@link IndexCreatedDate}, or {@link IndexModificationDate}, or both.
+ * These marker interfaces will instruct Objectify to index requested properties.
  *
  * @param <ID_TYPE> the type of the ID of this entity, supported generic values are {@link Long} and {@link String}.
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -48,16 +55,15 @@ public abstract class BaseEntityIdentity<ID_TYPE>
 {
     private Integer version;
 
-    @Index
+    @Index( CreatedDateIf.class )
     private Date createdDate;
 
-    @Index
+    @Index( ModificationDateIf.class )
     private Date modificationDate;
 
     /**
      * The model version persisted in datastore as a time stamp.
      */
-    @Index
     private Date dbModelVersion;
 
     public Integer getVersion()
@@ -110,6 +116,8 @@ public abstract class BaseEntityIdentity<ID_TYPE>
 
     /**
      * Returns the date of the last modification of the entity values.
+     * If the value is equal to {@link #getCreatedDate()} the entity has not been updated yet
+     * and {@link #getVersion()} returns 1.
      *
      * @return the date of the last modification
      */
@@ -189,6 +197,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         {
             dbModelVersion = new Date( getModelVersion() );
             createdDate = new Date();
+            modificationDate = createdDate;
         }
         else
         {
