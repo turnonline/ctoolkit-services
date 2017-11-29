@@ -18,6 +18,10 @@
 
 package org.ctoolkit.services.storage;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Set;
+
 /**
  * The entity identity abstraction with generic type of the ID.
  *
@@ -56,17 +60,55 @@ public interface EntityIdentity<ID_TYPE>
 
     /**
      * Saves (creates or updates) this entity in to the datastore best within transaction.
-     * Cascading save support is optional.
+     * Cascading save support is optional and implementation specific.
      * <p>
      * Active record pattern:save.
      */
     void save();
 
     /**
+     * Similar to the {@link #save()}.
+     * Use if you need more fine-grained control over which relationships of the entity
+     * are going to be cascading saved. Cascading save support with respecting ignored fields
+     * is optional and implementation specific.
+     *
+     * @param ignored the set of the field names to be ignored while saving
+     */
+    Set<Ignored> save( @Nullable Ignored ignored );
+
+    /**
      * Deletes the entity from the datastore best within transaction.
-     * Cascading delete support is optional.
+     * Cascading delete support is optional and implementation specific.
      * <p>
      * Active record pattern:delete.
      */
     void delete();
+
+    interface Ignored
+            extends Set<String>
+    {
+        /**
+         * Adds next level as a child.
+         *
+         * @param fieldName the property name that is a reference to another entity (relationship)
+         *                  with it's own properties (children) to be ignored if any
+         * @return the child to chain
+         */
+        Ignored addChild( @Nonnull String fieldName );
+
+        /**
+         * Adds field name to be ignored for cascading save.
+         *
+         * @param fieldName the field name to be ignored.
+         * @return <tt>true</tt> if given field name is a new item
+         */
+        boolean ignore( @Nonnull String fieldName );
+
+        /**
+         * Returns the set of children.
+         *
+         * @return the children
+         */
+        Set<Ignored> children();
+    }
 }

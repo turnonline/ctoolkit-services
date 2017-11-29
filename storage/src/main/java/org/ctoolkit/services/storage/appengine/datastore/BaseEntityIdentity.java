@@ -21,14 +21,20 @@ package org.ctoolkit.services.storage.appengine.datastore;
 import com.google.common.base.Strings;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.IgnoreSave;
 import com.googlecode.objectify.annotation.Index;
 import com.googlecode.objectify.annotation.OnLoad;
 import com.googlecode.objectify.annotation.OnSave;
 import org.ctoolkit.services.storage.EntityIdentity;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.Normalizer;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The objectify entity with common properties to all its children (unindexed):
@@ -66,6 +72,9 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      */
     private Date dbModelVersion;
 
+    @IgnoreSave
+    private Ignored ignoredFields;
+
     public Integer getVersion()
     {
         if ( version == null )
@@ -86,6 +95,38 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         }
 
         return Key.create( this ).getString();
+    }
+
+    @Override
+    public Set<Ignored> save( @Nullable Ignored ignored )
+    {
+        this.ignoredFields = ignored;
+        save();
+
+        return ignored == null ? null : ignored.children();
+    }
+
+    public boolean isIgnoredField( String fieldName )
+    {
+        return ignoredFields != null && ignoredFields.contains( fieldName );
+    }
+
+    public Ignored createIgnored()
+    {
+        return new IgnoredFieldsHash();
+    }
+
+    public Ignored createIgnored( String... fieldNames )
+    {
+        checkNotNull( fieldNames, "The field names to be ignored cannot be null." );
+
+        IgnoredFieldsHash ignored = new IgnoredFieldsHash();
+        for ( String next : fieldNames )
+        {
+            checkNotNull( next, "Any of the field name to be ignored cannot be null." );
+            ignored.add( next );
+        }
+        return ignored;
     }
 
     /**
@@ -243,6 +284,53 @@ public abstract class BaseEntityIdentity<ID_TYPE>
                 ", modificationDate=" + modificationDate +
                 ", createdDate=" + createdDate +
                 '}';
+    }
+
+    private static class IgnoredFieldsHash
+            extends HashSet<String>
+            implements Ignored
+    {
+        private Set<Ignored> children;
+
+        private String fieldName;
+
+        IgnoredFieldsHash()
+        {
+            children = new HashSet<>();
+        }
+
+        IgnoredFieldsHash( String fieldName )
+        {
+            this();
+            this.fieldName = checkNotNull( fieldName );
+        }
+
+        @Override
+        public Ignored addChild( @Nonnull String fieldName )
+        {
+            IgnoredFieldsHash level = new IgnoredFieldsHash( fieldName );
+            children.add( level );
+
+            return level;
+        }
+
+        @Override
+        public boolean ignore( @Nonnull String fieldName )
+        {
+            checkNotNull( fieldName, "The field name to be ignored cannot be null." );
+            return this.add( fieldName );
+        }
+
+        public String getFieldName()
+        {
+            return fieldName;
+        }
+
+        @Override
+        public Set<Ignored> children()
+        {
+            return children;
+        }
     }
 }
 
