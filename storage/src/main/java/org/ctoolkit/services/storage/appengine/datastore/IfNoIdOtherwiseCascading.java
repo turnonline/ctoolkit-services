@@ -24,7 +24,8 @@ import org.ctoolkit.services.storage.EntityIdentity;
 
 /**
  * The {@link If} implementation where cascading save is supported. Once condition is met
- * the {@link EntityIdentity#save()} will be called. Deferred save is not supported.
+ * either the {@link EntityIdentity#save()} or {@link EntityIdentity#save(EntityIdentity.Ignored)}
+ * will be called. Deferred save is not supported.
  * <p>
  * Including support of the {@link EntityIdentity.HasIgnored} for more fine-grained control
  * over which entities (relationships) are going to be saved.
