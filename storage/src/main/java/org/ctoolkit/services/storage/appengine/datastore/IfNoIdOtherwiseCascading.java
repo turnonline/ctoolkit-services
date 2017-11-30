@@ -19,9 +19,29 @@
 package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.condition.If;
+import org.ctoolkit.services.storage.ChildEntityOf;
+import org.ctoolkit.services.storage.EntityIdentity;
 
 /**
- * The {@link If} implementation where cascading save is supported.
+ * The {@link If} implementation where cascading save is supported. Once condition is met
+ * the {@link EntityIdentity#save()} will be called. Deferred save is not supported.
+ * <p>
+ * Including support of the {@link EntityIdentity.HasIgnored} for more fine-grained control
+ * over which entities (relationships) are going to be saved.
+ * <p>
+ * <b>For example</b>, the parent entity extends {@link BaseEntityIdentity}.
+ * <pre>
+ * {@code
+ *  ParentEntity parent = new ParentEntity();
+ *  parent.newCascading().ignore( "siblingChildEntity" )
+ *          .addChild( "childEntity" )
+ *          .ignore( "childEntity" );
+ *
+ *  parent.save();
+ * }
+ * </pre>
+ * If the referenced entity implements {@link ChildEntityOf} the {@link ChildEntityOf#setParent(EntityIdentity)}
+ * will be called in order to set enclosing POJO (object that holds the associated field) as a parent entity.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

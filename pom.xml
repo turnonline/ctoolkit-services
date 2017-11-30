@@ -159,7 +159,7 @@
 
     <properties>
         <gae.version>1.9.56</gae.version>
-        <jmockit.version>1.19</jmockit.version>
+        <jmockit.version>1.37</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar

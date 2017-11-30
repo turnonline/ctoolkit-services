@@ -126,9 +126,6 @@ public class IdentityCheckSessionFilterTest
 
                 token.getEmail();
                 result = "identity.test@ctoolkit.org";
-
-                session.getAttribute( SESSION_ATTR_VALUE );
-                result = null;
             }
         };
 
@@ -156,7 +153,6 @@ public class IdentityCheckSessionFilterTest
     @Test
     public void sendRedirect( final @Mocked HttpServletRequest request,
                               final @Mocked HttpServletResponse response,
-                              final @Mocked HttpSession session,
                               final @Mocked FilterChain chain,
                               final @Mocked FilterConfig config,
                               final @Mocked IdentityLoginListener listener ) throws Exception
@@ -168,7 +164,7 @@ public class IdentityCheckSessionFilterTest
         new Expectations()
         {
             {
-                session.getAttribute( SESSION_ATTR_VALUE );
+                request.getSession().getAttribute( SESSION_ATTR_VALUE );
                 result = "non null value";
 
                 request.getRequestURI();
@@ -186,7 +182,7 @@ public class IdentityCheckSessionFilterTest
                         ( FirebaseToken ) any, anyString );
                 times = 0;
 
-                session.invalidate();
+                request.getSession().invalidate();
                 times = 0;
 
                 response.sendRedirect( FilterConfigExpectations.REDIRECT_VALUE );

@@ -19,11 +19,16 @@
 package org.ctoolkit.services.storage.appengine;
 
 import com.google.appengine.api.utils.SystemProperty;
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+import org.ctoolkit.services.storage.appengine.datastore.Child2LevelEntity;
+import org.ctoolkit.services.storage.appengine.datastore.ChildEntity;
 import org.ctoolkit.services.storage.appengine.datastore.FakeEntity;
+import org.ctoolkit.services.storage.appengine.datastore.ParentEntity;
 import org.ctoolkit.services.storage.appengine.datastore.ParentFakeEntity;
+import org.ctoolkit.services.storage.appengine.datastore.SiblingChildEntity;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -37,7 +42,8 @@ import java.lang.reflect.Method;
  */
 public class ServiceTestNgCase
 {
-    private LocalServiceTestHelper helper = new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig() );
+    private LocalServiceTestHelper helper = new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig(),
+            new LocalDatastoreServiceTestConfig().setDefaultHighRepJobPolicyUnappliedJobPercentage( 0 ) );
 
     private Closeable session;
 
@@ -48,8 +54,13 @@ public class ServiceTestNgCase
 
         helper.setUp();
         session = ObjectifyService.begin();
+
         ObjectifyService.register( FakeEntity.class );
         ObjectifyService.register( ParentFakeEntity.class );
+        ObjectifyService.register( ParentEntity.class );
+        ObjectifyService.register( ChildEntity.class );
+        ObjectifyService.register( SiblingChildEntity.class );
+        ObjectifyService.register( Child2LevelEntity.class );
     }
 
     @AfterMethod

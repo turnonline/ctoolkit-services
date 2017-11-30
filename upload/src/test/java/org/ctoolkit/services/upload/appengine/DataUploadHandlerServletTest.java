@@ -27,9 +27,9 @@ import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ServingUrlOptions;
 import com.google.appengine.repackaged.com.google.gson.Gson;
 import com.google.appengine.repackaged.com.google.gson.GsonBuilder;
+import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
-import mockit.NonStrictExpectations;
 import mockit.Tested;
 import mockit.Verifications;
 import org.ctoolkit.services.upload.DataUploadHandler;
@@ -102,7 +102,7 @@ public class DataUploadHandlerServletTest
         final Map<String, List<FileInfo>> infos = new HashMap<>();
         infos.put( "__wrong_field_name", Collections.singletonList( fileInfo ) );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 request.getContentType();
@@ -133,7 +133,7 @@ public class DataUploadHandlerServletTest
         final Map<String, List<BlobKey>> blobs = new HashMap<>();
         blobs.put( DataUploadHandler.UPLOAD_NAME_FIELD_MARKER, Collections.singletonList( blobKey ) );
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 blobstoreService.getFileInfos( request );
@@ -215,7 +215,7 @@ public class DataUploadHandlerServletTest
     {
         final StringWriter writer = new StringWriter();
 
-        new NonStrictExpectations()
+        new Expectations()
         {
             {
                 blobstoreService.createUploadUrl( anyString, ( UploadOptions ) any );

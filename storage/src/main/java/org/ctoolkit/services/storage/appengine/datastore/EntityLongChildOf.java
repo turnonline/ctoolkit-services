@@ -19,6 +19,7 @@
 package org.ctoolkit.services.storage.appengine.datastore;
 
 import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.OnSave;
 import com.googlecode.objectify.annotation.Parent;
 import org.ctoolkit.services.storage.ChildEntityOf;
@@ -45,10 +46,22 @@ public abstract class EntityLongChildOf<P extends EntityIdentity>
     @Parent
     private Ref<P> parent;
 
+    @Ignore
+    private P tParent;
+
     @Override
     public P getParent()
     {
-        return fromRef( parent, null );
+        if ( tParent != null )
+        {
+            return tParent;
+        }
+        else if ( parent != null )
+        {
+            return parent.get();
+        }
+
+        return null;
     }
 
     @Override
@@ -56,6 +69,7 @@ public abstract class EntityLongChildOf<P extends EntityIdentity>
     {
         checkNotNull( parent );
         this.parent = Ref.create( parent );
+        this.tParent = parent;
     }
 
     /**

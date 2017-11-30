@@ -28,25 +28,52 @@ import org.ctoolkit.services.storage.ChildEntityOf;
 import org.ctoolkit.services.storage.EntityIdentity;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 /**
- * Ignore save of the associated field if entity is not persisted yet ({@link EntityIdentity#getId()}
- * returns {@code null}). It tells to Objectify in cooperation with {@link IgnoreSave}
- * whether to save this field into datastore or not.
+ * {@link IgnoreSave} for the associated field (reference to another entity) if that entity is not persisted yet;
+ * {@link EntityIdentity#getId()} returns {@code null}. It will instruct Objectify in cooperation with
+ * {@link IgnoreSave} annotation whether to save this field into datastore or not.
  * <p>
- * This implementation expects to have a sibling field annotated with {@link Ignore}
- * and named with the following rule: the name of the field where this is placed
- * with prefix 't' and changed first character of the source field name to upper case.
+ * This implementation expects to have a sibling field next to this field (a transient entity)
+ * annotated with {@link Ignore} and named with the following rule: the name of the field  with prefix 't'
+ * and changed the first character of the source field name to capital letter.
  * <p>
- * If the transient entity implements {@link ChildEntityOf} the {@link ChildEntityOf#setParent(EntityIdentity)}
- * will be called in order to set filed POJO as a parent entity.
- * <p>
- * App Engine Note: The Cloud Datastore API does not distinguish between creating a new entity
- * and updating an existing one. If the object's key represents an entity that already exists,
- * the put() method overwrites the existing entity.
+ * <b>For example</b>, entity extends {@link BaseEntityIdentity}.
+ * <pre>
+ * {@code
+ *  // reference to the entity, a relationship
+ * @literal @IgnoreSave( {IfNoId.class} )
+ *  private Ref<BillingAddress> billingAddress;
+ *
+ *  // transient entity
+ * @literal @Ignore
+ *  private BillingAddress tBillingAddress;
+ *
+ *  public BillingAddress getBillingAddress()
+ *  {
+ *      return BaseEntityIdentity#fromRef( billingAddress, tBillingAddress );
+ *  }
+ *
+ * @literal @Override
+ *  public void save()
+ *  {
+ *      if ( getId() == null )
+ *      {
+ *          // first, parent entity needs to saved itself without references (children has no IDs yet)
+ *          ofy().save().entity( this ).now();
+ *      }
+ *
+ *      // ... here save and manage relationships yourself (for better control) or use IfNoIdOtherwiseCascading
+ *
+ *      // now parent entity will be updated with children references
+ *      ofy().save().entity( this ).now();
+ *  }
+ * }
+ * </pre>
+ * The referenced entity BillingAddress is expected to be type of {@link EntityIdentity}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see IfNoIdOtherwiseCascading
  */
 public class IfNoId
         extends PojoIf<EntityIdentity>
@@ -77,7 +104,7 @@ public class IfNoId
         }
         catch ( NoSuchFieldException e )
         {
-            String msg = IfNoId.class.getSimpleName()
+            String msg = getClass().getSimpleName()
                     + " annotation expects transient sibling field declared with the name: "
                     + transientFieldName + " of type "
                     + EntityIdentity.class.getName();
@@ -106,29 +133,34 @@ public class IfNoId
             // by default this is switched off, turn it on by overriding #isCascadingOn() method
             if ( isCascadingOn() )
             {
-                boolean ignoreSave = pojo instanceof BaseEntityIdentity
-                        && ( ( BaseEntityIdentity ) pojo ).isIgnoredField( fieldName );
+                EntityIdentity.HasIgnored hasIgnored = null;
+                if ( pojo instanceof EntityIdentity.HasIgnored )
+                {
+                    hasIgnored = ( EntityIdentity.HasIgnored ) pojo;
+                }
+
+                boolean ignoreSave = hasIgnored != null
+                        && hasIgnored.cascading().isIgnored( fieldName );
 
                 // Whether to ignore cascading save. It's configurable per method call.
-                if ( !ignoreSave
-                        && pojo.getId() != null
-                        && tEntity instanceof ChildEntityOf )
+                if ( !ignoreSave && pojo.getId() != null )
                 {
-                    EntityIdentity parent = ( ( ChildEntityOf<? extends EntityIdentity, ?> ) tEntity ).getParent();
-                    if ( parent == null || isAllowedChangeParentEntity() )
+                    if ( tEntity instanceof ChildEntityOf )
                     {
-                        ( ( ChildEntityOf ) tEntity ).setParent( pojo );
+                        @SuppressWarnings( "unchecked" )
+                        ChildEntityOf<? super EntityIdentity, ?> tChildEntity = ( ChildEntityOf ) tEntity;
+                        tChildEntity.setParent( pojo );
+                    }
+
+                    if ( hasIgnored == null )
+                    {
+                        tEntity.save();
                     }
                     else
                     {
-                        if ( !Objects.equals( pojo.getKey(), parent.getKey() ) )
-                        {
-                            String msg = "Why do you try to change the parent of the child entity?";
-                            throw new IllegalArgumentException( msg );
-                        }
+                        EntityIdentity.Ignored ignored = hasIgnored.cascading().search( fieldName );
+                        tEntity.save( ignored );
                     }
-
-                    tEntity.save();
                     if ( tEntity.getId() == null )
                     {
                         String msg = "The ID is being expected to be set."
@@ -159,7 +191,7 @@ public class IfNoId
 
     /**
      * Constructs the transient field name with prefix 't' and changed first character
-     * of the source field name to upper case.
+     * of the source field name to capital letter.
      *
      * @param field the source field name
      * @return the transient field name
@@ -179,14 +211,6 @@ public class IfNoId
      * @return true to turn on cascading save
      */
     protected boolean isCascadingOn()
-    {
-        return false;
-    }
-
-    /**
-     * Returns false to throw exception if parent entity has changed.
-     */
-    protected boolean isAllowedChangeParentEntity()
     {
         return false;
     }

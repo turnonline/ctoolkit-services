@@ -52,12 +52,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * If the <b>createdDate</b>, <b>modificationDate</b> properties needs to be indexed
  * let implement your entity either {@link IndexCreatedDate}, or {@link IndexModificationDate}, or both.
  * These marker interfaces will instruct Objectify to index requested properties.
+ * <p>
+ * <b>App Engine Note:</b> The Cloud Datastore API does not distinguish between creating a new entity
+ * and updating an existing one. If the object's key represents an entity that already exists,
+ * the put() method overwrites the existing entity.
  *
  * @param <ID_TYPE> the type of the ID of this entity, supported generic values are {@link Long} and {@link String}.
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public abstract class BaseEntityIdentity<ID_TYPE>
-        implements EntityIdentity<ID_TYPE>
+        implements EntityIdentity<ID_TYPE>, EntityIdentity.HasIgnored
 {
     private Integer version;
 
@@ -104,29 +108,6 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         save();
 
         return ignored == null ? null : ignored.children();
-    }
-
-    public boolean isIgnoredField( String fieldName )
-    {
-        return ignoredFields != null && ignoredFields.contains( fieldName );
-    }
-
-    public Ignored createIgnored()
-    {
-        return new IgnoredFieldsHash();
-    }
-
-    public Ignored createIgnored( String... fieldNames )
-    {
-        checkNotNull( fieldNames, "The field names to be ignored cannot be null." );
-
-        IgnoredFieldsHash ignored = new IgnoredFieldsHash();
-        for ( String next : fieldNames )
-        {
-            checkNotNull( next, "Any of the field name to be ignored cannot be null." );
-            ignored.add( next );
-        }
-        return ignored;
     }
 
     /**
@@ -286,6 +267,29 @@ public abstract class BaseEntityIdentity<ID_TYPE>
                 '}';
     }
 
+    @Override
+    public Ignored createIgnored()
+    {
+        return new IgnoredFieldsHash();
+    }
+
+    @Override
+    public Ignored newCascading()
+    {
+        ignoredFields = createIgnored();
+        return ignoredFields;
+    }
+
+    @Override
+    public Ignored cascading()
+    {
+        if ( ignoredFields == null )
+        {
+            ignoredFields = createIgnored();
+        }
+        return ignoredFields;
+    }
+
     private static class IgnoredFieldsHash
             extends HashSet<String>
             implements Ignored
@@ -306,6 +310,27 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         }
 
         @Override
+        public Ignored ignore( @Nonnull String fieldName, String... fieldNames )
+        {
+            checkNotNull( fieldName, "The entity field name to be ignored cannot be null." );
+            super.add( fieldName );
+
+            for ( String next : fieldNames )
+            {
+                checkNotNull( next, "Any of the field name to be ignored cannot be null." );
+                super.add( next );
+            }
+            return this;
+        }
+
+        @Override
+        public boolean isIgnored( @Nonnull String fieldName )
+        {
+            checkNotNull( fieldName );
+            return super.contains( fieldName );
+        }
+
+        @Override
         public Ignored addChild( @Nonnull String fieldName )
         {
             IgnoredFieldsHash level = new IgnoredFieldsHash( fieldName );
@@ -315,15 +340,24 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         }
 
         @Override
-        public boolean ignore( @Nonnull String fieldName )
-        {
-            checkNotNull( fieldName, "The field name to be ignored cannot be null." );
-            return this.add( fieldName );
-        }
-
         public String getFieldName()
         {
             return fieldName;
+        }
+
+        @Override
+        public Ignored search( @Nonnull String fieldName )
+        {
+            checkNotNull( fieldName );
+
+            for ( Ignored next : children )
+            {
+                if ( fieldName.equals( next.getFieldName() ) )
+                {
+                    return next;
+                }
+            }
+            return null;
         }
 
         @Override

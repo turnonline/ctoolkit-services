@@ -69,10 +69,10 @@ public interface EntityIdentity<ID_TYPE>
     /**
      * Similar to the {@link #save()}.
      * Use if you need more fine-grained control over which relationships of the entity
-     * are going to be cascading saved. Cascading save support with respecting ignored fields
+     * are going to be cascading saved. Cascading save with respecting ignored fields support
      * is optional and implementation specific.
      *
-     * @param ignored the set of the field names to be ignored while saving
+     * @param ignored the tree of the field names to be ignored while saving
      */
     Set<Ignored> save( @Nullable Ignored ignored );
 
@@ -84,25 +84,50 @@ public interface EntityIdentity<ID_TYPE>
      */
     void delete();
 
+    /**
+     * The tree of the field names (reference to the relationships), to be ignored while cascading save.
+     */
     interface Ignored
-            extends Set<String>
     {
         /**
-         * Adds next level as a child.
+         * Adds the entity field name(s) to be ignored while cascading save.
+         *
+         * @return the current level of ignored to chain
+         */
+        Ignored ignore( @Nonnull String fieldName, String... fieldNames );
+
+        /**
+         * Returns the boolean indicating whether to ignore entity with given field name while cascading save.
+         *
+         * @param fieldName the entity field name to be checked
+         * @return {@code true} to be ignored
+         */
+        boolean isIgnored( @Nonnull String fieldName );
+
+        /**
+         * Adds the next level of the entity field names as a child to be ignored.
          *
          * @param fieldName the property name that is a reference to another entity (relationship)
-         *                  with it's own properties (children) to be ignored if any
-         * @return the child to chain
+         *                  with it's own properties (field names) to be ignored while cascading save if any
+         * @return the newly created child
          */
         Ignored addChild( @Nonnull String fieldName );
 
         /**
-         * Adds field name to be ignored for cascading save.
+         * Returns the entity field name for current level. If returns {@code null} it means
+         * represents a top level {@link Ignored} instance.
          *
-         * @param fieldName the field name to be ignored.
-         * @return <tt>true</tt> if given field name is a new item
+         * @return the entity field name
          */
-        boolean ignore( @Nonnull String fieldName );
+        String getFieldName();
+
+        /**
+         * Search for the child with given entity field name.
+         *
+         * @param fieldName the entity field name to search
+         * @return the set of ignored entity field names or {@code null}
+         */
+        Ignored search( @Nonnull String fieldName );
 
         /**
          * Returns the set of children.
@@ -110,5 +135,32 @@ public interface EntityIdentity<ID_TYPE>
          * @return the children
          */
         Set<Ignored> children();
+    }
+
+    /**
+     * Declaration of the support for {@link Ignored} while cascading save.
+     */
+    interface HasIgnored
+    {
+        /**
+         * Creates unattached new top level {@link Ignored} instance.
+         *
+         * @return the newly created instance
+         */
+        Ignored createIgnored();
+
+        /**
+         * Creates attached new top level {@link Ignored} instance.
+         *
+         * @return the newly created instance
+         */
+        Ignored newCascading();
+
+        /**
+         * Returns attached top level {@link Ignored} instance.
+         *
+         * @return always returns instance even empty
+         */
+        Ignored cascading();
     }
 }
