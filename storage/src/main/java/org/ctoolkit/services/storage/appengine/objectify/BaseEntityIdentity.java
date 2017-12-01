@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
 import com.google.common.base.Strings;
 import com.googlecode.objectify.Key;
@@ -127,6 +127,22 @@ public abstract class BaseEntityIdentity<ID_TYPE>
     }
 
     /**
+     * Returns the objectify entity key representation.
+     *
+     * @return the objectify entity key
+     */
+    @SuppressWarnings( "unchecked" )
+    public <T extends BaseEntityIdentity> Key<T> entityKey()
+    {
+        if ( getId() == null )
+        {
+            return null;
+        }
+
+        return Key.create( ( T ) this );
+    }
+
+    /**
      * Returns the date of entity creation.
      *
      * @return the date of entity creation
@@ -159,7 +175,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
     {
         if ( Strings.isNullOrEmpty( value ) )
         {
-            return "";
+            return null;
         }
         String normalized = Normalizer.normalize( value.toLowerCase(), Normalizer.Form.NFD );
         return normalized.replaceAll( "[^\\p{ASCII}]", "" );

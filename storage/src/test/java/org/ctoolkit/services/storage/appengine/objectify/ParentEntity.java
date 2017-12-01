@@ -16,21 +16,56 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.IgnoreSave;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The parent fake entity for test purpose.
+ * The parent entity for test purpose.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Entity
-public class ParentFakeEntity
+public class ParentEntity
         extends EntityLongIdentity
 {
+    @IgnoreSave( IfNoIdOtherwiseCascading.class )
+    private Ref<ChildEntity> childEntity;
+
+    @Ignore
+    private ChildEntity tChildEntity;
+
+    @IgnoreSave( IfNoIdOtherwiseCascading.class )
+    private Ref<SiblingChildEntity> siblingChildEntity;
+
+    @Ignore
+    private SiblingChildEntity tSiblingChildEntity;
+
+    ChildEntity getChildEntity()
+    {
+        return tChildEntity;
+    }
+
+    void setChildEntity( ChildEntity tChildEntity )
+    {
+        this.tChildEntity = tChildEntity;
+    }
+
+    public SiblingChildEntity getSiblingChildEntity()
+    {
+        return tSiblingChildEntity;
+    }
+
+    public void setSiblingChildEntity( SiblingChildEntity siblingChildEntity )
+    {
+        this.tSiblingChildEntity = siblingChildEntity;
+    }
+
     @Override
     protected long getModelVersion()
     {
@@ -40,6 +75,10 @@ public class ParentFakeEntity
     @Override
     public void save()
     {
+        if ( getId() == null )
+        {
+            ofy().save().entity( this ).now();
+        }
         ofy().save().entity( this ).now();
     }
 

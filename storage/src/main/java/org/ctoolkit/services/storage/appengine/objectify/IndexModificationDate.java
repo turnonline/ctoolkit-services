@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
 /**
  * The marker interface to let index {@link BaseEntityIdentity#modificationDate} property.

@@ -16,40 +16,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
-import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Entity;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The base objectify entity to be used in the client code.
- * The @Id of the entity with type of <code>String</code>.
- * The 'Id' must be set manually, it's application responsibility to make it unique.
+ * The parent fake entity for test purpose.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see <a href="https://github.com/objectify/objectify/wiki/Entities">Entities</a>
  */
-public abstract class EntityStringIdentity
-        extends BaseEntityIdentity<String>
+@Entity
+public class ParentFakeEntity
+        extends EntityLongIdentity
 {
-    /**
-     * Objectify checks the explicit type, cannot be generic.
-     */
-    @Id
-    private String id;
-
     @Override
-    public String getId()
+    protected long getModelVersion()
     {
-        return id;
+        return 1;
     }
 
-    /**
-     * Manually sets the ID of this entity instance.
-     *
-     * @param id the instance ID to be set
-     */
-    public void setId( String id )
+    @Override
+    public void save()
     {
-        this.id = id;
+        ofy().save().entity( this ).now();
+    }
+
+    @Override
+    public void delete()
+    {
     }
 }

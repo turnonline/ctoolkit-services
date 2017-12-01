@@ -16,24 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
-
-import com.googlecode.objectify.condition.PojoIf;
+package org.ctoolkit.services.storage.appengine.objectify;
 
 /**
- * The implementation of the {@link com.googlecode.objectify.condition.If} that defines a condition
- * to test whether {@link BaseEntityIdentity#createdDate} should be in indexed
- * in the datastore or not.
+ * The marker interface to let index {@link BaseEntityIdentity#createdDate} property.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see IndexCreatedDate
  */
-class CreatedDateIf
-        extends PojoIf<BaseEntityIdentity>
+public interface IndexCreatedDate
 {
-    @Override
-    public boolean matchesPojo( BaseEntityIdentity pojo )
-    {
-        return pojo instanceof IndexCreatedDate;
-    }
 }

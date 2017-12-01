@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
@@ -26,44 +26,28 @@ import com.googlecode.objectify.annotation.IgnoreSave;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The parent entity for test purpose.
+ * The entity for test purpose with parent/child relationship.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Entity
-public class ParentEntity
-        extends EntityLongIdentity
+public class ChildEntity
+        extends EntityLongChildOf<ParentEntity>
 {
     @IgnoreSave( IfNoIdOtherwiseCascading.class )
-    private Ref<ChildEntity> childEntity;
+    private Ref<Child2LevelEntity> childEntity;
 
     @Ignore
-    private ChildEntity tChildEntity;
+    private Child2LevelEntity tChildEntity;
 
-    @IgnoreSave( IfNoIdOtherwiseCascading.class )
-    private Ref<SiblingChildEntity> siblingChildEntity;
-
-    @Ignore
-    private SiblingChildEntity tSiblingChildEntity;
-
-    ChildEntity getChildEntity()
+    Child2LevelEntity getChildEntity()
     {
         return tChildEntity;
     }
 
-    void setChildEntity( ChildEntity tChildEntity )
+    void setChildEntity( Child2LevelEntity tChildEntity )
     {
         this.tChildEntity = tChildEntity;
-    }
-
-    public SiblingChildEntity getSiblingChildEntity()
-    {
-        return tSiblingChildEntity;
-    }
-
-    public void setSiblingChildEntity( SiblingChildEntity siblingChildEntity )
-    {
-        this.tSiblingChildEntity = siblingChildEntity;
     }
 
     @Override

@@ -23,12 +23,12 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
-import org.ctoolkit.services.storage.appengine.datastore.Child2LevelEntity;
-import org.ctoolkit.services.storage.appengine.datastore.ChildEntity;
-import org.ctoolkit.services.storage.appengine.datastore.FakeEntity;
-import org.ctoolkit.services.storage.appengine.datastore.ParentEntity;
-import org.ctoolkit.services.storage.appengine.datastore.ParentFakeEntity;
-import org.ctoolkit.services.storage.appengine.datastore.SiblingChildEntity;
+import org.ctoolkit.services.storage.appengine.objectify.Child2LevelEntity;
+import org.ctoolkit.services.storage.appengine.objectify.ChildEntity;
+import org.ctoolkit.services.storage.appengine.objectify.FakeEntity;
+import org.ctoolkit.services.storage.appengine.objectify.ParentEntity;
+import org.ctoolkit.services.storage.appengine.objectify.ParentFakeEntity;
+import org.ctoolkit.services.storage.appengine.objectify.SiblingChildEntity;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 

@@ -16,13 +16,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
+
+import com.googlecode.objectify.annotation.Id;
 
 /**
- * The marker interface to let index {@link BaseEntityIdentity#createdDate} property.
+ * The base objectify entity to be used in the client code.
+ * The @Id of the entity with type of <code>String</code>.
+ * The 'Id' must be set manually, it's application responsibility to make it unique.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see <a href="https://github.com/objectify/objectify/wiki/Entities">Entities</a>
  */
-public interface IndexCreatedDate
+public abstract class EntityStringIdentity
+        extends BaseEntityIdentity<String>
 {
+    /**
+     * Objectify checks the explicit type, cannot be generic.
+     */
+    @Id
+    private String id;
+
+    @Override
+    public String getId()
+    {
+        return id;
+    }
+
+    /**
+     * Manually sets the ID of this entity instance.
+     *
+     * @param id the instance ID to be set
+     */
+    public void setId( String id )
+    {
+        this.id = id;
+    }
 }

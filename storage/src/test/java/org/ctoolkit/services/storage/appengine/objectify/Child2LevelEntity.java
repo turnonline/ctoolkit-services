@@ -16,40 +16,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
-import com.googlecode.objectify.annotation.Id;
+import com.googlecode.objectify.annotation.Entity;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The base objectify entity to be used in the client code.
- * The @Id of the entity with type of <code>Long</code>. If 'Id' is not set (null value)
- * a numeric value will be generated for you using the standard App Engine allocator.
+ * The entity for test purpose with parent/child relationship.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see <a href="https://github.com/objectify/objectify/wiki/Entities">Entities</a>
  */
-public abstract class EntityLongIdentity
-        extends BaseEntityIdentity<Long>
+@Entity
+public class Child2LevelEntity
+        extends EntityStringChildOf<ChildEntity>
 {
-    /**
-     * Objectify checks the explicit type, cannot be generic.
-     */
-    @Id
-    private Long id;
-
-    @Override
-    public Long getId()
+    Child2LevelEntity( String id )
     {
-        return id;
+        super.setId( id );
     }
 
-    /**
-     * Manually sets the ID of this entity instance.
-     *
-     * @param id the instance ID to be set
-     */
-    protected void setId( Long id )
+    @Override
+    protected long getModelVersion()
     {
-        this.id = id;
+        return 1;
+    }
+
+    @Override
+    public void save()
+    {
+        ofy().save().entity( this ).now();
+    }
+
+    @Override
+    public void delete()
+    {
     }
 }

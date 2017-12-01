@@ -16,40 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.datastore;
+package org.ctoolkit.services.storage.appengine.objectify;
 
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.Ignore;
-import com.googlecode.objectify.annotation.IgnoreSave;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The entity for test purpose with parent/child relationship.
+ * The simple entity for test purpose (no parent/child relationship).
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Entity
-public class ChildEntity
+public class SiblingChildEntity
         extends EntityLongChildOf<ParentEntity>
 {
-    @IgnoreSave( IfNoIdOtherwiseCascading.class )
-    private Ref<Child2LevelEntity> childEntity;
-
-    @Ignore
-    private Child2LevelEntity tChildEntity;
-
-    Child2LevelEntity getChildEntity()
-    {
-        return tChildEntity;
-    }
-
-    void setChildEntity( Child2LevelEntity tChildEntity )
-    {
-        this.tChildEntity = tChildEntity;
-    }
-
     @Override
     protected long getModelVersion()
     {
@@ -59,10 +40,6 @@ public class ChildEntity
     @Override
     public void save()
     {
-        if ( getId() == null )
-        {
-            ofy().save().entity( this ).now();
-        }
         ofy().save().entity( this ).now();
     }
 

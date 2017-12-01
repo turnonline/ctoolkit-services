@@ -22,7 +22,7 @@ import com.google.cloud.storage.Storage;
 import com.google.inject.AbstractModule;
 import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 import org.ctoolkit.services.storage.appengine.blob.StorageServiceBean;
-import org.ctoolkit.services.storage.appengine.datastore.ObjectifyEntityExecutor;
+import org.ctoolkit.services.storage.appengine.objectify.ObjectifyEntityExecutor;
 
 /**
  * The ctoolkit services App Engine datastore and storage module.
