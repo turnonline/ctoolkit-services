@@ -52,11 +52,11 @@ public interface TaskExecutorService
      * Maximum countdown for a task	30 days from the current date and time.
      *
      * @param task        the asynchronously runnable task
-     * @param postponeFor the number of milliseconds to be added to current time,
+     * @param postponeFor the number of seconds to be added to current time,
      *                    that's a time when the task will be started. Max 30 days.
      * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( Task task, long postponeFor );
+    TaskHandle execute( Task task, int postponeFor );
 
     /**
      * Enqueue task to be executed asynchronously at some time in near future.

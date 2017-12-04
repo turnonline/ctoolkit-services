@@ -66,10 +66,10 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public TaskHandle execute( Task task, long postponeFor )
+    public TaskHandle execute( Task task, int postponeFor )
     {
         TaskOptions options = TaskOptions.Builder.withDefaults();
-        options.etaMillis( System.currentTimeMillis() + postponeFor );
+        options.etaMillis( System.currentTimeMillis() + postponeFor * 1000 );
 
         return execute( task, TaskOptions.Builder.withDefaults() );
     }
