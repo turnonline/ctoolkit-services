@@ -169,7 +169,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      * <b>Example:</b><code> Kľačany Village</code> -> <code>klacany village</code>
      *
      * @param value the string to be normalized
-     * @return the normalized string or empty string for null input value
+     * @return the normalized string or {@code null}
      */
     public String normalize( @Nullable String value )
     {
@@ -310,6 +310,9 @@ public abstract class BaseEntityIdentity<ID_TYPE>
             extends HashSet<String>
             implements Ignored
     {
+        private static final long serialVersionUID = -2365946383963083213L;
+
+        @SuppressWarnings( "NonSerializableFieldInSerializableClass" )
         private Set<Ignored> children;
 
         private String fieldName;

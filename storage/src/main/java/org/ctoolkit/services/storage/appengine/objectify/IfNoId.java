@@ -30,9 +30,10 @@ import org.ctoolkit.services.storage.EntityIdentity;
 import java.lang.reflect.Field;
 
 /**
- * {@link IgnoreSave} for the associated field (reference to another entity) if that entity is not persisted yet;
- * {@link EntityIdentity#getId()} returns {@code null}. It will instruct Objectify in cooperation with
- * {@link IgnoreSave} annotation whether to save this field into datastore or not.
+ * {@link IgnoreSave} of the associated field (reference to another entity) if that entity is not persisted yet;
+ * {@link EntityIdentity#getId()} returns {@code null}. Additionally in case of the use {@link IfNoIdOtherwiseCascading}
+ * the Objectify will be instructed in cooperation with {@link IgnoreSave} annotation whether to save transient field
+ * into datastore or not.
  * <p>
  * This implementation expects to have a sibling field next to this field (a transient entity)
  * annotated with {@link Ignore} and named with the following rule: the name of the field  with prefix 't'
@@ -41,7 +42,7 @@ import java.lang.reflect.Field;
  * <b>For example</b>, entity extends {@link BaseEntityIdentity}.
  * <pre>
  * {@code
- *  // reference to the entity, a relationship
+ * // reference to the entity, a relationship
  * @literal @IgnoreSave( {IfNoId.class} )
  *  private Ref<BillingAddress> billingAddress;
  *
@@ -70,7 +71,7 @@ import java.lang.reflect.Field;
  *  }
  * }
  * </pre>
- * The referenced entity BillingAddress is expected to be type of {@link EntityIdentity}.
+ * The referenced entity BillingAddress in this example is expected to be type of {@link EntityIdentity}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see IfNoIdOtherwiseCascading
@@ -205,8 +206,8 @@ public class IfNoId
     }
 
     /**
-     * If transient entity is type of {@link ChildEntityOf} and this method returns true
-     * the method {@link ChildEntityOf#save()} will be called.
+     * The boolean indicating whether transient entity should be evaluated for cascading save.
+     * If all conditions are met the {@link ChildEntityOf#save()} will be called.
      *
      * @return true to turn on cascading save
      */

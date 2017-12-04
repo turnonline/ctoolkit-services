@@ -139,25 +139,42 @@ public interface EntityIdentity<ID_TYPE>
 
     /**
      * Declaration of the support for {@link Ignored} while cascading save.
+     * There are two types of the Ignored instance:
+     * <ul>
+     * <li>Attached</li>
+     * <li>Unattached</li>
+     * </ul>
+     * <b>Attached</b>
+     * <p>
+     * An {@link EntityIdentity} instance is already aware about which fields has been marked to be ignored.
+     * In this case you can call {@link EntityIdentity#save()} and all marked fields
+     * will be ignored while cascading save.
+     * <p>
+     * <b>Unattached</b>
+     * <p>
+     * An {@link EntityIdentity} instance has no connection with an unattached Ignored instance.
+     * In order to ignore fields while saving you have to use {@link EntityIdentity#save(Ignored)}
+     * where input parameter is an unattached Ignored instance.
+     * <b>Note</b>, the input parameter overwrites an existing attached Ignored instance.
      */
     interface HasIgnored
     {
         /**
-         * Creates unattached new top level {@link Ignored} instance.
+         * Creates an unattached new top level {@link Ignored} instance.
          *
-         * @return the newly created instance
+         * @return the newly created unattached instance
          */
         Ignored createIgnored();
 
         /**
-         * Creates attached new top level {@link Ignored} instance.
+         * Creates an attached new top level {@link Ignored} instance.
          *
-         * @return the newly created instance
+         * @return the newly created attached instance
          */
         Ignored newCascading();
 
         /**
-         * Returns attached top level {@link Ignored} instance.
+         * Returns an attached top level {@link Ignored} instance.
          *
          * @return always returns instance even empty
          */
