@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  */
 @Singleton
 class TaskQueueExecutorBean
-        implements TaskExecutorService
+        implements TaskExecutor
 {
     private final Logger logger;
 
@@ -71,7 +71,7 @@ class TaskQueueExecutorBean
         TaskOptions options = TaskOptions.Builder.withDefaults();
         options.etaMillis( System.currentTimeMillis() + postponeFor * 1000 );
 
-        return execute( task, TaskOptions.Builder.withDefaults() );
+        return execute( task, options );
     }
 
     @Override

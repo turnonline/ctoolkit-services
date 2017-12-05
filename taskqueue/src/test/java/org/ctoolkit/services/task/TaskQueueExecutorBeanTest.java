@@ -34,7 +34,7 @@ public class TaskQueueExecutorBeanTest
     public final GuiceBerryRule guiceBerry = new GuiceBerryRule( ServiceEnvironment.class );
 
     @Inject
-    private TaskExecutorService executor;
+    private TaskExecutor executor;
 
     @Test
     public void testExecute() throws Exception

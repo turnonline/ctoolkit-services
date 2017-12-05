@@ -27,7 +27,7 @@ import java.util.Set;
 
 /**
  * The CtoolkiT Services - Google App Engine standard task queue extension module.
- * Install this module if {@link TaskExecutorService} service is needed in order to enqueue
+ * Install this module if {@link TaskExecutor} service is needed in order to enqueue
  * an asynchronous {@link Task}.
  * <p>
  * If you need cron task (asynchronously executed in defined time) install
@@ -48,7 +48,7 @@ public class CtoolkitServicesTaskModule
 
     @Provides
     @Singleton
-    TaskExecutorService provideExecutorService( TaskQueueExecutorBean executor, Set<CronTaskRegistrar> registrar )
+    TaskExecutor provideExecutorService( TaskQueueExecutorBean executor, Set<CronTaskRegistrar> registrar )
     {
         for ( CronTaskRegistrar next : registrar )
         {

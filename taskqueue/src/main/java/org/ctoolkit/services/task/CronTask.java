@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * A job standalone definition to be executed asynchronously in defined time (by a cron). CronTask represents a small,
- * discrete unit of work to be performed by the {@link TaskExecutorService} in asynchronous manner.
+ * discrete unit of work to be performed by the {@link TaskExecutor} in asynchronous manner.
  * <p>
  * The queue name should be known in implementation time, thus defined prior to execution.
  *

@@ -47,10 +47,10 @@ class CronServlet
 {
     private static final long serialVersionUID = 1L;
 
-    private final TaskExecutorService executor;
+    private final TaskExecutor executor;
 
     @Inject
-    CronServlet( TaskExecutorService executor )
+    CronServlet( TaskExecutor executor )
     {
         this.executor = executor;
     }

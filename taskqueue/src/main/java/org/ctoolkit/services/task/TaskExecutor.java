@@ -37,7 +37,7 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see <a href="https://cloud.google.com/appengine/docs/standard/java/taskqueue">Task Queue Overview</a>
  */
-public interface TaskExecutorService
+public interface TaskExecutor
 {
     /**
      * Enqueue task to be executed asynchronously at some time in near future.

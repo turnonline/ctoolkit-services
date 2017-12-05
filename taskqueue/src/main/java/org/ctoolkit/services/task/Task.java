@@ -24,7 +24,7 @@ import javax.annotation.Nonnull;
 
 /**
  * A job standalone definition to be executed asynchronously. Task represents a small, discrete unit of work to be
- * performed by the {@link TaskExecutorService} in asynchronous manner.
+ * performed by the {@link TaskExecutor} in asynchronous manner.
  * <p>
  * Vocabulary:
  * <lo>
@@ -42,7 +42,7 @@ import javax.annotation.Nonnull;
  * [0-9a-zA-Z\-\_]+
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org>Aurel Medvegy</a>"
- * @see TaskExecutorService
+ * @see TaskExecutor
  */
 public abstract class Task
         implements Comparable<Task>, DeferredTask
