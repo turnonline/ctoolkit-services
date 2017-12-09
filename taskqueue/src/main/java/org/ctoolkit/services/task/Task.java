@@ -190,6 +190,16 @@ public abstract class Task
     }
 
     /**
+     * Returns a task that will be executed once this task has finished successfully.
+     *
+     * @return the next task to execute
+     */
+    public Task next()
+    {
+        return next;
+    }
+
+    /**
      * Returns the configuration options of this task.
      *
      * @return the task options configuration, {@code null} if not set
