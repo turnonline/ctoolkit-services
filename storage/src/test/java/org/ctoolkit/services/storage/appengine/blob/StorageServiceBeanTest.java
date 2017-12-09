@@ -57,21 +57,21 @@ public class StorageServiceBeanTest
     private BlobstoreService blobstoreService;
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void createBlobIdWrongArg() throws Exception
+    public void createBlobIdWrongArg()
     {
         String fullName = "/gs/fileName";
         tested.createBlobId( fullName );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void createBlobIdWrongPrefix() throws Exception
+    public void createBlobIdWrongPrefix()
     {
         String fullName = "/haha/bucketName-12/fileName-23";
         tested.createBlobId( fullName );
     }
 
     @Test
-    public void createBlobId() throws Exception
+    public void createBlobId()
     {
         String fullName = "/gs/bucketName-12/fileName-23";
         BlobId blobId = tested.createBlobId( fullName );
@@ -82,7 +82,7 @@ public class StorageServiceBeanTest
     }
 
     @Test
-    public void getFullStorageName( @Mocked final Blob blob ) throws Exception
+    public void getFullStorageName( @Mocked final Blob blob )
     {
         new Expectations()
         {
@@ -100,21 +100,21 @@ public class StorageServiceBeanTest
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void createBlobKeyWrongPrefix() throws Exception
+    public void createBlobKeyWrongPrefix()
     {
         String fullName = "/haha/bucketName-12/fileName-23";
         tested.createBlobKey( fullName );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void createBlobKeyWrongArg() throws Exception
+    public void createBlobKeyWrongArg()
     {
         String fullName = "/gs/fileName";
         tested.createBlobKey( fullName );
     }
 
     @Test
-    public void createBlobKey() throws Exception
+    public void createBlobKey()
     {
         final String fullName = "/gs/bucketName-12/file/Name-23";
         tested.createBlobKey( fullName );
@@ -128,7 +128,7 @@ public class StorageServiceBeanTest
     }
 
     @Test
-    public void createBlobKeyFromBlob( @Mocked final Blob blob ) throws Exception
+    public void createBlobKeyFromBlob( @Mocked final Blob blob )
     {
         new Expectations()
         {
@@ -152,28 +152,28 @@ public class StorageServiceBeanTest
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void readByFullStorageNameWrongArg() throws Exception
+    public void readByFullStorageNameWrongArg()
     {
         String fullName = "/gs/fileName";
         tested.read( fullName );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void readByFullStorageNameWrongPrefix() throws Exception
+    public void readByFullStorageNameWrongPrefix()
     {
         String fullName = "/haha/bucketName-12/fileName-23";
         tested.read( fullName );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void readByFullStorageNameBucketEmpty() throws Exception
+    public void readByFullStorageNameBucketEmpty()
     {
         String fullName = "/gs//file/Name-23";
         tested.read( fullName );
     }
 
     @Test
-    public void readByFullStorageName() throws Exception
+    public void readByFullStorageName()
     {
         final String fullName = "/gs/bucketName-12/file/Name-2/3.pdf";
         tested.read( fullName );

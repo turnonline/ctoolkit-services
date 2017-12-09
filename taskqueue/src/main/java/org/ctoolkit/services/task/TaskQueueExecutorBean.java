@@ -19,19 +19,24 @@
 package org.ctoolkit.services.task;
 
 import com.google.appengine.api.modules.ModulesService;
-import com.google.appengine.api.modules.ModulesServiceFactory;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskHandle;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.inject.Injector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 /**
@@ -43,59 +48,92 @@ import java.util.logging.Logger;
 class TaskQueueExecutorBean
         implements TaskExecutor
 {
-    private final Logger logger;
+    private static final Logger logger = LoggerFactory.getLogger( TaskQueueExecutorBean.class );
 
     private final Injector injector;
 
     private final Map<String, Class<? extends CronTask>> map = new HashMap<>();
 
-    private ModulesService modulesService = ModulesServiceFactory.getModulesService();
+    private final ModulesService modulesService;
 
     @Inject
-    TaskQueueExecutorBean( Logger logger,
-                           Injector injector )
+    TaskQueueExecutorBean( Injector injector, ModulesService modulesService )
     {
-        this.logger = logger;
         this.injector = injector;
+        this.modulesService = modulesService;
     }
 
     @Override
-    public TaskHandle execute( Task task )
+    public TaskHandle schedule( @Nonnull Task task )
     {
-        return execute( task, TaskOptions.Builder.withDefaults() );
+        return schedule( task, TaskOptions.Builder.withDefaults() );
     }
 
     @Override
-    public TaskHandle execute( Task task, int postponeFor )
+    public List<TaskHandle> schedule( @Nonnull String queueName, @Nonnull Task... tasks )
     {
-        TaskOptions options = TaskOptions.Builder.withDefaults();
-        options.etaMillis( System.currentTimeMillis() + postponeFor * 1000 );
+        checkNotNull( queueName );
+        checkNotNull( tasks );
 
-        return execute( task, options );
+        if ( tasks.length == 0 )
+        {
+            throw new NullPointerException( "No task is being provided, task array is empty!" );
+        }
+
+        List<TaskOptions> options = new ArrayList<>();
+
+        for ( Task next : tasks )
+        {
+            if ( next == null )
+            {
+                throw new NullPointerException( "Any of the Task cannot be null!" );
+            }
+            options.add( populateTaskOptions( next, next.getOptions() ) );
+        }
+
+        Queue queue = getQueue( queueName );
+        return queue.add( options );
     }
 
     @Override
-    public final TaskHandle execute( Task task, TaskOptions options )
+    public TaskHandle schedule( @Nonnull Task task, int postponeFor )
     {
-        TaskHandle handler = addPayload( task, options );
+        checkNotNull( task );
+
+        task.postponeFor( postponeFor );
+        return schedule( task, TaskOptions.Builder.withDefaults() );
+    }
+
+    @Override
+    public final TaskHandle schedule( @Nonnull Task task, @Nullable TaskOptions options )
+    {
+        checkNotNull( task );
+
+        Queue queue = getQueue( task );
+        TaskOptions ready = populateTaskOptions( task, options );
+        TaskHandle handler = queue.add( ready );
+
         logger.info( "Task to execute: " + task );
         return handler;
     }
 
-    public void register( CronTaskRegistrar registrar )
+    public void register( @Nonnull CronTaskRegistrar registrar )
     {
+        checkNotNull( registrar );
         map.putAll( registrar.getClassMap() );
     }
 
     @Override
-    public TaskHandle execute( String cronUri )
+    public TaskHandle schedule( @Nonnull String cronUri )
     {
-        return execute( cronUri, null );
+        return schedule( cronUri, ( Map<String, String> ) null );
     }
 
     @Override
-    public final TaskHandle execute( String cronUri, Map<String, String> parameters )
+    public final TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
     {
+        checkNotNull( cronUri );
+
         Class<? extends CronTask> clazz = map.get( cronUri );
 
         if ( parameters == null )
@@ -105,45 +143,65 @@ class TaskQueueExecutorBean
 
         if ( clazz == null )
         {
-            if ( logger.isLoggable( Level.WARNING ) )
-            {
-                logger.warning( "No CronTask impl. class registered for cron URI: " + cronUri );
-            }
+            logger.warn( "No CronTask impl. class registered for cron URI: " + cronUri );
             return null;
         }
 
         CronTask task = injector.getInstance( clazz );
 
-        // TODO: From ServletRequest javadoc: The keys in the parameter map are of type String. The values in the parameter map are type of String array.
         for ( Map.Entry<String, String> params : parameters.entrySet() )
         {
             task.addParameter( params.getKey(), params.getValue() );
         }
 
-        if ( logger.isLoggable( Level.INFO ) )
-        {
-            logger.info( "Creating cron: " + task );
-        }
+        logger.info( "Creating cron: " + task );
 
         return addPayload( task );
     }
 
-    private TaskHandle addPayload( Task task, TaskOptions options )
+    @Override
+    public boolean delete( @Nonnull String taskName )
     {
-        Queue queue = getQueue( task );
+        return false;
+    }
 
-        String module = modulesService.getCurrentModule();
+    private TaskOptions populateTaskOptions( @Nonnull Task task, @Nullable TaskOptions options )
+    {
+        checkNotNull( task );
+
+        if ( options == null )
+        {
+            options = TaskOptions.Builder.withDefaults();
+        }
+
+        Integer countdown = task.getPostponeFor();
+        Long eta = options.getEtaMillis();
+
+        // Set only if there is no eta value, do not override an existing value
+        if ( countdown != null && countdown > 0 && eta == null )
+        {
+            // Calculates the final date in milliseconds TaskOptions#etaMillis for given relative value in seconds.
+            options.etaMillis( System.currentTimeMillis() + countdown * 1000 );
+        }
+
+        String taskName = task.getTaskName();
+        if ( taskName != null )
+        {
+            options.taskName( taskName );
+        }
+
+        String service = modulesService.getCurrentModule();
         String version = modulesService.getCurrentVersion();
-        String hostname = modulesService.getVersionHostname( module, version );
+        String hostname = modulesService.getVersionHostname( service, version );
 
         // header added to make sure run against current module (even non default module)
         // see https://code.google.com/p/googleappengine/issues/detail?id=10457
         options.header( "Host", hostname );
 
-        logger.info( "Enqueued in: " + task.getQueueName() + ",  module: " + module + ", version: " + version
-                + ", Module hostname: " + hostname );
+        logger.info( "Enqueued in: " + task.getQueueName() + ",  service: " + service + ", version: " + version
+                + ", Service hostname: " + hostname );
 
-        return queue.add( options.payload( task ) );
+        return options.payload( task );
     }
 
     private TaskHandle addPayload( CronTask task )
@@ -166,7 +224,8 @@ class TaskQueueExecutorBean
         return queue.add( options.payload( new CronTaskWrapper( task ) ) );
     }
 
-    private Queue getQueue( Task task )
+    @Override
+    public Queue getQueue( Task task )
     {
         Queue queue;
 
@@ -180,6 +239,12 @@ class TaskQueueExecutorBean
         }
 
         return queue;
+    }
+
+    @Override
+    public Queue getQueue( String queueName )
+    {
+        return QueueFactory.getQueue( queueName );
     }
 
     private Queue getQueue( CronTask task )

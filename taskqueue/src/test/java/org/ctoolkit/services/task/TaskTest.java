@@ -1,0 +1,171 @@
+/*
+ * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+package org.ctoolkit.services.task;
+
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.inject.Injector;
+import mockit.Expectations;
+import mockit.Injectable;
+import mockit.Tested;
+import mockit.Verifications;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
+
+/**
+ * {@link Task} unit testing.
+ *
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ */
+public class TaskTest
+{
+    @Tested
+    private Task tested;
+
+    @Injectable
+    private Injector injector;
+
+    @Injectable
+    private TaskExecutor executor;
+
+    @Test
+    public void chainingNextNoOptions()
+    {
+        final Task next = new FakeTask();
+        tested.addNext( next );
+
+        new Expectations()
+        {
+            {
+                tested.execute();
+            }
+        };
+
+        tested.run();
+
+        assertNull( next.getPostponeFor() );
+        new VerificationsNoOptions( next );
+    }
+
+    @Test
+    public void chainingNextWithOptions()
+    {
+        final Task next = new FakeTask();
+        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        tested.addNext( next ).options( options );
+
+        new Expectations()
+        {
+            {
+                tested.execute();
+            }
+        };
+
+        tested.run();
+
+        assertNull( next.getPostponeFor() );
+        new VerificationsWithOptions( next, options );
+    }
+
+    @Test
+    public void chainingNextWithOptionsAsArgument()
+    {
+        final Task next = new FakeTask();
+        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        tested.addNext( next, options );
+
+        new Expectations()
+        {
+            {
+                tested.execute();
+            }
+        };
+
+        tested.run();
+
+        assertNull( next.getPostponeFor() );
+        new VerificationsWithOptions( next, options );
+    }
+
+    @Test
+    public void chainingNextWithPostponeFor()
+    {
+        final Task next = new FakeTask();
+        tested.addNext( next ).postponeFor( 20 );
+
+        new Expectations()
+        {
+            {
+                tested.execute();
+            }
+        };
+
+        tested.run();
+
+        assertEquals( next.getPostponeFor(), Integer.valueOf( 20 ) );
+        new VerificationsNoOptions( next );
+    }
+
+    @Test
+    public void chainingNextWithPostponeForAsArgument()
+    {
+        final Task next = new FakeTask();
+        tested.addNext( next, 10 );
+
+        new Expectations()
+        {
+            {
+                tested.execute();
+            }
+        };
+
+        tested.run();
+
+        assertEquals( next.getPostponeFor(), Integer.valueOf( 10 ) );
+        new VerificationsNoOptions( next );
+    }
+
+    final class VerificationsWithOptions
+            extends Verifications
+    {
+        VerificationsWithOptions( Task next, TaskOptions options )
+        {
+            executor.schedule( ( Task ) any );
+            times = 0;
+
+            executor.schedule( next, options );
+            times = 1;
+        }
+    }
+
+    final class VerificationsNoOptions
+            extends Verifications
+    {
+        VerificationsNoOptions( Task next )
+        {
+            executor.schedule( next );
+            times = 1;
+
+            //noinspection ConstantConditions
+            executor.schedule( ( Task ) any, ( TaskOptions ) any );
+            times = 0;
+        }
+    }
+}

@@ -20,11 +20,9 @@ package org.ctoolkit.services.task;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -58,8 +56,7 @@ class CronServlet
     @Override
     @SuppressWarnings( value = "unchecked" )
     protected void doGet( HttpServletRequest request, HttpServletResponse response )
-            throws ServletException, IOException
     {
-        executor.execute( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
+        executor.schedule( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
     }
 }

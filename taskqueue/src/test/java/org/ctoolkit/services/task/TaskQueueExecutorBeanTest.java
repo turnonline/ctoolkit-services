@@ -18,304 +18,134 @@
 
 package org.ctoolkit.services.task;
 
-import com.google.guiceberry.junit4.GuiceBerryRule;
-import org.junit.Rule;
-import org.junit.Test;
+import com.google.appengine.api.modules.ModulesService;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.inject.Injector;
+import mockit.Expectations;
+import mockit.Injectable;
+import mockit.Mocked;
+import mockit.Tested;
+import mockit.Verifications;
+import org.testng.annotations.Test;
 
-import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
+ * {@link TaskQueueExecutorBean} unit testing.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class TaskQueueExecutorBeanTest
-        extends ServiceEnvironment
 {
-    @Rule
-    public final GuiceBerryRule guiceBerry = new GuiceBerryRule( ServiceEnvironment.class );
+    @Tested
+    private TaskQueueExecutorBean tested;
 
-    @Inject
-    private TaskExecutor executor;
+    @Injectable
+    private Injector injector;
+
+    @Injectable
+    private ModulesService modulesService;
+
+    @Test( expectedExceptions = NullPointerException.class )
+    public void batchScheduleEmpty()
+    {
+        final Task[] tasks = new Task[0];
+
+        tested.schedule( "my-queue", tasks );
+    }
+
+    @Test( expectedExceptions = NullPointerException.class )
+    public void batchScheduleNullArray()
+    {
+        final Task[] tasks = new Task[2];
+        tasks[0] = null;
+        tasks[1] = null;
+
+        tested.schedule( "my-queue", tasks );
+    }
 
     @Test
-    public void testExecute() throws Exception
+    public void scheduleNoOptions( @Mocked final Queue queue )
     {
-        Task task = new FakeTask( "process", 5 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 6 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 7 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 1 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 3 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 2 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 9 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "p", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 30 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 10 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 15 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 14 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 13 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 16 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 36 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 37 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 31 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 33 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 32 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 39 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 311 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 312 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 330 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 310 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 315 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 314 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 313 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 316 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-        task = new FakeTask( "process", 6 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 7 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 1 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 3 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 2 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 9 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process2", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 12 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 30 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 10 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 15 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 14 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 13 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 16 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 36 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 37 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 31 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 33 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 32 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 39 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 311 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 312 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 330 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 310 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 315 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 314 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 313 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 316 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-        task = new FakeTask( "process", 6 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 7 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 1 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 3 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 2 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 9 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process3", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "pro", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "proc", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "proces", 11 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 15 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 14 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
-        task = new FakeTask( "process", 13 );
-        task.setOwnerId( 1254L );
-        executor.execute( task );
-
+        final Task task = new FakeTask();
+
+        new ModulesServiceExpectations( tested, queue, task );
+
+        tested.schedule( task );
+
+        new Verifications()
+        {
+            {
+                TaskOptions options;
+                queue.add( options = withCapture() );
+
+                Map<String, List<String>> headers = options.getHeaders();
+                assertTrue( headers.size() > 0, "There are no headers!" );
+
+                List<String> host = headers.get( "Host" );
+                assertEquals( host.size(), 1, "Host header is" );
+
+                String hostname = host.get( 0 );
+                assertEquals( hostname, "complete-hostname" );
+            }
+        };
+    }
+
+    @Test
+    public void scheduleFulOptions( @Mocked final Queue queue )
+    {
+        final Integer postponeFor = 300;
+        final Long id = 123987L;
+
+        final Task task = new FakeTask( "my-prefix", "my-queue" );
+        task.postponeFor( postponeFor );
+        task.setEntityId( id );
+
+        new ModulesServiceExpectations( tested, queue, task );
+
+        tested.schedule( task );
+
+        new Verifications()
+        {
+            {
+                TaskOptions options;
+                queue.add( options = withCapture() );
+
+                Map<String, List<String>> headers = options.getHeaders();
+                assertTrue( headers.size() > 0, "There are no headers!" );
+
+                List<String> host = headers.get( "Host" );
+                assertEquals( host.size(), 1, "Host header is" );
+
+                String taskName = options.getTaskName();
+                assertEquals( taskName, "my-prefix_" + id, "Task name" );
+
+                Long eta = options.getEtaMillis();
+                Long diff = ( eta - System.currentTimeMillis() ) / 1000;
+                assertTrue( diff <= postponeFor, "Countdown" );
+            }
+        };
+    }
+
+    final class ModulesServiceExpectations
+            extends Expectations
+    {
+        ModulesServiceExpectations( TaskQueueExecutorBean partiallyMocked,
+                                    Queue queue,
+                                    Task task )
+        {
+            super( partiallyMocked );
+
+            modulesService.getVersionHostname( anyString, anyString );
+            result = "complete-hostname";
+
+            tested.getQueue( task );
+            result = queue;
+        }
     }
 }

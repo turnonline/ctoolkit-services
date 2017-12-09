@@ -18,71 +18,138 @@
 
 package org.ctoolkit.services.task;
 
+import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.TaskHandle;
 import com.google.appengine.api.taskqueue.TaskOptions;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 /**
  * The set of convenient methods for App Engine Task Queue (Push Queues).
  * <p>
+ * In order to inject an instance to the service in your implementation use transient instance.
+ * Task will be serialized and requested objects injected right before the execution.
+ * <p>
+ * <b>For example:</b>
+ * <pre>
+ * {@code
+ *
+ *  @literal @Inject
+ *   private transient MyService service;
+ * }
+ * </pre>
  * All task queue tasks are performed asynchronously. The application that creates the task is not notified
  * whether or not the task completed, or if it was successful. The task queue service provides a retry mechanism,
  * so if a task fails it can be retried a finite number of times.
  * <p>
  * Note: Although App Engine might appear to process tasks in the order in which they are enqueued,
  * it is normal for tasks to be executed in arbitrary order, so your implementation should not assume
- * that tasks are executed serially or in any other order.
+ * that tasks are executed serially or in any other order. If you need to make sure tasks are executed
+ * in defined order, use task chaining:
+ * <p>
+ * <b>Task chaining example:</b>
+ * <pre>
+ * {@code
  *
+ * Task first = new FakeTask().postponeFor( 10 );
+ * Task second = new FakeTask();
+ *
+ * first.addNext( second );
+ *
+ * // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
+ * executor.schedule( first );
+ * }
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see <a href="https://cloud.google.com/appengine/docs/standard/java/taskqueue">Task Queue Overview</a>
  */
 public interface TaskExecutor
 {
     /**
-     * Enqueue task to be executed asynchronously at some time in near future.
+     * Adds task to the queue to be executed asynchronously.
      *
      * @param task the asynchronously runnable task
      * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( Task task );
+    TaskHandle schedule( @Nonnull Task task );
 
     /**
-     * Enqueue task to be executed asynchronously with customized countdown.
-     * Maximum countdown for a task	30 days from the current date and time.
+     * Adds all tasks to the same queue to be executed asynchronously.
+     *
+     * @param queueName the queue name where all tasks will be added.
+     * @param task      the asynchronously runnable tasks
+     * @return the task definition (given or computed) already in queue
+     */
+    List<TaskHandle> schedule( @Nonnull String queueName, @Nonnull Task... task );
+
+    /**
+     * Adds task to the queue to be executed asynchronously and sets the number of seconds delay
+     * before execution of the task. Maximum countdown for a task is 30 days from the date and time
+     * when task has been added to a queue.
      *
      * @param task        the asynchronously runnable task
      * @param postponeFor the number of seconds to be added to current time,
      *                    that's a time when the task will be started. Max 30 days.
      * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( Task task, int postponeFor );
+    TaskHandle schedule( @Nonnull Task task, int postponeFor );
 
     /**
-     * Enqueue task to be executed asynchronously at some time in near future.
+     * Adds task to the queue to be executed asynchronously.
      *
      * @param task    the asynchronously runnable task
      * @param options the task configuration
      * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( Task task, TaskOptions options );
+    TaskHandle schedule( @Nonnull Task task, @Nullable TaskOptions options );
 
     /**
-     * Enqueue cron task to be executed asynchronously registered under cronUri,
+     * Adds cron task to the queue to be executed asynchronously registered under cronUri,
      * see {@link CronTaskRegistrar}.
      *
      * @param cronUri the URI under which is cron task registered
      * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( String cronUri );
+    TaskHandle schedule( @Nonnull String cronUri );
 
     /**
-     * Enqueue cron task to be executed asynchronously registered under cronUri,
+     * Adds cron task to the queue to be executed asynchronously registered under cronUri,
      * see {@link CronTaskRegistrar}.
      *
      * @param cronUri    the URI under which is cron task registered
      * @param parameters the additional parameters to be added to registered task
      * @return the task definition (given or computed) already in queue
      */
-    TaskHandle execute( String cronUri, Map<String, String> parameters );
+    TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters );
+
+    /**
+     * Deletes a task from the default queue.
+     *
+     * @param taskName the name of the task to be deleted
+     * @return true if the task was successfully deleted. False if the task was not found or was previously deleted.
+     */
+    boolean delete( @Nonnull String taskName );
+
+    /**
+     * Returns the associated {@link Queue} of the task.
+     *
+     * @param task the task instance
+     * @return the associated queue
+     */
+    Queue getQueue( Task task );
+
+    /**
+     * Returns the {@link Queue} by name.
+     * <p>
+     * The returned Queue object may not necessarily refer to an existing queue.
+     * Queues must be configured before they may be used.
+     * Attempting to use a non-existing queue name may result in errors
+     * at the point of use of the Queue object and not when calling getQueue(String).
+     *
+     * @param queueName the name of the queue to be returned
+     * @return the queue
+     */
+    Queue getQueue( String queueName );
 }

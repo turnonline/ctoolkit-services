@@ -18,32 +18,33 @@
 
 package org.ctoolkit.services.task;
 
-import javax.annotation.Nonnull;
+import com.google.guiceberry.junit4.GuiceBerryRule;
+import org.junit.Rule;
+import org.junit.Test;
+
+import javax.inject.Inject;
 
 /**
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class FakeTask
-        extends Task
+public class TaskExecutorQueueTest
+        extends ServiceEnvironment
 {
-    private static final long serialVersionUID = 1L;
+    @Rule
+    public final GuiceBerryRule guiceBerry = new GuiceBerryRule( ServiceEnvironment.class );
 
-    public FakeTask()
-    {
-    }
+    @Inject
+    private TaskExecutor executor;
 
-    public FakeTask( @Nonnull String namePrefix )
+    @Test
+    public void testExecute()
     {
-        super( namePrefix );
-    }
+        Task first = new FakeTask().postponeFor( 10 );
+        Task second = new FakeTask();
 
-    public FakeTask( @Nonnull String namePrefix, @Nonnull String queueName )
-    {
-        super( namePrefix, queueName );
-    }
+        first.addNext( second );
 
-    @Override
-    public void execute()
-    {
+        // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
+        executor.schedule( first );
     }
 }
