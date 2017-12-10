@@ -131,8 +131,8 @@ public class IfNoId
                 tEntity = ( EntityIdentity ) tField.get( pojo );
             }
 
-            // by default this is switched off, turn it on by overriding #isCascadingOn() method
-            if ( isCascadingOn() )
+            // by default cascading is switched off, turn it on by overriding #isCascadingOn() method
+            if ( isCascadingOn() && tEntity != null )
             {
                 EntityIdentity.HasIgnored hasIgnored = null;
                 if ( pojo instanceof EntityIdentity.HasIgnored )

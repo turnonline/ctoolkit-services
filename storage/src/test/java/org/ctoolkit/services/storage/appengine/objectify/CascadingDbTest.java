@@ -105,4 +105,14 @@ public class CascadingDbTest
         message = "Child entity with ignored 2 level child has been saved too many times";
         assertEquals( message, Integer.valueOf( 2 ), childEntity.getVersion() );
     }
+
+    @Test
+    public void cascadingSaveNullFields()
+    {
+        ParentEntity parent = new ParentEntity();
+        parent.save();
+
+        String message = "Parent entity has been saved too many times";
+        assertEquals( message, Integer.valueOf( 2 ), parent.getVersion() );
+    }
 }
