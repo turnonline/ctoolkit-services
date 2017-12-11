@@ -185,7 +185,10 @@ class TaskQueueExecutorBean
         }
 
         String taskName = task.getTaskName();
-        if ( taskName != null )
+        String optionsTaskName = options.getTaskName();
+
+        // Set only if there is no task name value, do not override an existing value
+        if ( taskName != null && optionsTaskName == null )
         {
             options.taskName( taskName );
         }
@@ -198,7 +201,7 @@ class TaskQueueExecutorBean
         // see https://code.google.com/p/googleappengine/issues/detail?id=10457
         options.header( "Host", hostname );
 
-        logger.info( "Enqueued in: " + task.getQueueName() + ",  service: " + service + ", version: " + version
+        logger.info( "Queue: " + task.getQueueName() + ",  service: " + service + ", version: " + version
                 + ", Service hostname: " + hostname );
 
         return options.payload( task );
