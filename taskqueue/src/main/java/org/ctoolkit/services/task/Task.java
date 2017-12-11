@@ -123,6 +123,17 @@ public abstract class Task
     }
 
     /**
+     * Returns the task name prefix.
+     *
+     * @return the task name prefix
+     * @see #getTaskName()
+     */
+    public String getNamePrefix()
+    {
+        return namePrefix;
+    }
+
+    /**
      * Returns the task name as a composition of the non null Entity ID and name prefix.
      * Otherwise returns {@code null}.
      *
