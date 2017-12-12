@@ -42,6 +42,8 @@ import static org.testng.Assert.assertTrue;
  */
 public class TaskQueueExecutorBeanTest
 {
+    private static long allocatedId = 119L;
+
     @Tested
     private TaskQueueExecutorBean tested;
 
@@ -97,12 +99,41 @@ public class TaskQueueExecutorBeanTest
     }
 
     @Test
+    public void scheduleWithUniqueTaskName( @Mocked final Queue queue )
+    {
+        final Long id = 651987L;
+        final Task task = new FakeTask( "my-prefix", true );
+        task.setEntityId( id );
+
+        new ModulesServiceExpectations( tested, queue, task );
+
+        tested.schedule( task );
+
+        new Verifications()
+        {
+            {
+                TaskOptions options;
+                queue.add( options = withCapture() );
+
+                Map<String, List<String>> headers = options.getHeaders();
+                assertTrue( headers.size() > 0, "There are no headers!" );
+
+                List<String> host = headers.get( "Host" );
+                assertEquals( host.size(), 1, "Host header is" );
+
+                String taskName = options.getTaskName();
+                assertEquals( taskName, "my-prefix_" + id + "_" + allocatedId, "Task name" );
+            }
+        };
+    }
+
+    @Test
     public void scheduleFulOptions( @Mocked final Queue queue )
     {
         final Integer postponeFor = 300;
         final Long id = 123987L;
 
-        final Task task = new FakeTask( "my-prefix", "my-queue" );
+        final Task task = new FakeTask( "my-prefix", false, "my-queue" );
         task.postponeFor( postponeFor );
         task.setEntityId( id );
 
@@ -143,6 +174,10 @@ public class TaskQueueExecutorBeanTest
 
             modulesService.getVersionHostname( anyString, anyString );
             result = "complete-hostname";
+
+            tested.allocateId();
+            result = allocatedId;
+            minTimes = 0;
 
             tested.getQueue( task );
             result = queue;

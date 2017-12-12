@@ -30,15 +30,23 @@ import java.util.Map;
 /**
  * The set of convenient methods for App Engine Task Queue (Push Queues).
  * <p>
- * In order to inject an instance to the service in your implementation use transient instance.
+ * In order to inject a service instance in your task implementation use transient instance.
  * Task will be serialized and requested objects injected right before the execution.
  * <p>
  * <b>For example:</b>
  * <pre>
  * {@code
  *
+ * class MyOwnTask
+ *        extends Task
+ *  {
  *  @literal @Inject
  *   private transient MyService service;
+ *   ..
+ *  }
+ *
+ *  // In the guice module
+ *  requestStaticInjection( MyOwnTask.class );
  * }
  * </pre>
  * All task queue tasks are performed asynchronously. The application that creates the task is not notified
@@ -55,12 +63,12 @@ import java.util.Map;
  * {@code
  *
  * Task first = new FakeTask().postponeFor( 10 );
- * Task second = new FakeTask();
+ *  Task second = new FakeTask();
  *
- * first.addNext( second );
+ *  first.addNext( second );
  *
- * // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
- * executor.schedule( first );
+ *  // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
+ *  executor.schedule( first );
  * }
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see <a href="https://cloud.google.com/appengine/docs/standard/java/taskqueue">Task Queue Overview</a>

@@ -23,6 +23,7 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskHandle;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 
 /**
@@ -177,20 +179,28 @@ class TaskQueueExecutorBean
         Integer countdown = task.getPostponeFor();
         Long eta = options.getEtaMillis();
 
-        // Set only if there is no eta value, do not override an existing value
+        // Set only if there is no eta value, the TaskOptions value has preference
         if ( countdown != null && countdown > 0 && eta == null )
         {
             // Calculates the final date in milliseconds TaskOptions#etaMillis for given relative value in seconds.
             options.etaMillis( System.currentTimeMillis() + countdown * 1000 );
         }
 
-        String taskName = task.getTaskName();
         String optionsTaskName = options.getTaskName();
 
-        // Set only if there is no task name value, do not override an existing value
-        if ( taskName != null && optionsTaskName == null )
+        // Set name defined by task only if it's not already defined by options, the TaskOptions value has preference
+        if ( optionsTaskName == null )
         {
-            options.taskName( taskName );
+            String taskName = task.getTaskName();
+            if ( taskName != null )
+            {
+                if ( task.isMakeUnique() )
+                {
+                    // append unique ID to make sure task name will be unique
+                    taskName = taskName + "_" + allocateId();
+                }
+                options.taskName( taskName );
+            }
         }
 
         String service = modulesService.getCurrentModule();
@@ -205,6 +215,12 @@ class TaskQueueExecutorBean
                 + ", Service hostname: " + hostname );
 
         return options.payload( task );
+    }
+
+    @VisibleForTesting
+    long allocateId()
+    {
+        return ofy().factory().allocateId( TaskUniqueIdGenerator.class ).getId();
     }
 
     private TaskHandle addPayload( CronTask task )

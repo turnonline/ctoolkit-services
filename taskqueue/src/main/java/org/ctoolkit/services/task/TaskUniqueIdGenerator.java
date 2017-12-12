@@ -18,38 +18,18 @@
 
 package org.ctoolkit.services.task;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Id;
 
 /**
+ * The datastore Kind place holder. It's here to provide a mechanism to generate
+ * an unique task ID: a task name with prefix that ends with generated ID by this kind.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class FakeTask
-        extends Task
+@Entity( name = "_GAE_TaskQueueJobUniqueIdGenerator" )
+class TaskUniqueIdGenerator
 {
-    private static final long serialVersionUID = 1L;
-
-    public FakeTask()
-    {
-    }
-
-    public FakeTask( @Nonnull String namePrefix )
-    {
-        super( namePrefix );
-    }
-
-    public FakeTask( @Nonnull String namePrefix, boolean makeUnique )
-    {
-        super( namePrefix, makeUnique );
-    }
-
-    public FakeTask( @Nullable String namePrefix, boolean makeUnique, @Nonnull String queueName )
-    {
-        super( namePrefix, makeUnique, queueName );
-    }
-
-    @Override
-    public void execute()
-    {
-    }
+    @Id
+    private Long id;
 }
