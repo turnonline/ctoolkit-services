@@ -27,6 +27,7 @@ import com.googlecode.objectify.condition.PojoIf;
 import org.ctoolkit.services.storage.ChildEntityOf;
 import org.ctoolkit.services.storage.EntityIdentity;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 
 /**
@@ -134,42 +135,7 @@ public class IfNoId
             // by default cascading is switched off, turn it on by overriding #isCascadingOn() method
             if ( isCascadingOn() && tEntity != null )
             {
-                EntityIdentity.HasIgnored hasIgnored = null;
-                if ( pojo instanceof EntityIdentity.HasIgnored )
-                {
-                    hasIgnored = ( EntityIdentity.HasIgnored ) pojo;
-                }
-
-                boolean ignoreSave = hasIgnored != null
-                        && hasIgnored.cascading().isIgnored( fieldName );
-
-                // Whether to ignore cascading save. It's configurable per method call.
-                if ( !ignoreSave && pojo.getId() != null )
-                {
-                    if ( tEntity instanceof ChildEntityOf )
-                    {
-                        @SuppressWarnings( "unchecked" )
-                        ChildEntityOf<? super EntityIdentity, ?> tChildEntity = ( ChildEntityOf ) tEntity;
-                        tChildEntity.setParent( pojo );
-                    }
-
-                    if ( hasIgnored == null )
-                    {
-                        tEntity.save();
-                    }
-                    else
-                    {
-                        EntityIdentity.Ignored ignored = hasIgnored.cascading().search( fieldName );
-                        tEntity.save( ignored );
-                    }
-                    if ( tEntity.getId() == null )
-                    {
-                        String msg = "The ID is being expected to be set."
-                                + " Deferred save is not supported with this annotation.";
-
-                        throw new RuntimeException( msg );
-                    }
-                }
+                cascadingSave( pojo, tEntity );
             }
 
             if ( tEntity != null && tEntity.getId() != null )
@@ -190,6 +156,46 @@ public class IfNoId
         }
     }
 
+    private void cascadingSave( @Nonnull EntityIdentity pojo, @Nonnull EntityIdentity tEntity )
+    {
+        EntityIdentity.HasIgnored hasIgnored = null;
+        if ( pojo instanceof EntityIdentity.HasIgnored )
+        {
+            hasIgnored = ( EntityIdentity.HasIgnored ) pojo;
+        }
+
+        boolean ignoreSave = hasIgnored != null
+                && hasIgnored.cascading().isIgnored( fieldName );
+
+        // Whether to ignore cascading save. It's configurable per method call.
+        if ( !ignoreSave && pojo.getId() != null )
+        {
+            if ( tEntity instanceof ChildEntityOf )
+            {
+                @SuppressWarnings( "unchecked" )
+                ChildEntityOf<? super EntityIdentity, ?> tChildEntity = ( ChildEntityOf ) tEntity;
+                tChildEntity.setParent( pojo );
+            }
+
+            if ( hasIgnored == null )
+            {
+                tEntity.save();
+            }
+            else
+            {
+                EntityIdentity.Ignored ignored = hasIgnored.cascading().search( fieldName );
+                tEntity.save( ignored );
+            }
+            if ( tEntity.getId() == null )
+            {
+                String msg = "The ID is being expected to be set."
+                        + " Deferred save is not supported with this annotation.";
+
+                throw new RuntimeException( msg );
+            }
+        }
+    }
+
     /**
      * Constructs the transient field name with prefix 't' and changed first character
      * of the source field name to capital letter.
@@ -207,7 +213,7 @@ public class IfNoId
 
     /**
      * The boolean indicating whether transient entity should be evaluated for cascading save.
-     * If all conditions are met the {@link ChildEntityOf#save()} will be called.
+     * If all conditions are met the {@link EntityIdentity#save()} will be called.
      *
      * @return true to turn on cascading save
      */
