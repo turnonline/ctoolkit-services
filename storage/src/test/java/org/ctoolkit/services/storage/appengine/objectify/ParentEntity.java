@@ -23,6 +23,9 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.IgnoreSave;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
@@ -45,6 +48,27 @@ public class ParentEntity
 
     @Ignore
     private SiblingChildEntity tSiblingChildEntity;
+
+    @IgnoreSave( IfNoIdOtherwiseCascading.class )
+    List<Ref<ChildEntity>> children;
+
+    @Ignore
+    private List<ChildEntity> tChildren = new ArrayList<>();
+
+    public void add( ChildEntity entity )
+    {
+        tChildren.add( entity );
+    }
+
+    public void remove( ChildEntity entity )
+    {
+        tChildren.remove( entity );
+    }
+
+    public List<ChildEntity> getChildren()
+    {
+        return fromCollectionOfRefs( children, tChildren );
+    }
 
     ChildEntity getChildEntity()
     {

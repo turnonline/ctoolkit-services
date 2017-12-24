@@ -31,6 +31,10 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class Child2LevelEntity
         extends EntityStringChildOf<ChildEntity>
 {
+    Child2LevelEntity()
+    {
+    }
+
     Child2LevelEntity( String id )
     {
         super.setId( id );

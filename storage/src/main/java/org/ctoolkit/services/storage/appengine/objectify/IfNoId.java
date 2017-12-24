@@ -28,7 +28,14 @@ import org.ctoolkit.services.storage.ChildEntityOf;
 import org.ctoolkit.services.storage.EntityIdentity;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * {@link IgnoreSave} of the associated field (reference to another entity) if that entity is not persisted yet;
@@ -73,6 +80,27 @@ import java.lang.reflect.Field;
  * }
  * </pre>
  * The referenced entity BillingAddress in this example is expected to be type of {@link EntityIdentity}.
+ * <p>
+ * <b>One to many cascading save support</b>
+ * <pre>
+ * {@code
+ *
+ *  // if you provide your concrete type of collection (for example ArrayList), type will be preserved
+ * @literal @IgnoreSave( IfNoIdOtherwiseCascading.class )
+ *  private List<Ref<Ingredient>> ingredients = new ArrayList<>();
+ *
+ *  // transient collection of entities
+ * @literal @Ignore
+ *  private List<Ingredient> tIngredients = new ArrayList<>();
+ *
+ *  public List<Ingredient> getIngredients()
+ *  {
+ *      return fromCollectionOfRefs( ingredients, tIngredients );
+ *  }
+ * }
+ * </pre>
+ * <b>Note:</b> if an entity has been removed from the collection comparing to the persisted one,
+ * the {@link EntityIdentity#delete()} will be called at missing instance.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see IfNoIdOtherwiseCascading
@@ -116,43 +144,152 @@ public class IfNoId
 
         try
         {
-            EntityIdentity tEntity = null;
-            Ref dbRef = ( Ref ) field.get( pojo );
+            Object fieldObject = field.get( pojo );
+            Object tFieldObject = tField.get( pojo );
+            boolean ignoreSave;
 
-            // if entity is already persisted the instance from the reference is preferred
-            if ( dbRef != null )
+            if ( tFieldObject instanceof Collection )
             {
-                Object entity = dbRef.get();
-                tEntity = ( EntityIdentity ) entity;
+                @SuppressWarnings( "unchecked" )
+                Collection<Ref<EntityIdentity>> collectionOfRefs = ( Collection<Ref<EntityIdentity>> ) fieldObject;
+                ignoreSave = populateField( pojo, tField, collectionOfRefs );
+            }
+            else
+            {
+                ignoreSave = populateField( pojo, tField, ( Ref ) fieldObject );
             }
 
-            if ( tEntity == null )
-            {
-                // retrieving of the transient entity instance if not persisted yet
-                tEntity = ( EntityIdentity ) tField.get( pojo );
-            }
-
-            // by default cascading is switched off, turn it on by overriding #isCascadingOn() method
-            if ( isCascadingOn() && tEntity != null )
-            {
-                cascadingSave( pojo, tEntity );
-            }
-
-            if ( tEntity != null && tEntity.getId() != null )
-            {
-                Ref<EntityIdentity> ref = Ref.create( tEntity );
-                field.set( pojo, ref );
-
-                // Either new or changed value, do NOT ignore -> perform save
-                return false;
-            }
-            // If true it already has a value, do NOT ignore -> perform save.
-            // Otherwise ignore save as there are no values (db, transient) at all.
-            else return dbRef == null;
+            return ignoreSave;
         }
         catch ( IllegalAccessException e )
         {
             throw new RuntimeException( e );
+        }
+    }
+
+    private boolean populateField( @Nonnull EntityIdentity pojo,
+                                   @Nonnull Field tField,
+                                   @Nullable Ref dbRef )
+            throws IllegalAccessException
+    {
+        EntityIdentity tEntity = null;
+
+        // if entity is already persisted the instance from the reference is preferred
+        if ( dbRef != null )
+        {
+            Object entity = dbRef.get();
+            tEntity = ( EntityIdentity ) entity;
+        }
+
+        if ( tEntity == null )
+        {
+            // retrieving of the transient entity instance if not persisted yet
+            tEntity = ( EntityIdentity ) tField.get( pojo );
+        }
+
+        // by default cascading is switched off, turn it on by overriding #isCascadingOn() method
+        if ( isCascadingOn() && tEntity != null )
+        {
+            cascadingSave( pojo, tEntity );
+        }
+
+        if ( tEntity != null && tEntity.getId() != null )
+        {
+            Ref<EntityIdentity> ref = Ref.create( tEntity );
+            field.set( pojo, ref );
+
+            // Either new or changed value, do NOT ignore -> perform save
+            return false;
+        }
+        // If false it already has a value, do NOT ignore -> perform save.
+        // Otherwise ignore save as there are no values (db, transient) at all.
+        else return dbRef == null;
+    }
+
+    private boolean populateField( @Nonnull EntityIdentity pojo,
+                                   @Nonnull Field tField,
+                                   @Nullable Collection<Ref<EntityIdentity>> dbCollectionOfRefs )
+            throws IllegalAccessException
+    {
+        // retrieving the collection of transient entities, it represents the most current state
+        @SuppressWarnings( "unchecked" )
+        Collection<EntityIdentity> tCollectionOfEntities = ( Collection<EntityIdentity> ) tField.get( pojo );
+
+        // by default cascading is switched off, turn it on by overriding #isCascadingOn() method
+        if ( isCascadingOn() && tCollectionOfEntities != null )
+        {
+            for ( EntityIdentity tEntity : tCollectionOfEntities )
+            {
+                cascadingSave( pojo, tEntity );
+            }
+        }
+
+        if ( tCollectionOfEntities != null )
+        {
+            if ( dbCollectionOfRefs == null )
+            {
+                dbCollectionOfRefs = newCollection( tCollectionOfEntities );
+            }
+
+            // Some of the item could be removed in meantime, thus first remove the items
+            // not presented in the current list. Ref collection represents datastore state.
+            Iterator<Ref<EntityIdentity>> iterator = dbCollectionOfRefs.iterator();
+            Ref<EntityIdentity> originItem;
+
+            while ( iterator.hasNext() )
+            {
+                originItem = iterator.next();
+                EntityIdentity originEntity = originItem.get();
+                if ( !tCollectionOfEntities.contains( originEntity ) )
+                {
+                    iterator.remove();
+                    if ( originEntity != null )
+                    {
+                        originEntity.delete();
+                    }
+                }
+            }
+
+            Ref<EntityIdentity> tEntityRef;
+            for ( EntityIdentity next : tCollectionOfEntities )
+            {
+                if ( next.getId() == null )
+                {
+                    // children not saved yet, ignore saving of the all entities in the collection
+                    dbCollectionOfRefs = null;
+                    break;
+                }
+
+                tEntityRef = Ref.create( next );
+                if ( !dbCollectionOfRefs.contains( tEntityRef ) )
+                {
+                    dbCollectionOfRefs.add( tEntityRef );
+                }
+            }
+
+            field.set( pojo, dbCollectionOfRefs );
+            // null means at least one of the entity in the collection is not persisted yet
+            return dbCollectionOfRefs == null;
+        }
+
+        // If false it already has a value, do NOT ignore -> perform save.
+        // Otherwise ignore save as there are no values (db, transient) at all.
+        else return dbCollectionOfRefs == null;
+    }
+
+    private Collection<Ref<EntityIdentity>> newCollection( Collection type )
+    {
+        if ( type instanceof List )
+        {
+            return new ArrayList<>();
+        }
+        else if ( type instanceof Set )
+        {
+            return new HashSet<>();
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Unsupported collection type: " + type.getClass() );
         }
     }
 

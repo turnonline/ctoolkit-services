@@ -21,9 +21,12 @@ package org.ctoolkit.services.storage.appengine.objectify;
 import org.ctoolkit.services.storage.appengine.ServiceTestNgCase;
 import org.testng.annotations.Test;
 
+import java.util.List;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.assertEquals;
 
 /**
  * Parent/Child entity group cascading saving.
@@ -60,17 +63,71 @@ public class CascadingDbTest
         // parent entities with children are expected have to be saved 2 times, at first the entity
         // must be saved without Ref (child has no Id yet) and then again with Ref to its children
         String message = "Parent entity has been saved too many times";
-        assertEquals( message, Integer.valueOf( 2 ), parent.getVersion() );
+        assertEquals( parent.getVersion(), Integer.valueOf( 2 ), message );
 
         message = "Child entity with 2 level child has been saved too many times";
-        assertEquals( message, Integer.valueOf( 2 ), childEntity.getVersion() );
+        assertEquals( childEntity.getVersion(), Integer.valueOf( 2 ), message );
 
         // leaf entities are expected have to be saved only once
         message = "Sibling child entity has been saved too many times";
-        assertEquals( message, Integer.valueOf( 1 ), siblingChildEntity.getVersion() );
+        assertEquals( siblingChildEntity.getVersion(), Integer.valueOf( 1 ), message );
 
         message = "2 level child entity has been saved too many times";
-        assertEquals( message, Integer.valueOf( 1 ), child2LevelEntity.getVersion() );
+        assertEquals( child2LevelEntity.getVersion(), Integer.valueOf( 1 ), message );
+    }
+
+    @Test
+    public void cascadingSaveWithOneToMany()
+    {
+        ParentEntity parent = new ParentEntity();
+        ChildEntity child = new ChildEntity();
+        ChildEntity secondChild = new ChildEntity();
+        child.setChildEntity( new Child2LevelEntity( "my-string-id" ) );
+
+        parent.add( child );
+        parent.add( secondChild );
+
+        // cascading save test
+        parent.save();
+
+        List<ChildEntity> children = parent.getChildren();
+        assertNotNull( children );
+        assertEquals( children.size(), 2, "Children list size" );
+        assertNotNull( parent.children, "Persisted children references" );
+        assertEquals( parent.children.size(), 2, "Persisted children list size" );
+
+        ChildEntity firstChildEntity = children.get( 0 );
+        Child2LevelEntity child2LevelEntity = firstChildEntity.getChildEntity();
+
+        assertNotNull( firstChildEntity.getId(), "Child entity not persisted." );
+        assertEquals( firstChildEntity.getParent(), parent, "Parent for child entity is not correct." );
+        assertEquals( child2LevelEntity.getParent(), firstChildEntity, "Parent for child entity is not correct." );
+
+        ChildEntity secondChildEntity = children.get( 1 );
+        assertNotNull( secondChildEntity.getId(), "Child entity not persisted." );
+        assertEquals( secondChildEntity.getParent(), parent, "Parent for child entity is not correct." );
+        ofy().clear();
+
+        // testing whether children records has been created
+        List<ChildEntity> dbList = ofy().load().type( ChildEntity.class ).list();
+        assertEquals( dbList.size(), 2, "Children list size" );
+
+        // cascading delete test
+        parent.remove( secondChild );
+        parent.save();
+
+        children = parent.getChildren();
+        assertNotNull( children );
+
+        // one child has been removed
+        assertEquals( children.size(), 1, "Updated children list size" );
+        assertNotNull( parent.children, "Persisted children references" );
+        assertEquals( parent.children.size(), 1, "Updated persisted children list size" );
+
+        // testing whether one of the persisted children records has been removed
+        ofy().clear();
+        dbList = ofy().load().type( ChildEntity.class ).list();
+        assertEquals( dbList.size(), 1, "Children list size" );
     }
 
     @Test
@@ -100,10 +157,10 @@ public class CascadingDbTest
         assertNull( child2LevelEntity.getCreatedDate(), "2 level child entity has been saved, but cannot." );
 
         String message = "Parent entity has been saved too many times";
-        assertEquals( message, Integer.valueOf( 2 ), parent.getVersion() );
+        assertEquals( parent.getVersion(), Integer.valueOf( 2 ), message );
 
         message = "Child entity with ignored 2 level child has been saved too many times";
-        assertEquals( message, Integer.valueOf( 2 ), childEntity.getVersion() );
+        assertEquals( childEntity.getVersion(), Integer.valueOf( 2 ), message );
     }
 
     @Test
@@ -113,6 +170,6 @@ public class CascadingDbTest
         parent.save();
 
         String message = "Parent entity has been saved too many times";
-        assertEquals( message, Integer.valueOf( 2 ), parent.getVersion() );
+        assertEquals( parent.getVersion(), Integer.valueOf( 2 ), message );
     }
 }

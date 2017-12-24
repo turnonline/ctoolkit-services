@@ -30,8 +30,11 @@ import org.ctoolkit.services.storage.EntityIdentity;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.Normalizer;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -195,6 +198,61 @@ public abstract class BaseEntityIdentity<ID_TYPE>
             return defaultInstance;
         }
         return ref.get();
+    }
+
+    /**
+     * Populates the collection (type of {@link List}) from the datastore references.
+     *
+     * @param collectionOfRefs      the collection of entity references as a source for the result
+     * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
+     * @return the populated collection from the references or empty collection
+     */
+    public <T> List<T> fromCollectionOfRefs( @Nullable List<Ref<T>> collectionOfRefs,
+                                             @Nullable List<T> tCollectionOfEntities )
+    {
+        if ( tCollectionOfEntities != null && !tCollectionOfEntities.isEmpty() )
+        {
+            return tCollectionOfEntities;
+        }
+
+        List<T> collection = tCollectionOfEntities == null ? new ArrayList<T>() : tCollectionOfEntities;
+        return ( List<T> ) fromRefs( collection, collectionOfRefs );
+    }
+
+    /**
+     * Populates the collection (type of {@link Set}) from the datastore references.
+     *
+     * @param collectionOfRefs      the collection of entity references as a source for the result
+     * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
+     * @return the populated collection from the references or empty collection
+     */
+    public <T> Set<T> fromCollectionOfRefs( @Nullable Set<Ref<T>> collectionOfRefs,
+                                            @Nullable Set<T> tCollectionOfEntities )
+    {
+        if ( tCollectionOfEntities != null && !tCollectionOfEntities.isEmpty() )
+        {
+            return tCollectionOfEntities;
+        }
+
+        Set<T> collection = tCollectionOfEntities == null ? new HashSet<T>() : tCollectionOfEntities;
+        return ( Set<T> ) fromRefs( collection, collectionOfRefs );
+    }
+
+    private <T> Collection<T> fromRefs( @Nonnull Collection<T> tCollectionOfEntities,
+                                        @Nullable Collection<Ref<T>> collectionOfRefs )
+    {
+        if ( collectionOfRefs != null )
+        {
+            for ( Ref<T> ref : collectionOfRefs )
+            {
+                T entity = checkNotNull( ref.get() );
+                if ( !tCollectionOfEntities.contains( entity ) )
+                {
+                    tCollectionOfEntities.add( entity );
+                }
+            }
+        }
+        return tCollectionOfEntities;
     }
 
     @Override

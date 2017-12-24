@@ -69,5 +69,6 @@ public class ChildEntity
     @Override
     public void delete()
     {
+        ofy().delete().entity( this ).now();
     }
 }
