@@ -65,6 +65,11 @@ public class ParentEntity
         tChildren.remove( entity );
     }
 
+    public void clearChildren()
+    {
+        tChildren = null;
+    }
+
     public List<ChildEntity> getChildren()
     {
         return fromCollectionOfRefs( children, tChildren );

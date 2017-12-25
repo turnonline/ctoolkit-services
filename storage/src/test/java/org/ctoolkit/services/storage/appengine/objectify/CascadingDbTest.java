@@ -124,10 +124,26 @@ public class CascadingDbTest
         assertNotNull( parent.children, "Persisted children references" );
         assertEquals( parent.children.size(), 1, "Updated persisted children list size" );
 
-        // testing whether one of the persisted children records has been removed
+        // testing whether persisted children record has been removed from datastore too
         ofy().clear();
         dbList = ofy().load().type( ChildEntity.class ).list();
         assertEquals( dbList.size(), 1, "Children list size" );
+
+        // testing whether simply load and immediate save will keep it same
+        ParentEntity dbParentEntity = ofy().load().type( ParentEntity.class ).id( parent.getId() ).now();
+        dbParentEntity.save();
+        ofy().clear();
+
+        dbParentEntity = ofy().load().type( ParentEntity.class ).id( dbParentEntity.getId() ).now();
+        dbList = ofy().load().type( ChildEntity.class ).list();
+
+        assertEquals( dbList.size(), 1, "Children list size" );
+
+        // clearing all one to many children
+        dbParentEntity.clearChildren();
+        dbParentEntity.save();
+        dbList = ofy().load().type( ChildEntity.class ).list();
+        assertEquals( dbList.size(), 0, "Children list size" );
     }
 
     @Test
@@ -161,6 +177,31 @@ public class CascadingDbTest
 
         message = "Child entity with ignored 2 level child has been saved too many times";
         assertEquals( childEntity.getVersion(), Integer.valueOf( 2 ), message );
+
+        // testing whether one to many entity update is being ignored
+        ChildEntity oneToMany = new ChildEntity();
+        parent.add( oneToMany );
+        parent.save();
+        ofy().clear();
+
+        List<ChildEntity> dbList = ofy().load().type( ChildEntity.class ).list();
+        assertEquals( dbList.size(), 2, "Children list size" );
+
+        oneToMany = new ChildEntity();
+        parent.add( oneToMany );
+        parent.newCascading().ignore( "children" );
+        parent.save();
+        ofy().clear();
+
+        parent = ofy().load().type( ParentEntity.class ).id( parent.getId() ).now();
+        dbList = ofy().load().type( ChildEntity.class ).list();
+        assertEquals( dbList.size(), 2, "Children list size" );
+
+        List<ChildEntity> children = parent.getChildren();
+        assertNotNull( children );
+        assertEquals( children.size(), 1, "One to many  children list size" );
+        assertNotNull( parent.children, "Persisted one to many children references" );
+        assertEquals( parent.children.size(), 1, "Persisted one to many children list size" );
     }
 
     @Test

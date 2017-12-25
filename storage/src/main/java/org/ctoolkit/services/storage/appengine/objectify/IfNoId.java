@@ -90,6 +90,7 @@ import java.util.Set;
  *  private List<Ref<Ingredient>> ingredients = new ArrayList<>();
  *
  *  // transient collection of entities
+ *  // Note: the null collection of entities is an explicit mark to delete all datastore references
  * @literal @Ignore
  *  private List<Ingredient> tIngredients = new ArrayList<>();
  *
@@ -100,7 +101,9 @@ import java.util.Set;
  * }
  * </pre>
  * <b>Note:</b> if an entity has been removed from the collection comparing to the persisted one,
- * the {@link EntityIdentity#delete()} will be called at missing instance.
+ * the {@link EntityIdentity#delete()} will be called at missing instance. Make sure equals and hashCode
+ * methods are properly implemented.
+ *
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see IfNoIdOtherwiseCascading
@@ -145,10 +148,9 @@ public class IfNoId
         try
         {
             Object fieldObject = field.get( pojo );
-            Object tFieldObject = tField.get( pojo );
             boolean ignoreSave;
 
-            if ( tFieldObject instanceof Collection )
+            if ( Collection.class.isAssignableFrom( tField.getType() ) )
             {
                 @SuppressWarnings( "unchecked" )
                 Collection<Ref<EntityIdentity>> collectionOfRefs = ( Collection<Ref<EntityIdentity>> ) fieldObject;
@@ -220,15 +222,32 @@ public class IfNoId
         {
             for ( EntityIdentity tEntity : tCollectionOfEntities )
             {
-                cascadingSave( pojo, tEntity );
+                if ( cascadingSave( pojo, tEntity ) )
+                {
+                    // cascading save operation has been configured to be ignored
+                    break;
+                }
             }
         }
 
-        if ( tCollectionOfEntities != null )
+        if ( dbCollectionOfRefs == null
+                && tCollectionOfEntities != null
+                && !tCollectionOfEntities.isEmpty() )
         {
-            if ( dbCollectionOfRefs == null )
+            dbCollectionOfRefs = newCollection( tCollectionOfEntities );
+        }
+
+        if ( dbCollectionOfRefs != null )
+        {
+            boolean allowDeletion;
+            if ( tCollectionOfEntities == null )
             {
-                dbCollectionOfRefs = newCollection( tCollectionOfEntities );
+                allowDeletion = true;
+                tCollectionOfEntities = new ArrayList<>();
+            }
+            else
+            {
+                allowDeletion = !tCollectionOfEntities.isEmpty();
             }
 
             // Some of the item could be removed in meantime, thus first remove the items
@@ -236,14 +255,14 @@ public class IfNoId
             Iterator<Ref<EntityIdentity>> iterator = dbCollectionOfRefs.iterator();
             Ref<EntityIdentity> originItem;
 
-            while ( iterator.hasNext() )
+            while ( allowDeletion && iterator.hasNext() )
             {
                 originItem = iterator.next();
                 EntityIdentity originEntity = originItem.get();
                 if ( !tCollectionOfEntities.contains( originEntity ) )
                 {
                     iterator.remove();
-                    if ( originEntity != null )
+                    if ( isCascadingOn() && originEntity != null )
                     {
                         originEntity.delete();
                     }
@@ -255,9 +274,8 @@ public class IfNoId
             {
                 if ( next.getId() == null )
                 {
-                    // children not saved yet, ignore saving of the all entities in the collection
-                    dbCollectionOfRefs = null;
-                    break;
+                    // not saved yet, configured to be ignored
+                    continue;
                 }
 
                 tEntityRef = Ref.create( next );
@@ -268,13 +286,12 @@ public class IfNoId
             }
 
             field.set( pojo, dbCollectionOfRefs );
-            // null means at least one of the entity in the collection is not persisted yet
-            return dbCollectionOfRefs == null;
+            // Either new or changed value, do NOT ignore -> perform save
+            return false;
         }
 
-        // If false it already has a value, do NOT ignore -> perform save.
-        // Otherwise ignore save as there are no values (db, transient) at all.
-        else return dbCollectionOfRefs == null;
+        // there are no values (db, transient) at all.
+        return true;
     }
 
     private Collection<Ref<EntityIdentity>> newCollection( Collection type )
@@ -293,7 +310,7 @@ public class IfNoId
         }
     }
 
-    private void cascadingSave( @Nonnull EntityIdentity pojo, @Nonnull EntityIdentity tEntity )
+    private boolean cascadingSave( @Nonnull EntityIdentity pojo, @Nonnull EntityIdentity tEntity )
     {
         EntityIdentity.HasIgnored hasIgnored = null;
         if ( pojo instanceof EntityIdentity.HasIgnored )
@@ -331,6 +348,7 @@ public class IfNoId
                 throw new RuntimeException( msg );
             }
         }
+        return ignoreSave;
     }
 
     /**

@@ -23,6 +23,8 @@ import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.IgnoreSave;
 
+import java.util.Objects;
+
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
@@ -70,5 +72,22 @@ public class ChildEntity
     public void delete()
     {
         ofy().delete().entity( this ).now();
+    }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o ) return true;
+        if ( !( o instanceof ChildEntity ) ) return false;
+        ChildEntity that = ( ChildEntity ) o;
+        return Objects.equals( getParent().getId(), that.getParent().getId() ) &&
+                Objects.equals( getId(), that.getId() );
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash( getParent().getId(), getId() );
     }
 }
