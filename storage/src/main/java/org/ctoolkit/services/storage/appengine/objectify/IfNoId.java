@@ -68,7 +68,7 @@ import java.util.Set;
  *  {
  *      if ( getId() == null )
  *      {
- *          // first, parent entity needs to saved itself without references (children has no IDs yet)
+ *          // first, parent entity needs to be saved itself without references (children has no IDs yet)
  *          ofy().save().entity( this ).now();
  *      }
  *

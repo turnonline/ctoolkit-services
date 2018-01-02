@@ -121,10 +121,17 @@ public class DataUploadHandlerServlet
         String gStorageName;
         String imageSize;
         String customName;
+        String nameFieldMarker = "file";
 
         //preferred method over getBlobInfos or getUploads because uploading files to Cloud Storage
         Map<String, List<FileInfo>> fileInfos = blobstoreService.getFileInfos( request );
-        List<FileInfo> list = fileInfos.get( UPLOAD_NAME_FIELD_MARKER );
+        List<FileInfo> list = fileInfos.get( nameFieldMarker );
+
+        if ( list == null )
+        {
+            nameFieldMarker = UPLOAD_NAME_FIELD_MARKER;
+            list = fileInfos.get( nameFieldMarker );
+        }
 
         if ( list == null )
         {
@@ -199,7 +206,7 @@ public class DataUploadHandlerServlet
 
                 // blob key retrieval
                 Map<String, List<BlobKey>> blobs = blobstoreService.getUploads( request );
-                BlobKey blobKey = blobs.get( UPLOAD_NAME_FIELD_MARKER ).get( 0 );
+                BlobKey blobKey = blobs.get( nameFieldMarker ).get( 0 );
 
                 if ( blobKey == null )
                 {
