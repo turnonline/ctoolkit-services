@@ -61,7 +61,7 @@ public class TaskTest
         tested.run();
 
         assertNull( next.getPostponeFor() );
-        new VerificationsNoOptions( next );
+        verificationsNoOptions( next );
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TaskTest
         tested.run();
 
         assertNull( next.getPostponeFor() );
-        new VerificationsWithOptions( next, options );
+        verificationsWithOptions( next, options );
     }
 
     @Test
@@ -101,7 +101,7 @@ public class TaskTest
         tested.run();
 
         assertNull( next.getPostponeFor() );
-        new VerificationsWithOptions( next, options );
+        verificationsWithOptions( next, options );
     }
 
     @Test
@@ -120,7 +120,7 @@ public class TaskTest
         tested.run();
 
         assertEquals( next.getPostponeFor(), Integer.valueOf( 20 ) );
-        new VerificationsNoOptions( next );
+        verificationsNoOptions( next );
     }
 
     @Test
@@ -139,33 +139,35 @@ public class TaskTest
         tested.run();
 
         assertEquals( next.getPostponeFor(), Integer.valueOf( 10 ) );
-        new VerificationsNoOptions( next );
+        verificationsNoOptions( next );
     }
 
-    final class VerificationsWithOptions
-            extends Verifications
+    private void verificationsWithOptions( final Task next, final TaskOptions options )
     {
-        VerificationsWithOptions( Task next, TaskOptions options )
+        new Verifications()
         {
-            executor.schedule( ( Task ) any );
-            times = 0;
+            {
+                executor.schedule( ( Task ) any );
+                times = 0;
 
-            executor.schedule( next, options );
-            times = 1;
-        }
+                executor.schedule( next, options );
+                times = 1;
+            }
+        };
     }
 
-    final class VerificationsNoOptions
-            extends Verifications
+    private void verificationsNoOptions( final Task next )
     {
-        VerificationsNoOptions( Task next )
+        new Verifications()
         {
-            executor.schedule( next );
-            times = 1;
+            {
+                executor.schedule( next );
+                times = 1;
 
-            //noinspection ConstantConditions
-            executor.schedule( ( Task ) any, ( TaskOptions ) any );
-            times = 0;
-        }
+                //noinspection ConstantConditions
+                executor.schedule( ( Task ) any, ( TaskOptions ) any );
+                times = 0;
+            }
+        };
     }
 }

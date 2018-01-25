@@ -50,6 +50,14 @@ public class IdentityCheckSessionFilterTest
 {
     private final static String SESSION_ATTR_VALUE = "session_attribute_value";
 
+    private final static String REDIRECT_VALUE = "/redirect_attribute_value";
+
+    private final static String SIGN_UP_VALUE = "/sign_up_attribute_value";
+
+    private final static String LOGIN_VALUE = "/login_attribute_value";
+
+    private final static String IGNORE_PATHS_VALUES = "pathY,/path2";
+
     @Tested
     private IdentityCheckSessionFilter tested;
 
@@ -70,7 +78,7 @@ public class IdentityCheckSessionFilterTest
     @Test
     public void fullInit( final @Mocked FilterConfig config ) throws Exception
     {
-        new FilterConfigExpectations( config );
+        filterConfigExpectations( config );
 
         tested.init( config );
     }
@@ -81,7 +89,7 @@ public class IdentityCheckSessionFilterTest
                              final @Mocked HttpServletResponse response,
                              final @Mocked FilterChain chain ) throws Exception
     {
-        new FilterConfigExpectations( config );
+        filterConfigExpectations( config );
 
         new Expectations()
         {
@@ -116,7 +124,7 @@ public class IdentityCheckSessionFilterTest
     {
         listeners.add( listener );
 
-        new FilterConfigExpectations( config );
+        filterConfigExpectations( config );
 
         new Expectations()
         {
@@ -159,7 +167,7 @@ public class IdentityCheckSessionFilterTest
     {
         listeners.add( listener );
 
-        new FilterConfigExpectations( config );
+        filterConfigExpectations( config );
 
         new Expectations()
         {
@@ -168,7 +176,7 @@ public class IdentityCheckSessionFilterTest
                 result = "non null value";
 
                 request.getRequestURI();
-                result = FilterConfigExpectations.LOGIN_VALUE;
+                result = LOGIN_VALUE;
             }
         };
 
@@ -185,39 +193,32 @@ public class IdentityCheckSessionFilterTest
                 request.getSession().invalidate();
                 times = 0;
 
-                response.sendRedirect( FilterConfigExpectations.REDIRECT_VALUE );
+                response.sendRedirect( REDIRECT_VALUE );
                 chain.doFilter( request, response );
             }
         };
     }
 
-    private final static class FilterConfigExpectations
-            extends Expectations
+    private void filterConfigExpectations( final FilterConfig filterConfig )
     {
-        static String REDIRECT_VALUE = "/redirect_attribute_value";
-
-        static String SIGN_UP_VALUE = "/sign_up_attribute_value";
-
-        static String LOGIN_VALUE = "/login_attribute_value";
-
-        static String IGNORE_PATHS_VALUES = "pathY,/path2";
-
-        FilterConfigExpectations( FilterConfig filterConfig )
+        new Expectations()
         {
-            filterConfig.getInitParameter( SESSION_AUTH_USER_ATTRIBUTE );
-            result = SESSION_ATTR_VALUE;
+            {
+                filterConfig.getInitParameter( SESSION_AUTH_USER_ATTRIBUTE );
+                result = SESSION_ATTR_VALUE;
 
-            filterConfig.getInitParameter( REDIRECT_PATH );
-            result = REDIRECT_VALUE;
+                filterConfig.getInitParameter( REDIRECT_PATH );
+                result = REDIRECT_VALUE;
 
-            filterConfig.getInitParameter( SIGN_UP_PATH );
-            result = SIGN_UP_VALUE;
+                filterConfig.getInitParameter( SIGN_UP_PATH );
+                result = SIGN_UP_VALUE;
 
-            filterConfig.getInitParameter( LOGIN_PATH );
-            result = LOGIN_VALUE;
+                filterConfig.getInitParameter( LOGIN_PATH );
+                result = LOGIN_VALUE;
 
-            filterConfig.getInitParameter( IGNORE_PATHS );
-            result = IGNORE_PATHS_VALUES;
-        }
+                filterConfig.getInitParameter( IGNORE_PATHS );
+                result = IGNORE_PATHS_VALUES;
+            }
+        };
     }
 }

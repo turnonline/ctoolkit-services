@@ -76,7 +76,7 @@ public class TaskQueueExecutorBeanTest
     {
         final Task task = new FakeTask();
 
-        new ModulesServiceExpectations( tested, queue, task );
+        modulesServiceExpectations( tested, queue, task );
 
         tested.schedule( task );
 
@@ -105,7 +105,7 @@ public class TaskQueueExecutorBeanTest
         final Task task = new FakeTask( "my-prefix", true );
         task.setEntityId( id );
 
-        new ModulesServiceExpectations( tested, queue, task );
+        modulesServiceExpectations( tested, queue, task );
 
         tested.schedule( task );
 
@@ -137,7 +137,7 @@ public class TaskQueueExecutorBeanTest
         task.postponeFor( postponeFor );
         task.setEntityId( id );
 
-        new ModulesServiceExpectations( tested, queue, task );
+        modulesServiceExpectations( tested, queue, task );
 
         tested.schedule( task );
 
@@ -163,24 +163,24 @@ public class TaskQueueExecutorBeanTest
         };
     }
 
-    final class ModulesServiceExpectations
-            extends Expectations
+    private void modulesServiceExpectations( final TaskQueueExecutorBean partiallyMocked,
+                                             final Queue queue,
+                                             final Task task )
     {
-        ModulesServiceExpectations( TaskQueueExecutorBean partiallyMocked,
-                                    Queue queue,
-                                    Task task )
+        new Expectations( partiallyMocked )
         {
-            super( partiallyMocked );
+            {
+                modulesService.getVersionHostname( anyString, anyString );
+                result = "complete-hostname";
 
-            modulesService.getVersionHostname( anyString, anyString );
-            result = "complete-hostname";
+                tested.allocateId();
+                result = allocatedId;
+                minTimes = 0;
 
-            tested.allocateId();
-            result = allocatedId;
-            minTimes = 0;
-
-            tested.getQueue( task );
-            result = queue;
+                tested.getQueue( task );
+                result = queue;
+            }
         }
+        ;
     }
 }
