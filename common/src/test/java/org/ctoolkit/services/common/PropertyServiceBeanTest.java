@@ -20,6 +20,7 @@ package org.ctoolkit.services.common;
 
 import com.google.common.base.Charsets;
 import junit.framework.Assert;
+import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheFactory;
 import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
@@ -46,6 +47,10 @@ public class PropertyServiceBeanTest
 
     @Inject
     private PropertyService propertyService;
+
+    // not used directly in the test, just making sure implementation for Cache has been bound
+    @Inject
+    private Cache cache;
 
     @Test
     public void setStringProperty() throws Exception

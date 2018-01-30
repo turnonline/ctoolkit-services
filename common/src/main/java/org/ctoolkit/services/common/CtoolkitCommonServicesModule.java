@@ -25,7 +25,8 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
-import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheFactory;
+import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 
 import javax.inject.Singleton;
 import java.util.Collection;
@@ -35,7 +36,8 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The common services guice module.
+ * The common services guice module. This module has dependency on {@link CtoolkitServicesAppEngineModule}
+ * because of {@link CacheFactory}. Make sure it's being installed while using common services.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -46,7 +48,6 @@ public class CtoolkitCommonServicesModule
     protected void configure()
     {
         bind( PropertyService.class ).to( PropertyServiceBean.class ).in( Singleton.class );
-        bind( Cache.class ).toProvider( JCacheProvider.class ).in( Singleton.class );
     }
 
     @Provides

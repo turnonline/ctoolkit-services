@@ -26,6 +26,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.common.testing.TearDown;
 import com.google.guiceberry.testng.TestNgGuiceBerry;
 import com.google.inject.name.Names;
+import net.sf.jsr107cache.Cache;
 import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 import org.testng.annotations.AfterMethod;
@@ -69,6 +70,8 @@ public class GuiceBerryTestNgCase
         SystemProperty.environment.set( "Development" );
         install( new CtoolkitServicesAppEngineModule() );
         install( new CtoolkitCommonServicesModule() );
+
+        bind( Cache.class ).toProvider( JCacheProvider.class );
 
         PropertyConfig config = new PropertyConfig();
         config.setTestAppI( "localhost" );

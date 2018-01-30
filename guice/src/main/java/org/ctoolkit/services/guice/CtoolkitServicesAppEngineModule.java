@@ -41,7 +41,7 @@ import javax.inject.Singleton;
  * <li>{@link AppIdentityService}</li>
  * <li>{@link CacheFactory}</li>
  * </ul>
- * ..or bind it on your won.
+ * ..or bind it on your own.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

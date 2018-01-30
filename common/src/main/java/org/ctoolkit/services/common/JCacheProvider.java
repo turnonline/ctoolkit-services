@@ -22,14 +22,16 @@ import net.sf.jsr107cache.Cache;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import java.util.HashMap;
 
 /**
  * The JCache provider to provide default cache instance by
- * {@link PropertyService#create(String)} with no namespace.
+ * {@link PropertyService#create(String)} with no namespace defined.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
+@Singleton
 class JCacheProvider
         implements Provider<Cache>
 {
