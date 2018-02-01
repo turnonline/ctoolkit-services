@@ -49,13 +49,12 @@ import java.util.Set;
  * <p>
  * <b>For example</b>, entity extends {@link BaseEntityIdentity}.
  * <pre>
- * {@code
  * // reference to the entity, a relationship
- * @literal @IgnoreSave( {IfNoId.class} )
- *  private Ref<BillingAddress> billingAddress;
+ *  &#64;IgnoreSave( {IfNoId.class} )
+ *  private Ref&#60;BillingAddress&#62; billingAddress;
  *
  *  // transient entity
- * @literal @Ignore
+ *  &#64;Ignore
  *  private BillingAddress tBillingAddress;
  *
  *  public BillingAddress getBillingAddress()
@@ -63,7 +62,7 @@ import java.util.Set;
  *      return BaseEntityIdentity#fromRef( billingAddress, tBillingAddress );
  *  }
  *
- * @literal @Override
+ *  &#64;Override
  *  public void save()
  *  {
  *      if ( getId() == null )
@@ -77,28 +76,25 @@ import java.util.Set;
  *      // now parent entity will be updated with children references
  *      ofy().save().entity( this ).now();
  *  }
- * }
  * </pre>
  * The referenced entity BillingAddress in this example is expected to be type of {@link EntityIdentity}.
  * <p>
  * <b>One to many cascading save support</b>
  * <pre>
- * {@code
  *
  *  // if you provide your concrete type of collection (for example ArrayList), type will be preserved
- * @literal @IgnoreSave( IfNoIdOtherwiseCascading.class )
- *  private List<Ref<Ingredient>> ingredients = new ArrayList<>();
+ *  &#64;IgnoreSave( IfNoIdOtherwiseCascading.class )
+ *  private List&#60;Ref&#60;Ingredient&#62;&#62; ingredients = new ArrayList&#60;&#62;();
  *
  *  // transient collection of entities
  *  // Note: the null collection of entities is an explicit mark to delete all datastore references
- * @literal @Ignore
- *  private List<Ingredient> tIngredients = new ArrayList<>();
+ *  &#64;Ignore
+ *  private List&#60;Ingredient&#62; tIngredients = new ArrayList&#60;&#62;();
  *
- *  public List<Ingredient> getIngredients()
+ *  public List&#60;Ingredient&#62; getIngredients()
  *  {
  *      return fromCollectionOfRefs( ingredients, tIngredients );
  *  }
- * }
  * </pre>
  * <b>Note:</b> if an entity has been removed from the collection comparing to the persisted one,
  * the {@link EntityIdentity#delete()} will be called at missing instance. Make sure equals and hashCode

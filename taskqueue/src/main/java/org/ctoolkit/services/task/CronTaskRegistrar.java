@@ -42,7 +42,7 @@ import java.util.Map;
  *  }
  *
  *  // finally add your registration binding in your application guice module
- *  Multibinder<CronTaskRegistrar> registrar = Multibinder.newSetBinder( binder(), CronTaskRegistrar.class );
+ *  Multibinder&#60;CronTaskRegistrar&#62; registrar = Multibinder.newSetBinder( binder(), CronTaskRegistrar.class );
  *  registrar.addBinding().to( MyCronTaskRegistration.class );
  * </pre>
  * The cron task scheduling definition takes place in cron.xml
@@ -62,7 +62,8 @@ public abstract class CronTaskRegistrar
     /**
      * Register a CronTask.
      *
-     * @param clazz the cron task class to register
+     * @param cronUri the relative path as cron identification starting with '/cron/..'
+     * @param clazz   the cron task class to register
      */
     public final void register( String cronUri, Class<? extends CronTask> clazz )
     {

@@ -49,11 +49,10 @@ import java.util.Map.Entry;
  * The endpoints servlet that makes {@link EndpointsContext} available via guice static injection for later processing.
  * In order to employ this servlet, change your Guice configuration, for example:
  * <pre>
- * {@code
  * public class MyEndpointsModule
  *          extends EndpointsModule
  * {
- *    @literal @Override
+ *     &#64;Override
  *     protected void configureEndpoints( String urlPattern,
  *                                        ServletInitializationParameters initParameters,
  *                                        boolean useLegacyServlet )
@@ -62,23 +61,20 @@ import java.util.Map.Entry;
  *         super.serve( urlPattern ).with( EndpointsContextAwareServlet.class, initParameters.asMap() );
  *     }
  * }
- * }
  * </pre>
  * In order to make it available use static injection, for example:
  * <pre>
- * {@code
- * @literal @Inject
+ * &#64;Inject
  * private static Injector injector;
  *
- * @literal @Inject
- * private Provider<ServletContext> context;
+ * &#64;Inject
+ * private Provider&#60;ServletContext&#62; context;
  *
  * // before use of EndpointsContext, call injector
  * injector.injectMembers( this );
  *
  * // then
  * EndpointsContext ec = EndpointsContext.class.cast( context.get().getAttribute( EndpointsContext.class.getName() ) );
- * }
  * </pre>
  * And don't forget {@link com.google.inject.AbstractModule#requestInjection(Object)};
  *

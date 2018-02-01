@@ -113,11 +113,11 @@ public class TransformerHelper
     }
 
     /**
-     * Converts to <code>Map<String, String></code> value if presented.
+     * Converts to {@code Map<String, String>} value if presented.
      *
      * @param map the map of properties taken from input JSON
      * @param key the JSON property as a key
-     * @return the optional <code>Map<String, String></code> map
+     * @return the optional {@code Map<String, String>} map
      */
     @SuppressWarnings( "unchecked" )
     public static Optional<Map<String, String>> toMap( Map<String, Object> map, String key )
@@ -147,11 +147,15 @@ public class TransformerHelper
     /**
      * Example of usage:
      * <pre>
-     * {@code
-     * TypeToken<Map<String, String>> subsidiaryMapType;
+     * TypeToken&#60;Map&#60;String, String&#62;&#62; subsidiaryMapType;
      *  subsidiaryMapType = mapOf( TypeToken.of( String.class ), TypeToken.of( String.class ) );
-     * }
      * </pre>
+     *
+     * @param keyToken   the type token map key
+     * @param valueToken the type token map value
+     * @param <K>        the type of the key
+     * @param <V>        the type of the value
+     * @return the type token for map
      */
     public static <K, V> TypeToken<Map<K, V>> mapOf( TypeToken<K> keyToken, TypeToken<V> valueToken )
     {

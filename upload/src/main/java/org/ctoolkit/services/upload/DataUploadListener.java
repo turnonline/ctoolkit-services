@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  * A data upload callback interface used for post processing once upload data has been uploaded.
  * In order to be notified about uploads bind <code>DataUploadListener</code> in guice module as following:
  * <pre>
- * Multibinder<DataUploadListener> multibinder = Multibinder.newSetBinder( binder(), DataUploadListener.class );
+ * Multibinder&#60;DataUploadListener&#62; multibinder = Multibinder.newSetBinder( binder(), DataUploadListener.class );
  * multibinder.addBinding().to( DataUploadCallbackImpl.class );
  * </pre>
  *

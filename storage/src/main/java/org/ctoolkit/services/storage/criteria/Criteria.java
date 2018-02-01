@@ -23,13 +23,13 @@ import java.util.List;
 
 /**
  * <p>Criteria class is helper class for creating criteria.</p>
- * <br/>
  * <p><b>Usage:</b></p>
- * <code>
- * Criteria&lt;Entity&gt; crit = Criteria.create(Entity.class);<br/>
- * crit.add(Restrictions.eq("id", 1);<br/>
- * </code>
+ * <pre>
+ * Criteria&#60;Entity&#62; crit = Criteria.create(Entity.class);
+ * crit.add(Restrictions.eq("id", 1);
+ * </pre>
  *
+ * @param <T> the concrete type of the entity
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */
 public class Criteria<T>
@@ -53,6 +53,7 @@ public class Criteria<T>
      * Construct criteria object.
      *
      * @param entity entity on which criteria will be applied
+     * @param <T>    the concrete type of the entity
      * @return new instance of {@link Criteria}
      */
     public static <T> Criteria<T> create( Class<T> entity )

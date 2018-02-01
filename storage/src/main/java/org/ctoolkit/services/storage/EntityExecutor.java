@@ -35,6 +35,7 @@ public interface EntityExecutor
      * Executes a query based on the given criteria and retrieves a list of objects.
      *
      * @param criteria a criteria holder {@link Criteria}
+     * @param <T> the concrete type of the entity
      * @return list of objects that meets the criteria
      */
     <T> List<T> list( @Nonnull Criteria<T> criteria );
@@ -44,6 +45,7 @@ public interface EntityExecutor
      * If the result does not match any criteria returns <code>null</code>
      *
      * @param criteria a criteria holder {@link Criteria}
+     * @param <T> the concrete type of the entity
      * @return the first entity in the result list
      */
     <T> T first( @Nonnull Criteria<T> criteria );

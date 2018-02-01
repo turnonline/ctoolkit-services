@@ -19,17 +19,16 @@
 package org.ctoolkit.services.storage.criteria;
 
 /**
- * <p>Implementation of {@link Expression} which represent <code>like</code> restriction.
- * If <code>ignoreCase</code> is set to true than <code>ilike</code> will be applied.</p>
- * <br>
- * <p>Match modes can be set as follows:</p>
- * <table border="1">
- * <tr><th>Match mode</th><th>Result</th></tr>
- * <tr><td>{@link MatchMode#EXACT}</td><td>propertyValue</td></tr>
- * <tr><td>{@link MatchMode#START}</td><td>propertyValue%</td></tr>
- * <tr><td>{@link MatchMode#END}</td><td>%propertyValue</td></tr>
- * <tr><td>{@link MatchMode#ANYWHERE}</td><td>%propertyValue%</td></tr>
- * </table>
+ * Implementation of {@link Expression} which represent <code>like</code> restriction.
+ * If <code>ignoreCase</code> is set to true than <code>ilike</code> will be applied.
+ * <p>
+ * Match modes can be set as follows:
+ * <ul>
+ * <li>{@link MatchMode#EXACT} : %propertyValue%</li>
+ * <li>{@link MatchMode#START} : %propertyValue%</li>
+ * <li>{@link MatchMode#END} : %propertyValue</li>
+ * <li>{@link MatchMode#ANYWHERE} : %propertyValue%</li>
+ * </ul>
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */

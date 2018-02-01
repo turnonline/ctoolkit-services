@@ -35,19 +35,17 @@ import java.util.Map;
  * <p>
  * <b>For example:</b>
  * <pre>
- * {@code
  *
  * class MyOwnTask
  *        extends Task
  *  {
- *  @literal @Inject
+ *   &#64;Inject
  *   private transient MyService service;
  *   ..
  *  }
  *
  *  // In the guice module
  *  requestStaticInjection( MyOwnTask.class );
- * }
  * </pre>
  * All task queue tasks are performed asynchronously. The application that creates the task is not notified
  * whether or not the task completed, or if it was successful. The task queue service provides a retry mechanism,
@@ -59,7 +57,6 @@ import java.util.Map;
  * in defined order, use task chaining:
  * <p>
  * <b>Task chaining example:</b>
- * <pre>
  * {@code
  *
  * Task first = new FakeTask().postponeFor( 10 );

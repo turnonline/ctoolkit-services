@@ -135,7 +135,7 @@ public interface PropertyService
 
     /**
      * Returns the AppSpot current secure URL at '.appspot.com' with subdomain (application Id).
-     * For example application Id 'turn-online' -> http://rest-api.turn-online.appspot.com
+     * For example application Id 'turn-online' - http://rest-api.turn-online.appspot.com
      *
      * @return the current secure URL at '.appspot.com'
      */
@@ -143,8 +143,8 @@ public interface PropertyService
 
     /**
      * Returns the AppSpot current secure URL at '.appspot.com' with subdomain (application Id).
-     * Optionally with subdomain prefix -> App Engine module name for example
-     * with prefix 'rest-api' and application Id 'turn-online' -> http://rest-api-dot-turn-online.appspot.com
+     * Optionally with subdomain prefix - App Engine module name for example
+     * with prefix 'rest-api' and application Id 'turn-online' - http://rest-api-dot-turn-online.appspot.com
      *
      * @param prefix the module prefix
      * @return the current secure URL at '.appspot.com'

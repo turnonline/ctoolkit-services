@@ -21,15 +21,14 @@ package org.ctoolkit.services.storage.criteria;
 /**
  * <p>Implementation of {@link Expression} which represent restrictions of value with low and high bound.
  * It can by used to determine if for example date is in specified date interval.</p>
- * <br>
  * <p>Low and high bound of expression can be set as follows:</p>
- * <table border="1">
- * <tr><th>Low bound</th><th>High bound</th><th>Result</th></tr>
- * <tr><td>{@link Bound#SOFT}</td><td>{@link Bound#SOFT}</td><td>e.date&gt;=:p_0 and e.date&lt;=:p_0</td></tr>
- * <tr><td>{@link Bound#HARD}</td><td>{@link Bound#SOFT}</td><td>e.date&gt;:p_0 and e.date&lt;=:p_0</td></tr>
- * <tr><td>{@link Bound#SOFT}</td><td>{@link Bound#HARD}</td><td>e.date&gt;=:p_0 and e.date&lt;:p_0</td></tr>
- * <tr><td>{@link Bound#HARD}</td><td>{@link Bound#HARD}</td><td>e.date&gt;:p_0 and e.date&lt;:p_0</td></tr>
- * </table>
+ * <b>Low bound | High bound | Result</b>
+ * <ul>
+ * <li>{@link Bound#SOFT} | {@link Bound#SOFT} | e.date&gt;=:p_0 and e.date&lt;=:p_0</li>
+ * <li>{@link Bound#HARD} | {@link Bound#SOFT} | e.date&gt;:p_0 and e.date&lt;=:p_0</li>
+ * <li>{@link Bound#SOFT} | {@link Bound#HARD} | e.date&gt;=:p_0 and e.date&lt;:p_0</li>
+ * <li>{@link Bound#HARD} | {@link Bound#HARD} | e.date&gt;:p_0 and e.date&lt;:p_0</li>
+ * </ul>
  *
  * @author <a href="mailto:jozef.pohorelec@ctoolkit.org">Jozef Pohorelec</a>
  */

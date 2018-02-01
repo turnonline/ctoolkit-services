@@ -116,6 +116,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
     /**
      * Returns the objectify reference of this instance.
      *
+     * @param <T> the concrete type of the entity
      * @return the objectify reference
      */
     @SuppressWarnings( "unchecked" )
@@ -132,6 +133,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
     /**
      * Returns the objectify entity key representation.
      *
+     * @param <T> the concrete type of the entity
      * @return the objectify entity key
      */
     @SuppressWarnings( "unchecked" )
@@ -169,7 +171,9 @@ public abstract class BaseEntityIdentity<ID_TYPE>
 
     /**
      * Normalize string value.
-     * <b>Example:</b><code> Kľačany Village</code> -> <code>klacany village</code>
+     * <b>Example:</b>
+     * <p>
+     * {@code Kľačany Village -> klacany village}
      *
      * @param value the string to be normalized
      * @return the normalized string or {@code null}
@@ -189,6 +193,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      *
      * @param ref             the entity reference
      * @param defaultInstance the default fallback instance if reference is null
+     * @param <T> the concrete type of the entity
      * @return the entity instance
      */
     public <T> T fromRef( @Nullable Ref<T> ref, @Nullable T defaultInstance )
@@ -205,6 +210,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      *
      * @param collectionOfRefs      the collection of entity references as a source for the result
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
+     * @param <T> the concrete type of the entity
      * @return the populated collection from the references or empty collection
      */
     public <T> List<T> fromCollectionOfRefs( @Nullable List<Ref<T>> collectionOfRefs,
@@ -224,6 +230,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      *
      * @param collectionOfRefs      the collection of entity references as a source for the result
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
+     * @param <T> the concrete type of the entity
      * @return the populated collection from the references or empty collection
      */
     public <T> Set<T> fromCollectionOfRefs( @Nullable Set<Ref<T>> collectionOfRefs,

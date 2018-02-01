@@ -36,18 +36,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * In your implementation of {@link #transformFrom(Map)} populate only those properties (patch)
  * that are presented in the input JSON map, for example:
  * <pre>
- * {@code
- * @literal @Override
- * public MyEntity transformFrom( Map<String, Object> map )
+ * &#64;Override
+ * public MyEntity transformFrom( Map&#60;String, Object&#62; map )
  * {
  *     MyEntity entity = super.transformFrom( map );
  *
- *     Optional<String> sValue = getString( map, "firstName" );
+ *     Optional&#60;String&#62; sValue = getString( map, "firstName" );
  *     if ( sValue.isPresent() )
  *     {
  *         entity.setFirstName( sValue.get() );
  *     }
- * }
  * }
  * </pre>
  * Transformer requires following configurations in your Guice modules.
@@ -55,9 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * First, requests must be server via {@link EndpointsContextAwareServlet}, see javadoc.
  * Next, in order to make Guice injection work use:
  * <p>
- * {@code
- * MyModule#requestStaticInjection(EntityTransformer.class);
- * }
+ * {@code MyModule#requestStaticInjection(EntityTransformer.class);}
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

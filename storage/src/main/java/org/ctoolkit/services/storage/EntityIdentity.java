@@ -73,6 +73,7 @@ public interface EntityIdentity<ID_TYPE>
      * is optional and implementation specific.
      *
      * @param ignored the tree of the field names to be ignored while saving
+     * @return the set of ignored instances if entity children has defined ignore rules, or {@code null}
      */
     Set<Ignored> save( @Nullable Ignored ignored );
 
@@ -92,6 +93,8 @@ public interface EntityIdentity<ID_TYPE>
         /**
          * Adds the entity field name(s) to be ignored while cascading save.
          *
+         * @param fieldName  the entity field name to be checked
+         * @param fieldNames the entity field name array to be checked
          * @return the current level of ignored to chain
          */
         Ignored ignore( @Nonnull String fieldName, String... fieldNames );

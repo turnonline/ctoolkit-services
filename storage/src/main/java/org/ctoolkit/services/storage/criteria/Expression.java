@@ -50,6 +50,8 @@ public interface Expression
      * Build implementation specific expression object.
      *
      * @param builder the expression builder
+     * @param <Q> the typed Query
+     * @param <E> the entity type
      * @return the implementation specific expression object
      */
     <Q, E> Q build( CriteriaBuilder<Q, E> builder );

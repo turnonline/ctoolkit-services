@@ -33,7 +33,7 @@ public class Restrictions
     }
 
     /**
-     * Equal restriction: <i>e.name=:p_0</i>
+     * Equal restriction: {@code <i>e.name=:p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -45,7 +45,7 @@ public class Restrictions
     }
 
     /**
-     * Not equal restriction: <i>e.name<>:p_0</i>
+     * Not equal restriction: {@code <i>e.name<>:p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -57,7 +57,7 @@ public class Restrictions
     }
 
     /**
-     * Greater then restriction: <i>e.name>:p_0</i>
+     * Greater then restriction: {@code <i>e.name>:p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -69,7 +69,7 @@ public class Restrictions
     }
 
     /**
-     * Greater then or equal restriction: <i>e.name>=:p_0</i>
+     * Greater then or equal restriction: {@code <i>e.name>=:p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -81,7 +81,7 @@ public class Restrictions
     }
 
     /**
-     * Less then restriction: <i>e.name>=:p_0</i>
+     * Less then restriction: {@code <i>e.name>=:p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -93,7 +93,7 @@ public class Restrictions
     }
 
     /**
-     * Less then or equal restriction: <i>e.name>=:p_0</i>
+     * Less then or equal restriction: {@code <i>e.name>=:p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -105,7 +105,7 @@ public class Restrictions
     }
 
     /**
-     * Is null restriction: <i>e.name is null</i>
+     * Is null restriction: {@code <i>e.name is null</i>}
      *
      * @param propertyName name of property
      * @return {@link NullExpression}
@@ -116,7 +116,7 @@ public class Restrictions
     }
 
     /**
-     * Is not null restriction: <i>e.name is not null</i>
+     * Is not null restriction: {@code <i>e.name is not null</i>}
      *
      * @param propertyName name of property
      * @return {@link NullExpression}
@@ -127,7 +127,7 @@ public class Restrictions
     }
 
     /**
-     * In restriction: <i>e.name in (:p_0)</i>
+     * In restriction: {@code <i>e.name in (:p_0)</i>}
      *
      * @param propertyName   name of property
      * @param propertyValues array of property values
@@ -139,7 +139,7 @@ public class Restrictions
     }
 
     /**
-     * In restriction: <i>e.name in (:p_0)</i>
+     * In restriction: {@code <i>e.name in (:p_0)</i>}
      *
      * @param propertyName   name of property
      * @param propertyValues collection of property values
@@ -151,7 +151,7 @@ public class Restrictions
     }
 
     /**
-     * ID In restriction: <i>e.id in (:p_0)</i>. Wouldn't you rather do a batch load-by-key?
+     * ID In restriction: {@code <i>e.id in (:p_0)</i>}. Wouldn't you rather do a batch load-by-key?
      *
      * @param idPropertyName name of the property
      * @param ids            array of ids Long (id)
@@ -163,7 +163,7 @@ public class Restrictions
     }
 
     /**
-     * ID In restriction: <i>e.name in (:p_0)</i>. Wouldn't you rather do a batch load-by-key?
+     * ID In restriction: {@code <i>e.name in (:p_0)</i>}. Wouldn't you rather do a batch load-by-key?
      *
      * @param idPropertyName name of the property
      * @param ids            array of ids as String (name)
@@ -175,7 +175,7 @@ public class Restrictions
     }
 
     /**
-     * Not in restriction: <i>e.name not in (:p_0)</i>
+     * Not in restriction: {@code <i>e.name not in (:p_0)</i>}
      *
      * @param propertyName   name of property
      * @param propertyValues array of property values
@@ -187,7 +187,7 @@ public class Restrictions
     }
 
     /**
-     * Not in restriction: <i>e.name not in (:p_0)</i>
+     * Not in restriction: {@code <i>e.name not in (:p_0)</i>}
      *
      * @param propertyName   name of property
      * @param propertyValues collection of property values
@@ -201,7 +201,7 @@ public class Restrictions
     }
 
     /**
-     * Between restriction: <i>e.name >=:p_0 and e.name <=:p_0</i>
+     * Between restriction: {@code <i>e.name >=:p_0 and e.name <=:p_0</i>}
      *
      * @param propertyName      name of property
      * @param lowPropertyValue  low bound property value
@@ -216,7 +216,7 @@ public class Restrictions
     }
 
     /**
-     * Logical expression <i>or</i>
+     * Logical expression {@code <i>or</i>}
      *
      * @param expressions array of expressions
      * @return {@link LogicalExpression}
@@ -227,7 +227,7 @@ public class Restrictions
     }
 
     /**
-     * Logical expression <i>and</i>
+     * Logical expression {@code <i>and</i>}
      *
      * @param expressions array of expressions
      * @return {@link LogicalExpression}
@@ -238,7 +238,7 @@ public class Restrictions
     }
 
     /**
-     * Equal restriction for entity properties: <i>e.name=e.otherName</i>
+     * Equal restriction for entity properties: {@code <i>e.name=e.otherName</i>}
      *
      * @param propertyName      name of property
      * @param otherPropertyName other property name
@@ -250,7 +250,7 @@ public class Restrictions
     }
 
     /**
-     * Not equal restriction for entity properties: <i>e.name<>e.otherName</i>
+     * Not equal restriction for entity properties: {@code <i>e.name<>e.otherName</i>}
      *
      * @param propertyName      name of property
      * @param otherPropertyName other property name
@@ -262,7 +262,7 @@ public class Restrictions
     }
 
     /**
-     * Greater then restriction for entity properties: <i>e.name>e.otherName</i>
+     * Greater then restriction for entity properties: {@code <i>e.name>e.otherName</i>}
      *
      * @param propertyName      name of property
      * @param otherPropertyName other property name
@@ -274,7 +274,7 @@ public class Restrictions
     }
 
     /**
-     * Greater then or equal restriction for entity properties: <i>e.name>=e.otherName</i>
+     * Greater then or equal restriction for entity properties: {@code <i>e.name>=e.otherName</i>}
      *
      * @param propertyName      name of property
      * @param otherPropertyName other property name
@@ -286,7 +286,7 @@ public class Restrictions
     }
 
     /**
-     * Lower then restriction for entity properties: <i>e.name<e.otherName</i>
+     * Lower then restriction for entity properties: {@code <i>e.name<e.otherName</i>}
      *
      * @param propertyName      name of property
      * @param otherPropertyName other property name
@@ -298,7 +298,7 @@ public class Restrictions
     }
 
     /**
-     * Lower then or equal restriction for entity properties: <i>e.name<=e.otherName</i>
+     * Lower then or equal restriction for entity properties: {@code <i>e.name<=e.otherName</i>}
      *
      * @param propertyName      name of property
      * @param otherPropertyName other property name
@@ -310,7 +310,7 @@ public class Restrictions
     }
 
     /**
-     * Like restriction: <i>e.name like :p_0</i>
+     * Like restriction: {@code <i>e.name like :p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -323,7 +323,7 @@ public class Restrictions
     }
 
     /**
-     * Ignore case like restriction: <i>lower(e.name) like lower(:p_0)</i>
+     * Ignore case like restriction: {@code <i>lower(e.name) like lower(:p_0)</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -336,7 +336,7 @@ public class Restrictions
     }
 
     /**
-     * Not like restriction: <i>e.name not like :p_0</i>
+     * Not like restriction: {@code <i>e.name not like :p_0</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
@@ -349,7 +349,7 @@ public class Restrictions
     }
 
     /**
-     * Ignore case not like restriction: <i>lower(e.name) not like lower(:p_0)</i>
+     * Ignore case not like restriction: {@code <i>lower(e.name) not like lower(:p_0)</i>}
      *
      * @param propertyName  name of property
      * @param propertyValue property value
