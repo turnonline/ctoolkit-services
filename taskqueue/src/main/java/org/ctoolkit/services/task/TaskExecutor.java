@@ -57,16 +57,17 @@ import java.util.Map;
  * in defined order, use task chaining:
  * <p>
  * <b>Task chaining example:</b>
- * {@code
+ * <pre>
  *
- * Task first = new FakeTask().postponeFor( 10 );
- *  Task second = new FakeTask();
+ * Task first = new MyOwnTask().postponeFor( 10 );
+ * Task second = new MySecondTask();
  *
- *  first.addNext( second );
+ * first.addNext( second );
  *
- *  // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
- *  executor.schedule( first );
- * }
+ * // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
+ * executor.schedule( first );
+ * </pre>
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see <a href="https://cloud.google.com/appengine/docs/standard/java/taskqueue">Task Queue Overview</a>
  */
