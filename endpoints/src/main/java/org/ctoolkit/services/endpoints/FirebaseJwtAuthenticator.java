@@ -65,10 +65,6 @@ public class FirebaseJwtAuthenticator
         verifier = builder.build();
     }
 
-    public FirebaseJwtAuthenticator()
-    {
-    }
-
     @Override
     public User authenticate( HttpServletRequest request )
     {
@@ -97,6 +93,10 @@ public class FirebaseJwtAuthenticator
         String userId = idToken.getPayload().getSubject();
         String email = idToken.getPayload().getEmail();
 
-        return ( userId == null && email == null ) ? null : new User( userId, email );
+        User user = ( userId == null && email == null ) ? null : new User( userId, email );
+
+        logger.info( "Firebase auth user: " + user );
+
+        return user;
     }
 }
