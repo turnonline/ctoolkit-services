@@ -27,13 +27,12 @@ import com.google.api.server.spi.Client;
 import com.google.api.server.spi.auth.GoogleAuth;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.config.Authenticator;
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 /**
  * The Firebase JWT token thread-safe authenticator that ignores validated token's audience and issuer.
@@ -78,13 +77,13 @@ public class FirebaseJwtAuthenticator
         GoogleIdToken idToken;
         try
         {
-            idToken = verifier.verify( token );
+            idToken = getVerifier().verify( token );
             if ( idToken == null )
             {
                 return null;
             }
         }
-        catch ( GeneralSecurityException | IOException | IllegalArgumentException e )
+        catch ( Exception e )
         {
             logger.warn( e.getMessage() );
             return null;
@@ -93,10 +92,31 @@ public class FirebaseJwtAuthenticator
         String userId = idToken.getPayload().getSubject();
         String email = idToken.getPayload().getEmail();
 
-        User user = ( userId == null && email == null ) ? null : new User( userId, email );
+        User user;
+        if ( email == null )
+        {
+            return null;
+        }
+        else
+        {
+            if ( userId == null )
+            {
+                user = new User( email );
+            }
+            else
+            {
+                user = new User( userId, email );
+            }
+        }
 
-        logger.info( "Firebase auth user: " + user );
+        logger.info( "Firebase authenticated user: " + user );
 
         return user;
+    }
+
+    @VisibleForTesting
+    GoogleIdTokenVerifier getVerifier()
+    {
+        return verifier;
     }
 }
