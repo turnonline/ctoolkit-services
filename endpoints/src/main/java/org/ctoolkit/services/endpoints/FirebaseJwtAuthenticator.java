@@ -25,6 +25,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.server.spi.Client;
 import com.google.api.server.spi.auth.GoogleAuth;
+import com.google.api.server.spi.auth.GoogleJwtAuthenticator;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.config.Authenticator;
 import com.google.common.annotations.VisibleForTesting;
@@ -33,9 +34,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Pattern;
 
 /**
  * The Firebase JWT token thread-safe authenticator that ignores validated token's audience and issuer.
+ * Inspired by {@link GoogleJwtAuthenticator}.
+ * <p>
+ * The user is type of the {@link VerifiedUser} and is available as request attribute:
+ * <p>
+ * {@code (VerifiedUser) request.getAttribute( VerifiedUser.class.getName() );}
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -44,6 +51,12 @@ public class FirebaseJwtAuthenticator
         implements Authenticator
 {
     private static final Logger logger = LoggerFactory.getLogger( FirebaseJwtAuthenticator.class );
+
+    // Identifies JSON Web Tokens, from GoogleAuth.java
+    private static final String BASE64_REGEX = "[a-zA-Z0-9+/=_-]{6,}+";
+
+    private static final Pattern JWT_PATTERN =
+            Pattern.compile( String.format( "%s\\.%s\\.%s", BASE64_REGEX, BASE64_REGEX, BASE64_REGEX ) );
 
     private static final String PUBLIC_CERTS_URL = "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
@@ -69,8 +82,9 @@ public class FirebaseJwtAuthenticator
     {
         String token = GoogleAuth.getAuthToken( request );
 
-        if ( token == null )
+        if ( !isJwt( token ) )
         {
+            logger.warn( "Not a JWT token." );
             return null;
         }
 
@@ -91,6 +105,7 @@ public class FirebaseJwtAuthenticator
 
         String userId = idToken.getPayload().getSubject();
         String email = idToken.getPayload().getEmail();
+        String audience = ( String ) idToken.getPayload().getAudience();
 
         User user;
         if ( email == null )
@@ -99,19 +114,22 @@ public class FirebaseJwtAuthenticator
         }
         else
         {
-            if ( userId == null )
-            {
-                user = new User( email );
-            }
-            else
-            {
-                user = new User( userId, email );
-            }
+            VerifiedUser.Builder builder = new VerifiedUser.Builder();
+            builder.email( email ).userId( userId ).audience( audience ).token( token );
+            user = new VerifiedUser( builder );
+
+            request.setAttribute( VerifiedUser.class.getName(), user );
         }
 
         logger.info( "Firebase authenticated user: " + user );
 
         return user;
+    }
+
+    @VisibleForTesting
+    boolean isJwt( String token )
+    {
+        return token != null && JWT_PATTERN.matcher( token ).matches();
     }
 
     @VisibleForTesting

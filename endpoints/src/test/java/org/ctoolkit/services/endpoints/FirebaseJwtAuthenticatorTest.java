@@ -43,7 +43,7 @@ import static org.testng.Assert.assertNull;
  */
 public class FirebaseJwtAuthenticatorTest
 {
-    private static final String FAKE_TOKEN = "Bearer token-123";
+    private static final String FAKE_TOKEN = "token-123";
 
     @Tested
     private FirebaseJwtAuthenticator tested;
@@ -61,14 +61,18 @@ public class FirebaseJwtAuthenticatorTest
         final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setSubject( "userId123" );
         payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
 
         verificationPassedExpectations( tested, request, verifier, idToken, payload );
 
         User user = tested.authenticate( request );
+        VerifiedUser verifiedUser = ( VerifiedUser ) user;
 
         assertNotNull( user );
-        assertEquals( user.getId(), "userId123" );
-        assertEquals( user.getEmail(), "verified@turnonline.biz" );
+        assertEquals( verifiedUser.getId(), "userId123" );
+        assertEquals( verifiedUser.getEmail(), "verified@turnonline.biz" );
+        assertEquals( verifiedUser.getToken(), FAKE_TOKEN );
+        assertEquals( verifiedUser.getAudience(), "my-audience" );
     }
 
     @Test
@@ -100,7 +104,28 @@ public class FirebaseJwtAuthenticatorTest
         final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setSubject( "userId123" );
 
-        verificationPassedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations( tested )
+        {
+            {
+                GoogleAuth.getAuthToken( request );
+                result = FAKE_TOKEN;
+
+                tested.isJwt( FAKE_TOKEN );
+                result = true;
+
+                tested.getVerifier();
+                result = verifier;
+
+                verifier.verify( FAKE_TOKEN );
+                result = idToken;
+
+                idToken.getPayload();
+                result = payload;
+
+                request.setAttribute( VerifiedUser.class.getName(), any );
+                times = 0;
+            }
+        };
 
         User user = tested.authenticate( request );
 
@@ -119,11 +144,37 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
+                tested.isJwt( FAKE_TOKEN );
+                result = true;
+
                 tested.getVerifier();
                 result = verifier;
 
                 verifier.verify( FAKE_TOKEN );
                 result = new Exception();
+            }
+        };
+
+        User user = tested.authenticate( request );
+
+        assertNull( user );
+    }
+
+    @Test
+    public void authenticateInvalidJwtToken( @Mocked final HttpServletRequest request,
+                                             @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    {
+        new Expectations( tested )
+        {
+            {
+                GoogleAuth.getAuthToken( request );
+                result = FAKE_TOKEN;
+
+                tested.isJwt( FAKE_TOKEN );
+                result = false;
+
+                tested.getVerifier();
+                times = 0;
             }
         };
 
@@ -164,6 +215,9 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
+                tested.isJwt( FAKE_TOKEN );
+                result = true;
+
                 tested.getVerifier();
                 result = verifier;
 
@@ -190,6 +244,9 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
+                tested.isJwt( FAKE_TOKEN );
+                result = true;
+
                 tested.getVerifier();
                 result = verifier;
 
@@ -198,6 +255,9 @@ public class FirebaseJwtAuthenticatorTest
 
                 idToken.getPayload();
                 result = payload;
+
+                request.setAttribute( VerifiedUser.class.getName(), any );
+                times = 1;
             }
         };
     }
