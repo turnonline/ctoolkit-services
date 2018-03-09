@@ -110,7 +110,7 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
-                tested.isJwt( FAKE_TOKEN );
+                FirebaseJwtAuthenticator.isJwt( FAKE_TOKEN );
                 result = true;
 
                 tested.getVerifier();
@@ -144,7 +144,7 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
-                tested.isJwt( FAKE_TOKEN );
+                FirebaseJwtAuthenticator.isJwt( FAKE_TOKEN );
                 result = true;
 
                 tested.getVerifier();
@@ -170,7 +170,7 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
-                tested.isJwt( FAKE_TOKEN );
+                FirebaseJwtAuthenticator.isJwt( FAKE_TOKEN );
                 result = false;
 
                 tested.getVerifier();
@@ -215,7 +215,7 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
-                tested.isJwt( FAKE_TOKEN );
+                FirebaseJwtAuthenticator.isJwt( FAKE_TOKEN );
                 result = true;
 
                 tested.getVerifier();
@@ -244,7 +244,7 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.getAuthToken( request );
                 result = FAKE_TOKEN;
 
-                tested.isJwt( FAKE_TOKEN );
+                FirebaseJwtAuthenticator.isJwt( FAKE_TOKEN );
                 result = true;
 
                 tested.getVerifier();

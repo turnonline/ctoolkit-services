@@ -77,6 +77,11 @@ public class FirebaseJwtAuthenticator
         verifier = builder.build();
     }
 
+    public static boolean isJwt( String token )
+    {
+        return token != null && JWT_PATTERN.matcher( token ).matches();
+    }
+
     @Override
     public User authenticate( HttpServletRequest request )
     {
@@ -124,12 +129,6 @@ public class FirebaseJwtAuthenticator
         logger.info( "Firebase authenticated user: " + user );
 
         return user;
-    }
-
-    @VisibleForTesting
-    boolean isJwt( String token )
-    {
-        return token != null && JWT_PATTERN.matcher( token ).matches();
     }
 
     @VisibleForTesting
