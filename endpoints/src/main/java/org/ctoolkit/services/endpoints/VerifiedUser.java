@@ -19,7 +19,6 @@
 package org.ctoolkit.services.endpoints;
 
 import com.google.api.server.spi.auth.common.User;
-import com.google.common.base.MoreObjects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -67,11 +66,11 @@ public class VerifiedUser
     @Override
     public String toString()
     {
-        return MoreObjects.toStringHelper( this )
-                .add( "userId", this.getId() )
-                .add( "email", this.getEmail() )
-                .add( "audience", audience )
-                .toString();
+        return "{" +
+                "userId='" + this.getId() + '\'' +
+                ", email='" + this.getEmail() + '\'' +
+                ", audience='" + audience + '\'' +
+                '}';
     }
 
     static class Builder
