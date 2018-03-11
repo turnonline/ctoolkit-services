@@ -18,6 +18,8 @@
 
 package org.ctoolkit.services.endpoints;
 
+import com.google.common.net.HttpHeaders;
+
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -28,14 +30,21 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS;
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS;
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS;
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
+import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
+
 /**
  * Engine adds these headers by default, thus adding these headers is useful mainly for local development.
  * These headers are added:
  * <ul>
- * <li>access-control-allow-credentials: true</li>
- * <li>access-control-allow-origin: *</li>
- * <li>access-control-allow-methods: DELETE,GET,HEAD,PATCH,POST,PUT</li>
- * <li>access-control-allow-headers: content-type,authorization,x-http-method-override</li>
+ * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_CREDENTIALS}: true</li>
+ * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_ORIGIN}: *</li>
+ * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_METHODS}: DELETE,GET,HEAD,PATCH,POST,PUT</li>
+ * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_HEADERS}: Content-Type,Authorization,x-http-method-override</li>
  * </ul>
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
@@ -55,12 +64,12 @@ public class ApiAccessControlFilter
     {
         HttpServletResponse response = ( HttpServletResponse ) servletResponse;
 
-        response.addHeader( "access-control-allow-credentials", "true" );
-        response.addHeader( "access-control-allow-origin", "*" );
-        response.addHeader( "access-control-allow-methods", "DELETE,GET,HEAD,PATCH,POST,PUT" );
+        response.addHeader( ACCESS_CONTROL_ALLOW_CREDENTIALS, "true" );
+        response.addHeader( ACCESS_CONTROL_ALLOW_ORIGIN, "*" );
+        response.addHeader( ACCESS_CONTROL_ALLOW_METHODS, "DELETE,GET,HEAD,PATCH,POST,PUT" );
 
-        String value = "content-type,authorization,x-http-method-override";
-        response.addHeader( "access-control-allow-headers", value );
+        String value = CONTENT_TYPE + "," + AUTHORIZATION + ",x-http-method-override";
+        response.addHeader( ACCESS_CONTROL_ALLOW_HEADERS, value );
         chain.doFilter( request, response );
     }
 
