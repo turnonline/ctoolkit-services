@@ -18,6 +18,9 @@
 
 package org.ctoolkit.services.storage.criteria;
 
+import org.ctoolkit.services.storage.EntityIdentity;
+
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +59,7 @@ public class Criteria<T>
      * @param <T>    the concrete type of the entity
      * @return new instance of {@link Criteria}
      */
-    public static <T> Criteria<T> create( Class<T> entity )
+    public static <T> Criteria<T> from( Class<T> entity )
     {
         return new Criteria<>( entity );
     }
@@ -75,6 +78,80 @@ public class Criteria<T>
     public Criteria addCriteria( Expression expression )
     {
         expressionList.add( expression );
+        return this;
+    }
+
+    /**
+     * The result for this criteria definition will be ordered by ascending.
+     *
+     * @param property the name of the property on which order will be applied
+     * @return this criteria instance
+     */
+    public Criteria ascending( @Nonnull String property )
+    {
+        addOrderRule( property, Order.ASC );
+        return this;
+    }
+
+    /**
+     * The result for this criteria definition will be ordered by descending.
+     *
+     * @param property the name of the property on which order will be applied
+     * @return this criteria instance
+     */
+    public Criteria descending( @Nonnull String property )
+    {
+        addOrderRule( property, Order.DESC );
+        return this;
+    }
+
+    /**
+     * Configures this criteria to filter query result by referenced entity.
+     *
+     * @param property the name of the property that holds the referenced entity key
+     * @param type     the type of the referenced class
+     * @param id       the referenced entity identification
+     * @return this criteria instance
+     */
+    public Criteria reference( @Nonnull String property, @Nonnull Class type, @Nonnull Long id )
+    {
+        addCriteria( Restrictions.idRef( property, type, id ) );
+        return this;
+    }
+
+    /**
+     * Configures this criteria to filter query result by referenced entity.
+     *
+     * @param property the name of the property that holds the referenced entity key
+     * @param type     the type of the referenced class
+     * @param name     the referenced entity identification
+     * @return this criteria instance
+     */
+    public Criteria reference( @Nonnull String property, @Nonnull Class type, @Nonnull String name )
+    {
+        addCriteria( Restrictions.idRef( property, type, name ) );
+        return this;
+    }
+
+    /**
+     * Configures this criteria to filter query result by referenced entity.
+     *
+     * @param property the name of the property that holds the referenced entity key
+     * @param entity   the referenced entity instance
+     * @return this criteria instance
+     */
+    public Criteria reference( @Nonnull String property, @Nonnull EntityIdentity entity )
+    {
+        Object identification = entity.getId();
+        if ( identification instanceof String )
+        {
+            addCriteria( Restrictions.idRef( property, entity.getClass(), ( String ) identification ) );
+        }
+        else
+        {
+            addCriteria( Restrictions.idRef( property, entity.getClass(), ( Long ) identification ) );
+        }
+
         return this;
     }
 
