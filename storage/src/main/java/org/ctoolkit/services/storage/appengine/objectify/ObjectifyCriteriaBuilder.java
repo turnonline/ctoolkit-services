@@ -86,13 +86,9 @@ class ObjectifyCriteriaBuilder<E>
     @Override
     public Query<E> build( InExpression expression )
     {
-        StringBuilder builder = new StringBuilder();
 
-        builder.append( expression.getPropertyName() );
-        builder.append( " " );
-        builder.append( "in" );
-
-        return query.filter( builder.toString(), expression.getPropertyValues() );
+        String condition = expression.getPropertyName() + " in";
+        return query.filter( condition, expression.getPropertyValues() );
     }
 
     public Query<E> build( IdInExpression expression )
@@ -185,13 +181,9 @@ class ObjectifyCriteriaBuilder<E>
         {
             filterOperator = "!=";
         }
-        StringBuilder builder = new StringBuilder();
 
-        builder.append( expression.getPropertyName() );
-        builder.append( " " );
-        builder.append( filterOperator );
-
-        return query.filter( builder.toString(), null );
+        String condition = expression.getPropertyName() + " " + filterOperator;
+        return query.filter( condition, null );
     }
 
     @Override
@@ -211,13 +203,8 @@ class ObjectifyCriteriaBuilder<E>
             filterOperator = "!=";
         }
 
-        StringBuilder builder = new StringBuilder();
-
-        builder.append( expression.getPropertyName() );
-        builder.append( " " );
-        builder.append( filterOperator );
-
-        return query.filter( builder.toString(), expression.getPropertyValue() );
+        String condition = expression.getPropertyName() + " " + filterOperator;
+        return query.filter( condition, expression.getPropertyValue() );
     }
 
     @Override
@@ -231,7 +218,7 @@ class ObjectifyCriteriaBuilder<E>
     public Query<E> build( ReferenceNameExpression expression )
     {
         String condition = expression.getPropertyName() + " =";
-        return query.filterKey( condition, Key.create( expression.getRefClass(), expression.getPropertyValue() ) );
+        return query.filter( condition, Key.create( expression.getRefClass(), expression.getPropertyValue() ) );
     }
 
     @Override

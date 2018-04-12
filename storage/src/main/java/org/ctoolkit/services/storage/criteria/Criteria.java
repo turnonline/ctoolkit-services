@@ -53,13 +53,13 @@ public class Criteria<T>
     }
 
     /**
-     * Construct criteria object.
+     * Creates criteria instance for requested entity type.
      *
      * @param entity entity on which criteria will be applied
      * @param <T>    the concrete type of the entity
      * @return new instance of {@link Criteria}
      */
-    public static <T> Criteria<T> from( Class<T> entity )
+    public static <T> Criteria<T> of( Class<T> entity )
     {
         return new Criteria<>( entity );
     }

@@ -87,7 +87,7 @@ import java.util.Set;
  *  private List&#60;Ref&#60;Ingredient&#62;&#62; ingredients = new ArrayList&#60;&#62;();
  *
  *  // transient collection of entities
- *  // Note: the null collection of entities is an explicit mark to delete all datastore references
+ *  // Note: the null collection of transient entities is an explicit mark to delete all datastore references
  *  &#64;Ignore
  *  private List&#60;Ingredient&#62; tIngredients = new ArrayList&#60;&#62;();
  *
