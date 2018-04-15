@@ -55,7 +55,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * If the <b>createdDate</b>, <b>modificationDate</b> properties needs to be indexed
  * let implement your entity either {@link IndexCreatedDate}, or {@link IndexModificationDate}, or both.
  * These marker interfaces will instruct Objectify to index requested properties.
- * <p>
+ *
  * <b>App Engine Note:</b> The Cloud Datastore API does not distinguish between creating a new entity
  * and updating an existing one. If the object's key represents an entity that already exists,
  * the put() method overwrites the existing entity.
@@ -111,6 +111,12 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         save();
 
         return ignored == null ? null : ignored.children();
+    }
+
+    @Override
+    public void save( @Nonnull String ignored, String... moreIgnored )
+    {
+        save( createIgnored().ignore( ignored, moreIgnored ) );
     }
 
     /**
@@ -193,7 +199,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      *
      * @param ref             the entity reference
      * @param defaultInstance the default fallback instance if reference is null
-     * @param <T> the concrete type of the entity
+     * @param <T>             the concrete type of the entity
      * @return the entity instance
      */
     public <T> T fromRef( @Nullable Ref<T> ref, @Nullable T defaultInstance )
@@ -210,7 +216,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      *
      * @param collectionOfRefs      the collection of entity references as a source for the result
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
-     * @param <T> the concrete type of the entity
+     * @param <T>                   the concrete type of the entity
      * @return the populated collection from the references or empty collection
      */
     public <T> List<T> fromCollectionOfRefs( @Nullable List<Ref<T>> collectionOfRefs,
@@ -230,7 +236,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      *
      * @param collectionOfRefs      the collection of entity references as a source for the result
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
-     * @param <T> the concrete type of the entity
+     * @param <T>                   the concrete type of the entity
      * @return the populated collection from the references or empty collection
      */
     public <T> Set<T> fromCollectionOfRefs( @Nullable Set<Ref<T>> collectionOfRefs,

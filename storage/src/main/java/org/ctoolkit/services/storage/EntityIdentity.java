@@ -78,6 +78,16 @@ public interface EntityIdentity<ID_TYPE>
     Set<Ignored> save( @Nullable Ignored ignored );
 
     /**
+     * Similar to the {@link #save(Ignored)}.
+     * Use if you need more fine-grained control over which relationships of this entity
+     * are going to be cascading saved, but no support to ignore cascading children
+     * (if needed then use {@link #save(Ignored)}).
+     *
+     * @param ignored the field names of this entity (no cascading to children) to be ignored while saving
+     */
+    void save( @Nonnull String ignored, String... moreIgnored );
+
+    /**
      * Deletes the entity from the datastore best within transaction.
      * Cascading delete support is optional and implementation specific.
      * <p>
@@ -152,7 +162,7 @@ public interface EntityIdentity<ID_TYPE>
      * An {@link EntityIdentity} instance is already aware about which fields has been marked to be ignored.
      * In this case you can call {@link EntityIdentity#save()} and all marked fields
      * will be ignored while cascading save.
-     * <p>
+     *
      * <b>Unattached</b>
      * <p>
      * An {@link EntityIdentity} instance has no connection with an unattached Ignored instance.
