@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FakeTask
-        extends Task
+        extends Task<Object>
 {
     private static final long serialVersionUID = 1L;
 

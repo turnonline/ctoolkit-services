@@ -22,6 +22,7 @@ import com.google.appengine.api.modules.ModulesService;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.inject.Injector;
+import com.googlecode.objectify.Key;
 import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
@@ -53,6 +54,9 @@ public class TaskQueueExecutorBeanTest
     @Injectable
     private ModulesService modulesService;
 
+    @Mocked
+    private Queue queue;
+
     @Test( expectedExceptions = NullPointerException.class )
     public void batchScheduleEmpty()
     {
@@ -72,7 +76,7 @@ public class TaskQueueExecutorBeanTest
     }
 
     @Test
-    public void scheduleNoOptions( @Mocked final Queue queue )
+    public void scheduleNoOptions()
     {
         final Task task = new FakeTask();
 
@@ -99,11 +103,22 @@ public class TaskQueueExecutorBeanTest
     }
 
     @Test
-    public void scheduleWithUniqueTaskName( @Mocked final Queue queue )
+    public void scheduleWithUniqueTaskName( @Mocked final Key<Object> key )
     {
         final Long id = 651987L;
-        final Task task = new FakeTask( "my-prefix", true );
-        task.setEntityId( id );
+        final Task<Object> task = new FakeTask( "my-prefix", true );
+        task.setEntityKey( key );
+
+        new Expectations()
+        {
+            {
+                key.getKind();
+                result = "FakeEntity";
+
+                key.getId();
+                result = id;
+            }
+        };
 
         modulesServiceExpectations( tested, queue, task );
 
@@ -122,20 +137,31 @@ public class TaskQueueExecutorBeanTest
                 assertEquals( host.size(), 1, "Host header is" );
 
                 String taskName = options.getTaskName();
-                assertEquals( taskName, "my-prefix_" + id + "_" + allocatedId, "Task name" );
+                assertEquals( taskName, "my-prefix_FakeEntity_" + id + "_" + allocatedId, "Task name" );
             }
         };
     }
 
     @Test
-    public void scheduleFulOptions( @Mocked final Queue queue )
+    public void scheduleFulOptions( @Mocked final Key<Object> key )
     {
         final Integer postponeFor = 300;
         final Long id = 123987L;
 
-        final Task task = new FakeTask( "my-prefix", false, "my-queue" );
+        final Task<Object> task = new FakeTask( "my-prefix", false, "my-queue" );
         task.postponeFor( postponeFor );
-        task.setEntityId( id );
+        task.setEntityKey( key );
+
+        new Expectations()
+        {
+            {
+                key.getKind();
+                result = "FakeEntity";
+
+                key.getId();
+                result = id;
+            }
+        };
 
         modulesServiceExpectations( tested, queue, task );
 
@@ -154,7 +180,7 @@ public class TaskQueueExecutorBeanTest
                 assertEquals( host.size(), 1, "Host header is" );
 
                 String taskName = options.getTaskName();
-                assertEquals( taskName, "my-prefix_" + id, "Task name" );
+                assertEquals( taskName, "my-prefix_FakeEntity_" + id, "Task name" );
 
                 Long eta = options.getEtaMillis();
                 Long diff = ( eta - System.currentTimeMillis() ) / 1000;

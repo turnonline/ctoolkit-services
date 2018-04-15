@@ -22,6 +22,7 @@ import com.google.appengine.api.taskqueue.DeferredTask;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.inject.Injector;
+import com.googlecode.objectify.Key;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -29,10 +30,11 @@ import javax.inject.Inject;
 import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
  * The task, a standalone job definition to be executed asynchronously. Task represents a small, discrete unit of work.
- * <p>
+ *
  * <b>Vocabulary:</b>
  * <ul>
  * <li><b>Entity ID:</b> represents an identification of an entity to work with</li>
@@ -42,11 +44,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * to append an unique ID to customized task name. By default value is {@code true}</li>
  * <li><b>Queue name:</b> a queue defined by the execution environment where task will be placed in.</li>
  * </ul>
- * <p>
+ *
  * <b>Note:</b> Queue, and task names must be a combination of one or more digits, letters a-z, underscores, and/or dashes,
  * satisfying the following regular expression:
  * [0-9a-zA-Z\-\_]+
- * <p>
+ *
  * <b>Naming a task</b>
  * When you create a new task, App Engine assigns the task a unique name by default. However, you can assign your
  * own name to a task by using the name parameters (Task Name, Entity ID, Make Unique). An advantage of assigning
@@ -58,10 +60,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * if task names are sequential, such as with timestamps. So, if you assign your own names, we recommend
  * using a well-distributed prefix for task names, such as a hash of the contents.
  *
+ * @param <T> the type of the entity that task will work with
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see TaskExecutor
  */
-public abstract class Task
+public abstract class Task<T>
         implements DeferredTask
 {
     private static final long serialVersionUID = 1L;
@@ -72,7 +75,7 @@ public abstract class Task
     @Inject
     private transient TaskExecutor executor;
 
-    private Long entityId;
+    private Key<T> entityKey;
 
     private String namePrefix;
 
@@ -132,23 +135,24 @@ public abstract class Task
     }
 
     /**
-     * Returns the entity Id, represents an unique identification of the job.
+     * Returns the entity key that might be used to retrieve entity to work with.
+     * See {@link #workWith()}.
      *
-     * @return the entity Id
+     * @return the entity key
      */
-    public Long getEntityId()
+    public Key<T> getEntityKey()
     {
-        return entityId;
+        return entityKey;
     }
 
     /**
-     * Sets the entity Id.
+     * Sets the entity key.
      *
-     * @param entityId the entity Id to be set
+     * @param entityKey the entity key to be set
      */
-    public void setEntityId( Long entityId )
+    public void setEntityKey( Key<T> entityKey )
     {
-        this.entityId = entityId;
+        this.entityKey = entityKey;
     }
 
     /**
@@ -172,13 +176,26 @@ public abstract class Task
     {
         if ( namePrefix != null )
         {
-            if ( entityId == null )
+            if ( entityKey == null )
             {
                 return namePrefix;
             }
             else
             {
-                return namePrefix + "_" + entityId;
+                Object identification;
+                long id = entityKey.getId();
+
+                if ( id == 0 )
+                {
+                    // 0 if this key has a name
+                    identification = entityKey.getName();
+                }
+                else
+                {
+                    identification = id;
+                }
+
+                return namePrefix + "_" + entityKey.getKind() + "_" + identification;
             }
         }
 
@@ -314,13 +331,25 @@ public abstract class Task
         return this;
     }
 
+    /**
+     * Returns the entity resolved by {@link #getEntityKey()}.
+     *
+     * @return the entity the task will handle or {@code null} if not found
+     */
+    public T workWith()
+    {
+        Key<T> key = getEntityKey();
+        checkNotNull( key, "Entity key is null" );
+        return ofy().load().key( key ).now();
+    }
+
     @Override
     public boolean equals( Object o )
     {
         if ( this == o ) return true;
         if ( !( o instanceof Task ) ) return false;
         Task task = ( Task ) o;
-        return Objects.equals( entityId, task.entityId ) &&
+        return Objects.equals( entityKey, task.entityKey ) &&
                 Objects.equals( namePrefix, task.namePrefix ) &&
                 Objects.equals( queueName, task.queueName );
     }
@@ -328,14 +357,14 @@ public abstract class Task
     @Override
     public int hashCode()
     {
-        return Objects.hash( entityId, namePrefix, queueName );
+        return Objects.hash( entityKey, namePrefix, queueName );
     }
 
     @Override
     public String toString()
     {
         return "Task{" +
-                "entityId=" + entityId +
+                "entityKey=" + entityKey +
                 ", namePrefix='" + namePrefix + '\'' +
                 ", makeUnique=" + makeUnique +
                 ", next=" + ( next != null ) +
