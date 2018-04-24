@@ -22,14 +22,17 @@ import org.ctoolkit.services.storage.EntityIdentity;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * <p>Criteria class is helper class for creating criteria.</p>
  * <p><b>Usage:</b></p>
  * <pre>
- * Criteria&#60;Entity&#62; crit = Criteria.create(Entity.class);
- * crit.add(Restrictions.eq("id", 1);
+ * Criteria&#60;Entity&#62; criteria = Criteria.of(Entity.class);
+ * criteria.equal("id", 1);
  * </pre>
  *
  * @param <T> the concrete type of the entity
@@ -47,9 +50,9 @@ public class Criteria<T>
 
     private List<OrderRule> orderRules = new ArrayList<>();
 
-    private Criteria( Class<T> entity )
+    private Criteria( @Nonnull Class<T> entity )
     {
-        this.entity = entity;
+        this.entity = checkNotNull( entity );
     }
 
     /**
@@ -59,7 +62,7 @@ public class Criteria<T>
      * @param <T>    the concrete type of the entity
      * @return new instance of {@link Criteria}
      */
-    public static <T> Criteria<T> of( Class<T> entity )
+    public static <T> Criteria<T> of( @Nonnull Class<T> entity )
     {
         return new Criteria<>( entity );
     }
@@ -75,7 +78,7 @@ public class Criteria<T>
      * @param expression implementation of {@link Expression}
      * @return this
      */
-    public Criteria addCriteria( Expression expression )
+    public Criteria addCriteria( @Nonnull Expression expression )
     {
         expressionList.add( expression );
         return this;
@@ -109,13 +112,13 @@ public class Criteria<T>
      * Configures this criteria to filter query result by referenced entity.
      *
      * @param property the name of the property that holds the referenced entity key
-     * @param type     the type of the referenced class
+     * @param type     the type of the referenced class used to filter results
      * @param id       the referenced entity identification
      * @return this criteria instance
      */
     public Criteria reference( @Nonnull String property, @Nonnull Class type, @Nonnull Long id )
     {
-        addCriteria( Restrictions.idRef( property, type, id ) );
+        addCriteria( new ReferenceIdExpression( property, type, id ) );
         return this;
     }
 
@@ -123,13 +126,13 @@ public class Criteria<T>
      * Configures this criteria to filter query result by referenced entity.
      *
      * @param property the name of the property that holds the referenced entity key
-     * @param type     the type of the referenced class
+     * @param type     the type of the referenced class used to filter results
      * @param name     the referenced entity identification
      * @return this criteria instance
      */
     public Criteria reference( @Nonnull String property, @Nonnull Class type, @Nonnull String name )
     {
-        addCriteria( Restrictions.idRef( property, type, name ) );
+        addCriteria( new ReferenceNameExpression( property, type, name ) );
         return this;
     }
 
@@ -137,7 +140,7 @@ public class Criteria<T>
      * Configures this criteria to filter query result by referenced entity.
      *
      * @param property the name of the property that holds the referenced entity key
-     * @param entity   the referenced entity instance
+     * @param entity   the referenced entity instance as a type used to filter results
      * @return this criteria instance
      */
     public Criteria reference( @Nonnull String property, @Nonnull EntityIdentity entity )
@@ -145,13 +148,345 @@ public class Criteria<T>
         Object identification = entity.getId();
         if ( identification instanceof String )
         {
-            addCriteria( Restrictions.idRef( property, entity.getClass(), ( String ) identification ) );
+            addCriteria( new ReferenceNameExpression( property, entity.getClass(), ( String ) identification ) );
         }
         else
         {
-            addCriteria( Restrictions.idRef( property, entity.getClass(), ( Long ) identification ) );
+            addCriteria( new ReferenceIdExpression( property, entity.getClass(), ( Long ) identification ) );
         }
 
+        return this;
+    }
+
+    /**
+     * Equal restriction: {@code <i>e.name=:p_0</i>}
+     *
+     * @param property the name of the property
+     * @param value    the property value
+     * @return this criteria instance
+     */
+    public Criteria equal( @Nonnull String property, @Nonnull Object value )
+    {
+        addCriteria( new SimpleExpression( property, value, "=" ) );
+        return this;
+    }
+
+    /**
+     * Not equal restriction: {@code <i>e.name<>:p_0</i>}
+     *
+     * @param property the name of the property
+     * @param value    the property value
+     * @return this criteria instance
+     */
+    public Criteria notEqual( @Nonnull String property, @Nonnull Object value )
+    {
+        addCriteria( new SimpleExpression( property, value, "<>" ) );
+        return this;
+    }
+
+    /**
+     * Greater then restriction: {@code <i>e.name>:p_0</i>}
+     *
+     * @param property the name of the property
+     * @param value    the property value
+     * @return this criteria instance
+     */
+    public Criteria gt( @Nonnull String property, @Nonnull Object value )
+    {
+        addCriteria( new SimpleExpression( property, value, ">" ) );
+        return this;
+    }
+
+    /**
+     * Greater then or equal restriction: {@code <i>e.name>=:p_0</i>}
+     *
+     * @param property the name of the property
+     * @param value    the property value
+     * @return this criteria instance
+     */
+    public Criteria ge( @Nonnull String property, @Nonnull Object value )
+    {
+        addCriteria( new SimpleExpression( property, value, ">=" ) );
+        return this;
+    }
+
+    /**
+     * Less then restriction: {@code <i>e.name>=:p_0</i>}
+     *
+     * @param property the name of the property
+     * @param value    the property value
+     * @return this criteria instance
+     */
+    public Criteria lt( @Nonnull String property, @Nonnull Object value )
+    {
+        addCriteria( new SimpleExpression( property, value, "<" ) );
+        return this;
+    }
+
+    /**
+     * Less then or equal restriction: {@code <i>e.name>=:p_0</i>}
+     *
+     * @param property the name of the property
+     * @param value    the property value
+     * @return this criteria instance
+     */
+    public Criteria le( @Nonnull String property, @Nonnull Object value )
+    {
+        addCriteria( new SimpleExpression( property, value, "<=" ) );
+        return this;
+    }
+
+    /**
+     * Is null restriction: {@code <i>e.name is null</i>}
+     *
+     * @param property the name of the property
+     * @return this criteria instance
+     */
+    public Criteria isNull( @Nonnull String property )
+    {
+        addCriteria( new NullExpression( property, "is null" ) );
+        return this;
+    }
+
+    /**
+     * Is not null restriction: {@code <i>e.name is not null</i>}
+     *
+     * @param property the name of the property
+     * @return this criteria instance
+     */
+    public Criteria isNotNull( @Nonnull String property )
+    {
+        addCriteria( new NullExpression( property, "is not null" ) );
+        return this;
+    }
+
+    /**
+     * In restriction: {@code <i>e.name in (:p_0)</i>}
+     *
+     * @param property the name of the property
+     * @param values   the array of property values
+     * @return this criteria instance
+     */
+    public Criteria in( @Nonnull String property, @Nonnull Object[] values )
+    {
+        addCriteria( new InExpression( property, values, "in" ) );
+        return this;
+    }
+
+    /**
+     * In restriction: {@code <i>e.name in (:p_0)</i>}
+     *
+     * @param property the name of the property
+     * @param values   the collection of property values
+     * @return this criteria instance
+     */
+    public Criteria in( @Nonnull String property, @Nonnull Collection values )
+    {
+        addCriteria( new InExpression( property, values.toArray(), "in" ) );
+        return this;
+    }
+
+    /**
+     * ID In restriction: {@code <i>e.id in (:p_0)</i>}.
+     *
+     * @param property the name of the property
+     * @param ids      the array of ids Long (id)
+     * @return this criteria instance
+     */
+    public Criteria idIn( @Nonnull String property, @Nonnull Long[] ids )
+    {
+        addCriteria( new IdInExpression( property, ids ) );
+        return this;
+    }
+
+    /**
+     * ID In restriction: {@code <i>e.name in (:p_0)</i>}.
+     *
+     * @param property the name of the property
+     * @param ids      the array of ids as String (name)
+     * @return this criteria instance
+     */
+    public Criteria idIn( @Nonnull String property, @Nonnull String[] ids )
+    {
+        addCriteria( new NameInExpression( property, ids ) );
+        return this;
+    }
+
+    /**
+     * Between restriction: {@code <i>e.name >=:p_0 and e.name <=:p_0</i>}
+     *
+     * @param property  the name of the property
+     * @param lowValue  the low bound property value
+     * @param highValue the high bound  property value
+     * @param lowBound  the low comparison type
+     * @param highBound the high comparison type
+     * @return this criteria instance
+     */
+    public Criteria between( @Nonnull String property,
+                             @Nonnull Object lowValue,
+                             @Nonnull Object highValue,
+                             @Nonnull Bound lowBound,
+                             @Nonnull Bound highBound )
+    {
+        addCriteria( new BetweenExpression( property, lowValue, highValue, lowBound, highBound ) );
+        return this;
+    }
+
+    /**
+     * Logical expression {@code <i>or</i>}
+     *
+     * @param expressions the array of expressions
+     * @return this criteria instance
+     */
+    public Criteria or( @Nonnull Expression... expressions )
+    {
+        addCriteria( new LogicalExpression( LogicalExpression.OR, expressions ) );
+        return this;
+    }
+
+    /**
+     * Logical expression {@code <i>and</i>}
+     *
+     * @param expressions the array of expressions
+     * @return this criteria instance
+     */
+    public Criteria and( @Nonnull Expression... expressions )
+    {
+        addCriteria( new LogicalExpression( LogicalExpression.AND, expressions ) );
+        return this;
+    }
+
+    /**
+     * Equal restriction for entity properties: {@code <i>e.name=e.otherName</i>}
+     *
+     * @param property      the name of the property
+     * @param otherProperty the other property name
+     * @return this criteria instance
+     */
+    public Criteria eqProperty( @Nonnull String property, @Nonnull String otherProperty )
+    {
+        addCriteria( new PropertyExpression( property, otherProperty, "=" ) );
+        return this;
+    }
+
+    /**
+     * Not equal restriction for entity properties: {@code <i>e.name<>e.otherName</i>}
+     *
+     * @param property      the name of the property
+     * @param otherProperty the other property name
+     * @return this criteria instance
+     */
+    public Criteria neProperty( @Nonnull String property, @Nonnull String otherProperty )
+    {
+        addCriteria( new PropertyExpression( property, otherProperty, "<>" ) );
+        return this;
+    }
+
+    /**
+     * Greater then restriction for entity properties: {@code <i>e.name>e.otherName</i>}
+     *
+     * @param property      the name of the property
+     * @param otherProperty the other property name
+     * @return this criteria instance
+     */
+    public Criteria gtProperty( @Nonnull String property, @Nonnull String otherProperty )
+    {
+        addCriteria( new PropertyExpression( property, otherProperty, ">" ) );
+        return this;
+    }
+
+    /**
+     * Greater then or equal restriction for entity properties: {@code <i>e.name>=e.otherName</i>}
+     *
+     * @param property      the name of the property
+     * @param otherProperty the other property name
+     * @return this criteria instance
+     */
+    public Criteria geProperty( @Nonnull String property, @Nonnull String otherProperty )
+    {
+        addCriteria( new PropertyExpression( property, otherProperty, ">=" ) );
+        return this;
+    }
+
+    /**
+     * Lower then restriction for entity properties: {@code <i>e.name<e.otherName</i>}
+     *
+     * @param property      the name of the property
+     * @param otherProperty the other property name
+     * @return this criteria instance
+     */
+    public Criteria ltProperty( @Nonnull String property, @Nonnull String otherProperty )
+    {
+        addCriteria( new PropertyExpression( property, otherProperty, "<" ) );
+        return this;
+    }
+
+    /**
+     * Lower then or equal restriction for entity properties: {@code <i>e.name<=e.otherName</i>}
+     *
+     * @param property      the name of the property
+     * @param otherProperty the other property name
+     * @return this criteria instance
+     */
+    public Criteria leProperty( @Nonnull String property, @Nonnull String otherProperty )
+    {
+        addCriteria( new PropertyExpression( property, otherProperty, "<=" ) );
+        return this;
+    }
+
+    /**
+     * Like restriction: {@code <i>e.name like :p_0</i>}
+     *
+     * @param property  the name of the property
+     * @param value     the property value
+     * @param matchMode match mode(EXACT, START, END, ANYWHERE)
+     * @return this criteria instance
+     */
+    public Criteria like( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    {
+        addCriteria( new LikeExpression( property, value, matchMode, "like", false ) );
+        return this;
+    }
+
+    /**
+     * Ignore case like restriction: {@code <i>lower(e.name) like lower(:p_0)</i>}
+     *
+     * @param property  the name of the property
+     * @param value     the property value
+     * @param matchMode match mode(EXACT, START, END, ANYWHERE)
+     * @return this criteria instance
+     */
+    public Criteria ilike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    {
+        addCriteria( new LikeExpression( property, value, matchMode, "like", true ) );
+        return this;
+    }
+
+    /**
+     * Not like restriction: {@code <i>e.name not like :p_0</i>}
+     *
+     * @param property  the name of the property
+     * @param value     the property value
+     * @param matchMode match mode(EXACT, START, END, ANYWHERE)
+     * @return this criteria instance
+     */
+    public Criteria notLike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    {
+        addCriteria( new LikeExpression( property, value, matchMode, "not like", false ) );
+        return this;
+    }
+
+    /**
+     * Ignore case not like restriction: {@code <i>lower(e.name) not like lower(:p_0)</i>}
+     *
+     * @param property  the name of the property
+     * @param value     the property value
+     * @param matchMode match mode(EXACT, START, END, ANYWHERE)
+     * @return this criteria instance
+     */
+    public Criteria iNotLike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    {
+        addCriteria( new LikeExpression( property, value, matchMode, "not like", true ) );
         return this;
     }
 
@@ -213,7 +548,7 @@ public class Criteria<T>
      * @param order        type of order asc[desc]
      * @return this
      */
-    public Criteria addOrderRule( String propertyName, Order order )
+    public Criteria addOrderRule( @Nonnull String propertyName, @Nonnull Order order )
     {
         orderRules.add( new OrderRule( propertyName, order ) );
         return this;
