@@ -20,6 +20,7 @@ package org.ctoolkit.services.storage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -29,6 +30,7 @@ import java.util.Set;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public interface EntityIdentity<ID_TYPE>
+        extends Serializable
 {
     /**
      * Returns the unique string identification unique across all entities of all kinds and parents.
@@ -99,6 +101,7 @@ public interface EntityIdentity<ID_TYPE>
      * The tree of the field names (reference to the relationships), to be ignored while cascading save.
      */
     interface Ignored
+            extends Serializable
     {
         /**
          * Adds the entity field name(s) to be ignored while cascading save.

@@ -31,6 +31,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class SiblingChildEntity
         extends EntityLongChildOf<ParentEntity>
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     protected long getModelVersion()
     {
