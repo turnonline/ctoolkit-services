@@ -18,12 +18,17 @@
 
 package org.ctoolkit.services.storage.appengine.objectify;
 
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.annotation.Id;
 
 /**
  * The base objectify entity to be used in the client code.
  * The @Id of the entity with type of <code>Long</code>. If 'Id' is not set (null value)
  * a numeric value will be generated for you using the standard App Engine allocator.
+ * <p>
+ * While using manual 'Id' allocation it's recommended first allocate 'Id' to reserve it
+ * {@link ObjectifyFactory#allocateIds(Class, long)}. Once allocated it will not be used
+ * by the datastore's automatic ID allocator for entities with the same kind and parent.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see <a href="https://github.com/objectify/objectify/wiki/Entities">Entities</a>
@@ -47,6 +52,7 @@ public abstract class EntityLongIdentity
 
     /**
      * Manually sets the ID of this entity instance.
+     * Prefer generated, using the standard App Engine allocator.
      *
      * @param id the instance ID to be set
      */
