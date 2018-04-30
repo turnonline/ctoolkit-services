@@ -87,13 +87,14 @@ import java.util.Set;
  *  private List&#60;Ref&#60;Ingredient&#62;&#62; ingredients = new ArrayList&#60;&#62;();
  *
  *  // transient collection of entities
- *  // Note: the null collection of transient entities is an explicit mark to delete all datastore references
+ *  // Note: the null collection of transient entities while saving is an explicit mark
+ *  // to delete all datastore references (not entities itself)
  *  &#64;Ignore
  *  private List&#60;Ingredient&#62; tIngredients = new ArrayList&#60;&#62;();
  *
  *  public List&#60;Ingredient&#62; getIngredients()
  *  {
- *      return fromCollectionOfRefs( ingredients, tIngredients );
+ *      return fromListOfRefs( ingredients, tIngredients );
  *  }
  * </pre>
  * <b>Note:</b> if an entity has been removed from the collection comparing to the persisted one,

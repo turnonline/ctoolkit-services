@@ -74,7 +74,7 @@ public class ParentEntity
 
     public List<ChildEntity> getChildren()
     {
-        return fromCollectionOfRefs( children, tChildren );
+        return fromListOfRefs( children, tChildren );
     }
 
     ChildEntity getChildEntity()

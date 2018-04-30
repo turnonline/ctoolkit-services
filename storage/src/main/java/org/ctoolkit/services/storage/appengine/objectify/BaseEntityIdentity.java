@@ -214,48 +214,55 @@ public abstract class BaseEntityIdentity<ID_TYPE>
     }
 
     /**
-     * Populates the collection (type of {@link List}) from the datastore references.
+     * Populates the list from the datastore references.
      *
      * @param collectionOfRefs      the collection of entity references as a source for the result
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
      * @param <T>                   the concrete type of the entity
-     * @return the populated collection from the references or empty collection
+     * @return the populated list from the references or empty one
      */
-    public <T> List<T> fromCollectionOfRefs( @Nullable List<Ref<T>> collectionOfRefs,
-                                             @Nullable List<T> tCollectionOfEntities )
+    public <T> List<T> fromListOfRefs( @Nullable List<Ref<T>> collectionOfRefs,
+                                       @Nullable List<T> tCollectionOfEntities )
     {
-        if ( tCollectionOfEntities != null && !tCollectionOfEntities.isEmpty() )
-        {
-            return tCollectionOfEntities;
-        }
-
-        List<T> collection = tCollectionOfEntities == null ? new ArrayList<T>() : tCollectionOfEntities;
-        return ( List<T> ) fromRefs( collection, collectionOfRefs );
+        return fromCollectionOfRefs( collectionOfRefs, tCollectionOfEntities, new ArrayList<T>() );
     }
 
     /**
-     * Populates the collection (type of {@link Set}) from the datastore references.
+     * Populates the set from the datastore references.
      *
      * @param collectionOfRefs      the collection of entity references as a source for the result
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
      * @param <T>                   the concrete type of the entity
-     * @return the populated collection from the references or empty collection
+     * @return the populated set from the references or empty one
      */
-    public <T> Set<T> fromCollectionOfRefs( @Nullable Set<Ref<T>> collectionOfRefs,
-                                            @Nullable Set<T> tCollectionOfEntities )
+    public <T> Set<T> fromSetOfRefs( @Nullable Set<Ref<T>> collectionOfRefs,
+                                     @Nullable Set<T> tCollectionOfEntities )
     {
+        return fromCollectionOfRefs( collectionOfRefs, tCollectionOfEntities, new HashSet<T>() );
+    }
+
+    /**
+     * Populates the collection from the datastore references.
+     *
+     * @param collectionOfRefs      the collection of entity references as a source for the result
+     * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
+     * @param defaultCollection     the default collection to be used if tCollectionOfEntities is {@code null}
+     * @param <T>                   the concrete type of the entity
+     * @return the populated collection from the references or default collection
+     */
+    public <T, C extends Collection<T>> C fromCollectionOfRefs( @Nullable Collection<Ref<T>> collectionOfRefs,
+                                                                @Nullable C tCollectionOfEntities,
+                                                                @Nonnull C defaultCollection )
+    {
+        checkNotNull( defaultCollection );
+
         if ( tCollectionOfEntities != null && !tCollectionOfEntities.isEmpty() )
         {
             return tCollectionOfEntities;
         }
 
-        Set<T> collection = tCollectionOfEntities == null ? new HashSet<T>() : tCollectionOfEntities;
-        return ( Set<T> ) fromRefs( collection, collectionOfRefs );
-    }
+        tCollectionOfEntities = tCollectionOfEntities == null ? defaultCollection : tCollectionOfEntities;
 
-    private <T> Collection<T> fromRefs( @Nonnull Collection<T> tCollectionOfEntities,
-                                        @Nullable Collection<Ref<T>> collectionOfRefs )
-    {
         if ( collectionOfRefs != null )
         {
             for ( Ref<T> ref : collectionOfRefs )
