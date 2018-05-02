@@ -46,7 +46,7 @@ import java.util.Set;
  * This implementation expects to have a sibling field next to this field (a transient entity)
  * annotated with {@link Ignore} and named with the following rule: the name of the field  with prefix 't'
  * and changed the first character of the source field name to capital letter.
- * <p>
+ *
  * <b>For example</b>, entity extends {@link BaseEntityIdentity}.
  * <pre>
  * // reference to the entity, a relationship
@@ -78,7 +78,7 @@ import java.util.Set;
  *  }
  * </pre>
  * The referenced entity BillingAddress in this example is expected to be type of {@link EntityIdentity}.
- * <p>
+ *
  * <b>One to many cascading save support</b>
  * <pre>
  *
@@ -88,7 +88,7 @@ import java.util.Set;
  *
  *  // transient collection of entities
  *  // Note: the null collection of transient entities while saving is an explicit mark
- *  // to delete all datastore references (not entities itself)
+ *  // to delete all datastore references (including referenced entities - {@link EntityIdentity#delete()} will be called)
  *  &#64;Ignore
  *  private List&#60;Ingredient&#62; tIngredients = new ArrayList&#60;&#62;();
  *
@@ -100,7 +100,6 @@ import java.util.Set;
  * <b>Note:</b> if an entity has been removed from the collection comparing to the persisted one,
  * the {@link EntityIdentity#delete()} will be called at missing instance. Make sure equals and hashCode
  * methods are properly implemented.
- *
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see IfNoIdOtherwiseCascading

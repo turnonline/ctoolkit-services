@@ -42,7 +42,7 @@ public interface EntityIdentity<ID_TYPE>
     /**
      * Returns the identification unique only for entities with the same kind and parent.
      *
-     * @return the id associated with this entity, or null if has a name
+     * @return the id associated with this entity
      */
     ID_TYPE getId();
 

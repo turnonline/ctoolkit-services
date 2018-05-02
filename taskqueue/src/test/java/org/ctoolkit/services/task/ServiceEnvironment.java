@@ -21,19 +21,22 @@ package org.ctoolkit.services.task;
 import com.google.appengine.tools.development.testing.LocalAppIdentityServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalBlobstoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalCapabilitiesServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalChannelServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalFileServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalImagesServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalLogServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMailServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalModulesServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalRdbmsServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalRobotEnabledAppIdentityServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalSearchServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.appengine.tools.development.testing.LocalSocketServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalStubbyServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalTaskQueueTestConfig;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalUserServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalXMPPServiceTestConfig;
 import org.ctoolkit.test.appengine.ServiceConfigModule;
 
 /**
@@ -48,18 +51,21 @@ public class ServiceEnvironment
                 new LocalAppIdentityServiceTestConfig(),
                 new LocalBlobstoreServiceTestConfig(),
                 new LocalCapabilitiesServiceTestConfig(),
-                new LocalChannelServiceTestConfig(),
                 new LocalDatastoreServiceTestConfig(),
                 new LocalFileServiceTestConfig(),
                 new LocalImagesServiceTestConfig(),
+                new LocalLogServiceTestConfig(),
                 new LocalMailServiceTestConfig(),
                 new LocalMemcacheServiceTestConfig(),
                 new LocalModulesServiceTestConfig(),
                 new LocalRdbmsServiceTestConfig(),
+                new LocalRobotEnabledAppIdentityServiceTestConfig(),
+                new LocalSearchServiceTestConfig(),
+                new LocalSocketServiceTestConfig(),
+                new LocalStubbyServiceTestConfig(),
                 new LocalTaskQueueTestConfig(),
                 new LocalURLFetchServiceTestConfig(),
-                new LocalUserServiceTestConfig(),
-                new LocalXMPPServiceTestConfig()
+                new LocalUserServiceTestConfig()
         ) );
     }
 

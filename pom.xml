@@ -90,14 +90,9 @@
                 <version>${gae.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.firebase</groupId>
-                <artifactId>firebase-admin</artifactId>
-                <version>5.8.0</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-framework</artifactId>
-                <version>2.0.11</version>
+                <version>2.0.14</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -108,12 +103,12 @@
             <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-framework-guice</artifactId>
-                <version>2.0.11</version>
+                <version>2.0.14</version>
             </dependency>
             <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-management-control-appengine-all</artifactId>
-                <version>1.0.6</version>
+                <version>1.0.7</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
@@ -150,8 +145,8 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.56</gae.version>
-        <jmockit.version>1.38</jmockit.version>
+        <gae.version>1.9.63</gae.version>
+        <jmockit.version>1.39</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
