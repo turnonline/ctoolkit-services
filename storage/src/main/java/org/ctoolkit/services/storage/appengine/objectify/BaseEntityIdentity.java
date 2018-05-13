@@ -197,19 +197,25 @@ public abstract class BaseEntityIdentity<ID_TYPE>
     }
 
     /**
-     * Returns instance taken either fom the entity reference or default instance passed as a second parameter.
+     * Returns instance taken either fom the entity reference or its non null transient counterpart (preferred).
      *
-     * @param ref             the entity reference
-     * @param defaultInstance the default fallback instance if reference is null
-     * @param <T>             the concrete type of the entity
+     * @param ref         the entity reference
+     * @param refInstance the referenced transient instance
+     * @param <T>         the concrete type of the entity
      * @return the entity instance
      */
-    public <T> T fromRef( @Nullable Ref<T> ref, @Nullable T defaultInstance )
+    public <T> T fromRef( @Nullable Ref<T> ref, @Nullable T refInstance )
     {
+        if ( refInstance != null )
+        {
+            return refInstance;
+        }
+
         if ( ref == null )
         {
-            return defaultInstance;
+            return null;
         }
+
         return ref.get();
     }
 
