@@ -126,14 +126,16 @@ public class IfNoId
     public boolean matchesPojo( EntityIdentity pojo )
     {
         Field tField;
+        Class<?> fieldClass = field.getDeclaringClass();
+
         try
         {
-            tField = pojo.getClass().getDeclaredField( transientFieldName );
+            tField = fieldClass.getDeclaredField( transientFieldName );
             tField.setAccessible( true );
         }
         catch ( NoSuchFieldException e )
         {
-            String msg = getClass().getSimpleName()
+            String msg = fieldClass.getSimpleName()
                     + " annotation expects transient sibling field declared with the name: "
                     + transientFieldName + " of type "
                     + EntityIdentity.class.getName();
