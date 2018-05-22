@@ -29,6 +29,9 @@ import com.googlecode.objectify.annotation.Id;
  * While using manual 'Id' allocation it's recommended first allocate 'Id' to reserve it
  * {@link ObjectifyFactory#allocateIds(Class, long)}. Once allocated it will not be used
  * by the datastore's automatic ID allocator for entities with the same kind and parent.
+ * <p>
+ * <b>Datastore Note:</b> Don't use the value 0 (zero) for the ID. If you do,
+ * you will get an automatically allocated ID.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see <a href="https://github.com/objectify/objectify/wiki/Entities">Entities</a>
@@ -59,5 +62,17 @@ public abstract class EntityLongIdentity
     protected void setId( Long id )
     {
         this.id = id;
+    }
+
+    @Override
+    public String getKey()
+    {
+        // zero ID has the same behavior as null, it will get an automatically allocated ID
+        if ( id == null || Long.valueOf( 0L ).equals( id ) )
+        {
+            return null;
+        }
+
+        return super.getKey();
     }
 }
