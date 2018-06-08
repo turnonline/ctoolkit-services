@@ -75,7 +75,7 @@
             <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
                 <artifactId>ctoolkit-library-bom</artifactId>
-                <version>7</version>
+                <version>8-20180608.060351-2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -138,15 +138,15 @@
             <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
-                <version>6.9.10</version>
+                <version>6.11</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.63</gae.version>
-        <jmockit.version>1.39</jmockit.version>
+        <gae.version>1.9.64</gae.version>
+        <jmockit.version>1.38</jmockit.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
         <jmockit.setting>
             -javaagent:${settings.localRepository}/org/jmockit/jmockit/${jmockit.version}/jmockit-${jmockit.version}.jar
