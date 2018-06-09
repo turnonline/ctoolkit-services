@@ -75,7 +75,7 @@
             <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
                 <artifactId>ctoolkit-library-bom</artifactId>
-                <version>8-20180608.060351-2</version>
+                <version>8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -108,7 +108,7 @@
             <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-management-control-appengine-all</artifactId>
-                <version>1.0.7</version>
+                <version>1.0.8</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
