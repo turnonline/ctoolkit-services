@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.storage.appengine.objectify;
 
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.OnSave;
@@ -50,6 +51,16 @@ public abstract class EntityLongChildOf<P extends EntityIdentity>
 
     @Ignore
     private P tParent;
+
+    public Key<P> getParentKey()
+    {
+        if ( parent != null )
+        {
+            return parent.getKey();
+        }
+
+        return null;
+    }
 
     @Override
     public P getParent()
