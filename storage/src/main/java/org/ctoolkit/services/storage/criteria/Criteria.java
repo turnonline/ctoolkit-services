@@ -40,9 +40,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class Criteria<T>
 {
-    private int maxResults = -1;
+    private int limit = -1;
 
-    private int firstResult = -1;
+    private int offset = -1;
 
     private Class<T> entity;
 
@@ -505,19 +505,20 @@ public class Criteria<T>
      *
      * @return the maximum number of results to retrieve.
      */
-    public int getMaxResults()
+    public int getLimit()
     {
-        return maxResults;
+        return limit;
     }
 
     /**
      * Sets the maximum number of results to retrieve.
      *
-     * @param maxResults max results of query
+     * @param limit the max number of results to retrieve
      */
-    public void setMaxResults( int maxResults )
+    public Criteria limit( int limit )
     {
-        this.maxResults = maxResults;
+        this.limit = limit;
+        return this;
     }
 
     /**
@@ -525,19 +526,20 @@ public class Criteria<T>
      *
      * @return the position of the first result to retrieve.
      */
-    public int getFirstResult()
+    public int getOffset()
     {
-        return firstResult;
+        return offset;
     }
 
     /**
      * Sets the position of the first result to retrieve.
      *
-     * @param firstResult first result of query
+     * @param offset first result of query
      */
-    public void setFirstResult( int firstResult )
+    public Criteria offset( int offset )
     {
-        this.firstResult = firstResult;
+        this.offset = offset;
+        return this;
     }
 
     /**

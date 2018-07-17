@@ -20,14 +20,12 @@ package org.ctoolkit.services.storage.appengine.objectify;
 
 import com.googlecode.objectify.Key;
 import org.ctoolkit.services.storage.EntityExecutor;
-import org.ctoolkit.services.storage.EntityIdentity;
 import org.ctoolkit.services.storage.criteria.Criteria;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The Objectify entity executor implementation.
@@ -48,8 +46,13 @@ public class ObjectifyEntityExecutor
     @Override
     public <T> T first( @Nonnull Criteria<T> criteria )
     {
-        List<T> list = new ObjectifyCriteriaBuilder<T>().build( criteria ).list();
-        return list.isEmpty() ? null : list.get( 0 );
+        return new ObjectifyCriteriaBuilder<T>().build( criteria ).first().now();
+    }
+
+    @Override
+    public <T> int count( @Nonnull Criteria<T> criteria )
+    {
+        return new ObjectifyCriteriaBuilder<T>().build( criteria ).count();
     }
 
     @Override
@@ -82,23 +85,5 @@ public class ObjectifyEntityExecutor
         }
 
         return ids;
-    }
-
-    @Override
-    public void save( @Nonnull EntityIdentity entity, @Nonnull Map<String, Object> map )
-    {
-        Key<?> key = Key.create( entity );
-        PropertyMapDbHandler dbHandler = new PropertyMapDbHandler( key, map );
-
-        dbHandler.save();
-    }
-
-    @Override
-    public Map<String, Object> load( @Nonnull EntityIdentity entity )
-    {
-        Key<?> key = Key.create( entity );
-        PropertyMapDbHandler dbHandler = new PropertyMapDbHandler( key );
-
-        return dbHandler.load();
     }
 }

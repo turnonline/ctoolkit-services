@@ -42,6 +42,7 @@ import org.ctoolkit.services.storage.criteria.SimpleExpression;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
@@ -222,9 +223,10 @@ class ObjectifyCriteriaBuilder<E>
     }
 
     @Override
-    @SuppressWarnings( value = "unchecked" )
     public Query<E> build( Criteria<E> criteria )
     {
+        checkNotNull( criteria, "Criteria instance cannot be null" );
+
         entityClass = criteria.getEntityClass();
         query = ofy().load().type( criteria.getEntityClass() );
 
@@ -247,14 +249,14 @@ class ObjectifyCriteriaBuilder<E>
         }
 
         // set first result of the query
-        if ( criteria.getFirstResult() > 0 )
+        if ( criteria.getOffset() > 0 )
         {
-            query = query.offset( criteria.getFirstResult() );
+            query = query.offset( criteria.getOffset() );
         }
         // set max results of the query
-        if ( criteria.getMaxResults() > 0 )
+        if ( criteria.getLimit() > 0 )
         {
-            query = query.limit( criteria.getMaxResults() );
+            query = query.limit( criteria.getLimit() );
         }
 
         return query;

@@ -22,7 +22,6 @@ import org.ctoolkit.services.storage.criteria.Criteria;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The entity executor.
@@ -35,7 +34,7 @@ public interface EntityExecutor
      * Executes a query based on the given criteria and retrieves a list of objects.
      *
      * @param criteria a criteria holder {@link Criteria}
-     * @param <T> the concrete type of the entity
+     * @param <T>      the concrete type of the entity
      * @return list of objects that meets the criteria
      */
     <T> List<T> list( @Nonnull Criteria<T> criteria );
@@ -45,10 +44,20 @@ public interface EntityExecutor
      * If the result does not match any criteria returns <code>null</code>
      *
      * @param criteria a criteria holder {@link Criteria}
-     * @param <T> the concrete type of the entity
+     * @param <T>      the concrete type of the entity
      * @return the first entity in the result list
      */
     <T> T first( @Nonnull Criteria<T> criteria );
+
+    /**
+     * Count the total number of values in the result.  <em>limit</em> and <em>offset</em> are obeyed.
+     * This is somewhat faster than fetching, but the time still grows with the number of results.
+     * The datastore actually walks through the result set and counts for you.</p>
+     *
+     * <p>WARNING:  Each counted entity is billed as a "datastore minor operation".  Even though these
+     * are free, they may take significant time because they require an index walk.</p>
+     */
+    <T> int count( @Nonnull Criteria<T> criteria );
 
     /**
      * Executes a keys-only query based on given criteria and get the result as a list of entity names.
@@ -69,23 +78,4 @@ public interface EntityExecutor
      * @return the list of string names (entity identification)
      */
     <T> List<String> fetchNames( @Nonnull Criteria<T> criteria );
-
-    /**
-     * Saves the map of property value pairs as dynamic properties for given entity.
-     * Already saved properties not found in current map will be removed.
-     *
-     * @param entity the source of the ID to retrieve target entity to work with
-     * @param map    the map of property value pair to be saved
-     * @throws IllegalArgumentException if entity is not found
-     */
-    void save( @Nonnull EntityIdentity entity, @Nonnull Map<String, Object> map );
-
-    /**
-     * Retrieves the map of property value pairs as dynamic properties for given entity.
-     *
-     * @param entity the source of the ID to retrieve target entity to work with
-     * @return the map of property value pair related to the given entity
-     * @throws IllegalArgumentException if entity is not found
-     */
-    Map<String, Object> load( @Nonnull EntityIdentity entity );
 }
