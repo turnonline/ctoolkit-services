@@ -49,7 +49,7 @@ public class TaskTest
     public void chainingNextNoOptions()
     {
         final Task next = new FakeTask();
-        tested.addNext( next );
+        tested.setNext( next );
 
         new Expectations()
         {
@@ -69,7 +69,7 @@ public class TaskTest
     {
         final Task next = new FakeTask();
         final TaskOptions options = TaskOptions.Builder.withDefaults();
-        tested.addNext( next ).options( options );
+        tested.setNext( next ).options( options );
 
         new Expectations()
         {
@@ -89,7 +89,7 @@ public class TaskTest
     {
         final Task next = new FakeTask();
         final TaskOptions options = TaskOptions.Builder.withDefaults();
-        tested.addNext( next, options );
+        tested.setNext( next, options );
 
         new Expectations()
         {
@@ -108,7 +108,7 @@ public class TaskTest
     public void chainingNextWithPostponeFor()
     {
         final Task next = new FakeTask();
-        tested.addNext( next ).postponeFor( 20 );
+        tested.setNext( next ).postponeFor( 20 );
 
         new Expectations()
         {
@@ -127,7 +127,7 @@ public class TaskTest
     public void chainingNextWithPostponeForAsArgument()
     {
         final Task next = new FakeTask();
-        tested.addNext( next, 10 );
+        tested.setNext( next, 10 );
 
         new Expectations()
         {

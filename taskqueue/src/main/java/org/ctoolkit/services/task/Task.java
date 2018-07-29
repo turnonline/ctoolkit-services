@@ -80,7 +80,7 @@ public abstract class Task<T>
 
     private String namePrefix;
 
-    private boolean makeUnique = true;
+    private boolean makeUnique;
 
     private Task next;
 
@@ -141,7 +141,7 @@ public abstract class Task<T>
      *
      * @return the entity key
      */
-    public Key<T> getEntityKey()
+    public final Key<T> getEntityKey()
     {
         return entityKey;
     }
@@ -151,7 +151,7 @@ public abstract class Task<T>
      *
      * @param entityKey the entity key to be set
      */
-    public void setEntityKey( Key<T> entityKey )
+    public final void setEntityKey( Key<T> entityKey )
     {
         this.entityKey = entityKey;
     }
@@ -162,7 +162,7 @@ public abstract class Task<T>
      * @return the task name prefix
      * @see #getTaskName()
      */
-    public String getNamePrefix()
+    public final String getNamePrefix()
     {
         return namePrefix;
     }
@@ -175,7 +175,7 @@ public abstract class Task<T>
      *
      * @return the task name, or {@code null} to be auto generated
      */
-    public String getTaskName()
+    public final String getTaskName()
     {
         if ( namePrefix != null )
         {
@@ -211,7 +211,7 @@ public abstract class Task<T>
      *
      * @return true to append an unique ID to the task name
      */
-    public boolean isMakeUnique()
+    public final boolean isMakeUnique()
     {
         return namePrefix != null && makeUnique;
     }
@@ -222,7 +222,7 @@ public abstract class Task<T>
      * @param unique true to append an unique ID to the task name
      * @return this task to chain configuration
      */
-    public Task makeUnique( boolean unique )
+    public final Task makeUnique( boolean unique )
     {
         this.makeUnique = unique;
         return this;
@@ -233,7 +233,7 @@ public abstract class Task<T>
      *
      * @return the queue name
      */
-    public String getQueueName()
+    public final String getQueueName()
     {
         return queueName;
     }
@@ -245,9 +245,9 @@ public abstract class Task<T>
      * @param task the task as the next one to execute
      * @return just added task to chain calls
      */
-    public Task addNext( @Nonnull Task task )
+    public final Task setNext( @Nonnull Task task )
     {
-        return addNext( task, null );
+        return setNext( task, null );
     }
 
     /**
@@ -259,7 +259,7 @@ public abstract class Task<T>
      *                    that's a time when the task will be started. Max 30 days.
      * @return just added task to chain calls
      */
-    public Task addNext( @Nonnull Task task, int postponeFor )
+    public final Task setNext( @Nonnull Task task, int postponeFor )
     {
         this.next = checkNotNull( task );
         return task.postponeFor( postponeFor );
@@ -273,7 +273,7 @@ public abstract class Task<T>
      * @param options the task configuration
      * @return just added task to chain calls
      */
-    public Task addNext( @Nonnull Task task, @Nullable TaskOptions options )
+    public final Task setNext( @Nonnull Task task, @Nullable TaskOptions options )
     {
         this.next = checkNotNull( task );
         return task.options( options );
@@ -284,7 +284,7 @@ public abstract class Task<T>
      *
      * @return the next task to execute
      */
-    public Task next()
+    public final Task next()
     {
         return next;
     }
@@ -294,7 +294,7 @@ public abstract class Task<T>
      *
      * @return the task options configuration, {@code null} if not set
      */
-    public TaskOptions getOptions()
+    public final TaskOptions getOptions()
     {
         return options;
     }
@@ -305,7 +305,7 @@ public abstract class Task<T>
      * @param options the configuration options instance
      * @return this task to chain configuration
      */
-    public Task options( @Nullable TaskOptions options )
+    public final Task options( @Nullable TaskOptions options )
     {
         this.options = options;
         return this;
@@ -317,7 +317,7 @@ public abstract class Task<T>
      *
      * @return the countdown in seconds, {@code null} if not set
      */
-    public Integer getPostponeFor()
+    public final Integer getPostponeFor()
     {
         return postponeFor;
     }
@@ -328,10 +328,20 @@ public abstract class Task<T>
      * @param countdown the countdown to be set in seconds
      * @return this task to chain configuration
      */
-    public Task postponeFor( @Nullable Integer countdown )
+    public final Task postponeFor( @Nullable Integer countdown )
     {
         this.postponeFor = countdown;
         return this;
+    }
+
+    /**
+     * Returns the task executor service instance.
+     *
+     * @return the task executor
+     */
+    protected TaskExecutor executor()
+    {
+        return executor;
     }
 
     /**
@@ -339,7 +349,7 @@ public abstract class Task<T>
      *
      * @return the entity the task will handle or {@code null} if not found
      */
-    public T workWith()
+    public final T workWith()
     {
         Key<T> key = getEntityKey();
         checkNotNull( key, "Entity key is null" );
