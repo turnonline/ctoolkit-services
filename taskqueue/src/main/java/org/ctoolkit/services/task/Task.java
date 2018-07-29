@@ -339,7 +339,7 @@ public abstract class Task<T>
      *
      * @return the task executor
      */
-    protected TaskExecutor executor()
+    protected final TaskExecutor executor()
     {
         return executor;
     }
