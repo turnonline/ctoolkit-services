@@ -61,7 +61,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * if task names are sequential, such as with timestamps. So, if you assign your own names, we recommend
  * using a well-distributed prefix for task names, such as a hash of the contents.
  *
- * @param <T> the type of the entity that task will work with
+ * @param <T> the type of the entity key and related entity
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see TaskExecutor
  */
@@ -410,7 +410,7 @@ public abstract class Task<T>
     }
 
     /**
-     * A method implementation to be executed asynchronously.
+     * The client implementation to be executed asynchronously.
      */
-    public abstract void execute();
+    protected abstract void execute();
 }
