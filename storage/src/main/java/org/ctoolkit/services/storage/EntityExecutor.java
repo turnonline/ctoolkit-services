@@ -52,10 +52,13 @@ public interface EntityExecutor
     /**
      * Count the total number of values in the result.  <em>limit</em> and <em>offset</em> are obeyed.
      * This is somewhat faster than fetching, but the time still grows with the number of results.
-     * The datastore actually walks through the result set and counts for you.</p>
+     * The datastore actually walks through the result set and counts for you.
+     * <p>
+     * WARNING:  Each counted entity is billed as a "datastore minor operation".  Even though these
+     * are free, they may take significant time because they require an index walk.
+     * <p>
      *
-     * <p>WARNING:  Each counted entity is billed as a "datastore minor operation".  Even though these
-     * are free, they may take significant time because they require an index walk.</p>
+     * @return the total number of values in the result
      */
     <T> int count( @Nonnull Criteria<T> criteria );
 

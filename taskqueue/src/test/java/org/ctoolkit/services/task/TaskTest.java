@@ -65,6 +65,35 @@ public class TaskTest
     }
 
     @Test
+    public void chainingNextRemovedByFirstTask()
+    {
+        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        final Task next = new FakeTask();
+        tested.setNext( next );
+
+        new Expectations()
+        {
+            {
+                tested.execute();
+            }
+        };
+
+        tested.clear();
+        tested.run();
+
+        new Verifications()
+        {
+            {
+                executor.schedule( ( Task ) any );
+                times = 0;
+
+                executor.schedule( ( Task ) any, options );
+                times = 0;
+            }
+        };
+    }
+
+    @Test
     public void chainingNextWithOptions()
     {
         final Task next = new FakeTask();

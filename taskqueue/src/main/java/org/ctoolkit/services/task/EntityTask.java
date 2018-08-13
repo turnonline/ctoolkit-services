@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The extension of the {@link Task} with dedicated convenient method {@link #execute(T)}.
+ * The extension of the {@link Task} with dedicated convenient method {@link #execute(Object)}.
  * The task might be retired if no entity will be found once task has started
  * as in the meantime entity could be removed with another process etc.
  * In this case warning will be logged.

@@ -290,6 +290,18 @@ public abstract class Task<T>
     }
 
     /**
+     * Removes the next task from the actual instance to be queued if defined.
+     * <p>
+     * <strong>Note</strong>: call to this method will not persist this change back to the queue
+     * and will take effect only for this instance. However once task will be successfully finished,
+     * no next task is going to be scheduled as it will be removed as a whole by the task engine from the queue.
+     */
+    public void clear()
+    {
+        this.next = null;
+    }
+
+    /**
      * Returns the configuration options of this task.
      *
      * @return the task options configuration, {@code null} if not set
