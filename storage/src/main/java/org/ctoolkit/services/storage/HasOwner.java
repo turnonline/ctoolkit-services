@@ -20,6 +20,8 @@ package org.ctoolkit.services.storage;
 
 import javax.annotation.Nonnull;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Declaration for an entity that's being owned by another entity.
  * It's NOT a parent/child relationship, but represents an ownership from the business point of view.
@@ -43,10 +45,14 @@ public interface HasOwner<T extends EntityIdentity>
     void setOwner( @Nonnull T owner );
 
     /**
-     * Checks whether given entity is the same entity as declared owner.
+     * Checks whether specified entity is the same entity as declared owner.
      *
-     * @param entity the entity to be checked
-     * @return {@code true} if given entity is tha same as declared owner, otherwise {@code false}.
+     * @param checked the entity to be checked
+     * @return {@code true} if specified entity is the same as declared owner, otherwise {@code false}.
      */
-    boolean checkOwner( @Nonnull T entity );
+    default boolean checkOwner( @Nonnull T checked )
+    {
+        checkNotNull( checked );
+        return getOwner() != null && checked.equals( getOwner() );
+    }
 }

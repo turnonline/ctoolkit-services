@@ -295,10 +295,14 @@ public abstract class Task<T>
      * <strong>Note</strong>: call to this method will not persist this change back to the queue
      * and will take effect only for this instance. However once task will be successfully finished,
      * no next task is going to be scheduled as it will be removed as a whole by the task engine from the queue.
+     *
+     * @return {@code true} if there was a planned task but has been cleared
      */
-    public void clear()
+    public final boolean clear()
     {
+        boolean cleared = this.next != null;
         this.next = null;
+        return cleared;
     }
 
     /**

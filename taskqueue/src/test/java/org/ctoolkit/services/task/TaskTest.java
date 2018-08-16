@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * {@link Task} unit testing.
@@ -78,7 +79,7 @@ public class TaskTest
             }
         };
 
-        tested.clear();
+        assertTrue( tested.clear() );
         tested.run();
 
         new Verifications()
