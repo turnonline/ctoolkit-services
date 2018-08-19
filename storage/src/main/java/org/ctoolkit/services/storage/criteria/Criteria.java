@@ -78,7 +78,7 @@ public class Criteria<T>
      * @param expression implementation of {@link Expression}
      * @return this
      */
-    public Criteria addCriteria( @Nonnull Expression expression )
+    public Criteria<T> addCriteria( @Nonnull Expression expression )
     {
         expressionList.add( expression );
         return this;
@@ -90,7 +90,7 @@ public class Criteria<T>
      * @param property the name of the property on which order will be applied
      * @return this criteria instance
      */
-    public Criteria ascending( @Nonnull String property )
+    public Criteria<T> ascending( @Nonnull String property )
     {
         addOrderRule( property, Order.ASC );
         return this;
@@ -102,7 +102,7 @@ public class Criteria<T>
      * @param property the name of the property on which order will be applied
      * @return this criteria instance
      */
-    public Criteria descending( @Nonnull String property )
+    public Criteria<T> descending( @Nonnull String property )
     {
         addOrderRule( property, Order.DESC );
         return this;
@@ -116,7 +116,7 @@ public class Criteria<T>
      * @param id       the referenced entity identification
      * @return this criteria instance
      */
-    public Criteria reference( @Nonnull String property, @Nonnull Class type, @Nonnull Long id )
+    public Criteria<T> reference( @Nonnull String property, @Nonnull Class type, @Nonnull Long id )
     {
         addCriteria( new ReferenceIdExpression( property, type, id ) );
         return this;
@@ -130,7 +130,7 @@ public class Criteria<T>
      * @param name     the referenced entity identification
      * @return this criteria instance
      */
-    public Criteria reference( @Nonnull String property, @Nonnull Class type, @Nonnull String name )
+    public Criteria<T> reference( @Nonnull String property, @Nonnull Class type, @Nonnull String name )
     {
         addCriteria( new ReferenceNameExpression( property, type, name ) );
         return this;
@@ -143,7 +143,7 @@ public class Criteria<T>
      * @param entity   the referenced entity instance as a type used to filter results
      * @return this criteria instance
      */
-    public Criteria reference( @Nonnull String property, @Nonnull EntityIdentity entity )
+    public Criteria<T> reference( @Nonnull String property, @Nonnull EntityIdentity entity )
     {
         Object identification = entity.getId();
         if ( identification instanceof String )
@@ -165,7 +165,7 @@ public class Criteria<T>
      * @param value    the property value
      * @return this criteria instance
      */
-    public Criteria equal( @Nonnull String property, @Nonnull Object value )
+    public Criteria<T> equal( @Nonnull String property, @Nonnull Object value )
     {
         addCriteria( new SimpleExpression( property, value, "=" ) );
         return this;
@@ -178,7 +178,7 @@ public class Criteria<T>
      * @param value    the property value
      * @return this criteria instance
      */
-    public Criteria notEqual( @Nonnull String property, @Nonnull Object value )
+    public Criteria<T> notEqual( @Nonnull String property, @Nonnull Object value )
     {
         addCriteria( new SimpleExpression( property, value, "<>" ) );
         return this;
@@ -191,7 +191,7 @@ public class Criteria<T>
      * @param value    the property value
      * @return this criteria instance
      */
-    public Criteria gt( @Nonnull String property, @Nonnull Object value )
+    public Criteria<T> gt( @Nonnull String property, @Nonnull Object value )
     {
         addCriteria( new SimpleExpression( property, value, ">" ) );
         return this;
@@ -204,7 +204,7 @@ public class Criteria<T>
      * @param value    the property value
      * @return this criteria instance
      */
-    public Criteria ge( @Nonnull String property, @Nonnull Object value )
+    public Criteria<T> ge( @Nonnull String property, @Nonnull Object value )
     {
         addCriteria( new SimpleExpression( property, value, ">=" ) );
         return this;
@@ -217,7 +217,7 @@ public class Criteria<T>
      * @param value    the property value
      * @return this criteria instance
      */
-    public Criteria lt( @Nonnull String property, @Nonnull Object value )
+    public Criteria<T> lt( @Nonnull String property, @Nonnull Object value )
     {
         addCriteria( new SimpleExpression( property, value, "<" ) );
         return this;
@@ -230,7 +230,7 @@ public class Criteria<T>
      * @param value    the property value
      * @return this criteria instance
      */
-    public Criteria le( @Nonnull String property, @Nonnull Object value )
+    public Criteria<T> le( @Nonnull String property, @Nonnull Object value )
     {
         addCriteria( new SimpleExpression( property, value, "<=" ) );
         return this;
@@ -242,7 +242,7 @@ public class Criteria<T>
      * @param property the name of the property
      * @return this criteria instance
      */
-    public Criteria isNull( @Nonnull String property )
+    public Criteria<T> isNull( @Nonnull String property )
     {
         addCriteria( new NullExpression( property, "is null" ) );
         return this;
@@ -254,7 +254,7 @@ public class Criteria<T>
      * @param property the name of the property
      * @return this criteria instance
      */
-    public Criteria isNotNull( @Nonnull String property )
+    public Criteria<T> isNotNull( @Nonnull String property )
     {
         addCriteria( new NullExpression( property, "is not null" ) );
         return this;
@@ -267,7 +267,7 @@ public class Criteria<T>
      * @param values   the array of property values
      * @return this criteria instance
      */
-    public Criteria in( @Nonnull String property, @Nonnull Object[] values )
+    public Criteria<T> in( @Nonnull String property, @Nonnull Object[] values )
     {
         addCriteria( new InExpression( property, values, "in" ) );
         return this;
@@ -280,7 +280,7 @@ public class Criteria<T>
      * @param values   the collection of property values
      * @return this criteria instance
      */
-    public Criteria in( @Nonnull String property, @Nonnull Collection values )
+    public Criteria<T> in( @Nonnull String property, @Nonnull Collection values )
     {
         addCriteria( new InExpression( property, values.toArray(), "in" ) );
         return this;
@@ -293,7 +293,7 @@ public class Criteria<T>
      * @param ids      the array of ids Long (id)
      * @return this criteria instance
      */
-    public Criteria idIn( @Nonnull String property, @Nonnull Long[] ids )
+    public Criteria<T> idIn( @Nonnull String property, @Nonnull Long[] ids )
     {
         addCriteria( new IdInExpression( property, ids ) );
         return this;
@@ -306,7 +306,7 @@ public class Criteria<T>
      * @param ids      the array of ids as String (name)
      * @return this criteria instance
      */
-    public Criteria idIn( @Nonnull String property, @Nonnull String[] ids )
+    public Criteria<T> idIn( @Nonnull String property, @Nonnull String[] ids )
     {
         addCriteria( new NameInExpression( property, ids ) );
         return this;
@@ -322,11 +322,11 @@ public class Criteria<T>
      * @param highBound the high comparison type
      * @return this criteria instance
      */
-    public Criteria between( @Nonnull String property,
-                             @Nonnull Object lowValue,
-                             @Nonnull Object highValue,
-                             @Nonnull Bound lowBound,
-                             @Nonnull Bound highBound )
+    public Criteria<T> between( @Nonnull String property,
+                                @Nonnull Object lowValue,
+                                @Nonnull Object highValue,
+                                @Nonnull Bound lowBound,
+                                @Nonnull Bound highBound )
     {
         addCriteria( new BetweenExpression( property, lowValue, highValue, lowBound, highBound ) );
         return this;
@@ -338,7 +338,7 @@ public class Criteria<T>
      * @param expressions the array of expressions
      * @return this criteria instance
      */
-    public Criteria or( @Nonnull Expression... expressions )
+    public Criteria<T> or( @Nonnull Expression... expressions )
     {
         addCriteria( new LogicalExpression( LogicalExpression.OR, expressions ) );
         return this;
@@ -350,7 +350,7 @@ public class Criteria<T>
      * @param expressions the array of expressions
      * @return this criteria instance
      */
-    public Criteria and( @Nonnull Expression... expressions )
+    public Criteria<T> and( @Nonnull Expression... expressions )
     {
         addCriteria( new LogicalExpression( LogicalExpression.AND, expressions ) );
         return this;
@@ -363,7 +363,7 @@ public class Criteria<T>
      * @param otherProperty the other property name
      * @return this criteria instance
      */
-    public Criteria eqProperty( @Nonnull String property, @Nonnull String otherProperty )
+    public Criteria<T> eqProperty( @Nonnull String property, @Nonnull String otherProperty )
     {
         addCriteria( new PropertyExpression( property, otherProperty, "=" ) );
         return this;
@@ -376,7 +376,7 @@ public class Criteria<T>
      * @param otherProperty the other property name
      * @return this criteria instance
      */
-    public Criteria neProperty( @Nonnull String property, @Nonnull String otherProperty )
+    public Criteria<T> neProperty( @Nonnull String property, @Nonnull String otherProperty )
     {
         addCriteria( new PropertyExpression( property, otherProperty, "<>" ) );
         return this;
@@ -389,7 +389,7 @@ public class Criteria<T>
      * @param otherProperty the other property name
      * @return this criteria instance
      */
-    public Criteria gtProperty( @Nonnull String property, @Nonnull String otherProperty )
+    public Criteria<T> gtProperty( @Nonnull String property, @Nonnull String otherProperty )
     {
         addCriteria( new PropertyExpression( property, otherProperty, ">" ) );
         return this;
@@ -402,7 +402,7 @@ public class Criteria<T>
      * @param otherProperty the other property name
      * @return this criteria instance
      */
-    public Criteria geProperty( @Nonnull String property, @Nonnull String otherProperty )
+    public Criteria<T> geProperty( @Nonnull String property, @Nonnull String otherProperty )
     {
         addCriteria( new PropertyExpression( property, otherProperty, ">=" ) );
         return this;
@@ -415,7 +415,7 @@ public class Criteria<T>
      * @param otherProperty the other property name
      * @return this criteria instance
      */
-    public Criteria ltProperty( @Nonnull String property, @Nonnull String otherProperty )
+    public Criteria<T> ltProperty( @Nonnull String property, @Nonnull String otherProperty )
     {
         addCriteria( new PropertyExpression( property, otherProperty, "<" ) );
         return this;
@@ -428,7 +428,7 @@ public class Criteria<T>
      * @param otherProperty the other property name
      * @return this criteria instance
      */
-    public Criteria leProperty( @Nonnull String property, @Nonnull String otherProperty )
+    public Criteria<T> leProperty( @Nonnull String property, @Nonnull String otherProperty )
     {
         addCriteria( new PropertyExpression( property, otherProperty, "<=" ) );
         return this;
@@ -442,7 +442,7 @@ public class Criteria<T>
      * @param matchMode match mode(EXACT, START, END, ANYWHERE)
      * @return this criteria instance
      */
-    public Criteria like( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    public Criteria<T> like( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
     {
         addCriteria( new LikeExpression( property, value, matchMode, "like", false ) );
         return this;
@@ -456,7 +456,7 @@ public class Criteria<T>
      * @param matchMode match mode(EXACT, START, END, ANYWHERE)
      * @return this criteria instance
      */
-    public Criteria ilike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    public Criteria<T> ilike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
     {
         addCriteria( new LikeExpression( property, value, matchMode, "like", true ) );
         return this;
@@ -470,7 +470,7 @@ public class Criteria<T>
      * @param matchMode match mode(EXACT, START, END, ANYWHERE)
      * @return this criteria instance
      */
-    public Criteria notLike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    public Criteria<T> notLike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
     {
         addCriteria( new LikeExpression( property, value, matchMode, "not like", false ) );
         return this;
@@ -484,7 +484,7 @@ public class Criteria<T>
      * @param matchMode match mode(EXACT, START, END, ANYWHERE)
      * @return this criteria instance
      */
-    public Criteria iNotLike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
+    public Criteria<T> iNotLike( @Nonnull String property, @Nonnull String value, @Nonnull MatchMode matchMode )
     {
         addCriteria( new LikeExpression( property, value, matchMode, "not like", true ) );
         return this;
@@ -515,7 +515,7 @@ public class Criteria<T>
      *
      * @param limit the max number of results to retrieve
      */
-    public Criteria limit( int limit )
+    public Criteria<T> limit( int limit )
     {
         this.limit = limit;
         return this;
@@ -536,7 +536,7 @@ public class Criteria<T>
      *
      * @param offset first result of query
      */
-    public Criteria offset( int offset )
+    public Criteria<T> offset( int offset )
     {
         this.offset = offset;
         return this;
@@ -550,7 +550,7 @@ public class Criteria<T>
      * @param order        type of order asc[desc]
      * @return this
      */
-    public Criteria addOrderRule( @Nonnull String propertyName, @Nonnull Order order )
+    public Criteria<T> addOrderRule( @Nonnull String propertyName, @Nonnull Order order )
     {
         orderRules.add( new OrderRule( propertyName, order ) );
         return this;
