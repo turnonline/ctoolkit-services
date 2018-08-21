@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,28 +18,20 @@
 
 package org.ctoolkit.services.task;
 
-import org.testng.annotations.Test;
-
-import javax.inject.Inject;
+import com.google.inject.AbstractModule;
 
 /**
+ * The guice module configuration for testing purpose only.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class TaskExecutorQueueTest
-        extends BackendServiceTestCase
+public class TestModule
+        extends AbstractModule
 {
-    @Inject
-    private TaskExecutor executor;
-
-    @Test
-    public void testExecute()
+    @Override
+    protected void configure()
     {
-        Task first = new FakeTask().postponeFor( 10 );
-        Task second = new FakeTask();
-
-        first.setNext( second );
-
-        // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
-        executor.schedule( first );
+        install( new CtoolkitServicesTaskModule() );
+        install( new CtoolkitServicesTaskServletModule() );
     }
 }

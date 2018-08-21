@@ -71,11 +71,16 @@
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
         </dependency>
-        <!--Test dependencies-->
+        <!-- App Engine testing-->
         <dependency>
-            <groupId>org.ctoolkit.test</groupId>
-            <artifactId>ctoolkit-test</artifactId>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-testing</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-stubs</artifactId>
+        </dependency>
+        <!--Test dependencies-->
         <dependency>
             <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
@@ -83,6 +88,10 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
         </dependency>
     </dependencies>
 

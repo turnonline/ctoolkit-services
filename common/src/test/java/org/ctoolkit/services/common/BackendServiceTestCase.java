@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,33 +16,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine;
+package org.ctoolkit.services.common;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalModulesServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
-import org.ctoolkit.services.storage.appengine.objectify.Child2LevelEntity;
-import org.ctoolkit.services.storage.appengine.objectify.ChildEntity;
-import org.ctoolkit.services.storage.appengine.objectify.FakeEntity;
-import org.ctoolkit.services.storage.appengine.objectify.ParentEntity;
-import org.ctoolkit.services.storage.appengine.objectify.ParentFakeEntity;
-import org.ctoolkit.services.storage.appengine.objectify.SiblingChildEntity;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Guice;
 
 import java.io.Closeable;
 import java.lang.reflect.Method;
 
 /**
- * The base class for App Engine backend services local testing.
+ * The common test case for all integration tests requiring App Engine services to be available within unit test.
  *
- * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
-public class ServiceTestNgCase
+@Guice( modules = TestModule.class )
+public class BackendServiceTestCase
 {
-    private LocalServiceTestHelper helper = new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig(),
+    private LocalServiceTestHelper helper = new LocalServiceTestHelper(
+            new LocalMemcacheServiceTestConfig(),
+            new LocalModulesServiceTestConfig(),
             new LocalDatastoreServiceTestConfig().setDefaultHighRepJobPolicyUnappliedJobPercentage( 0 ) );
 
     private Closeable session;
@@ -50,17 +49,9 @@ public class ServiceTestNgCase
     @BeforeMethod
     public void setUp( Method m )
     {
-        SystemProperty.environment.set( "Development" );
-
         helper.setUp();
         session = ObjectifyService.begin();
-
-        ObjectifyService.register( FakeEntity.class );
-        ObjectifyService.register( ParentFakeEntity.class );
-        ObjectifyService.register( ParentEntity.class );
-        ObjectifyService.register( ChildEntity.class );
-        ObjectifyService.register( SiblingChildEntity.class );
-        ObjectifyService.register( Child2LevelEntity.class );
+        SystemProperty.environment.set( "Development" );
     }
 
     @AfterMethod

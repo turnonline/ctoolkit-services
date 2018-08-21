@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,30 +16,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.task;
+package org.ctoolkit.services.common;
 
-import org.testng.annotations.Test;
-
-import javax.inject.Inject;
+import com.google.inject.AbstractModule;
+import com.google.inject.name.Names;
+import net.sf.jsr107cache.Cache;
+import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 
 /**
+ * The guice module configuration for testing purpose only.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class TaskExecutorQueueTest
-        extends BackendServiceTestCase
+public class TestModule
+        extends AbstractModule
 {
-    @Inject
-    private TaskExecutor executor;
-
-    @Test
-    public void testExecute()
+    @Override
+    protected void configure()
     {
-        Task first = new FakeTask().postponeFor( 10 );
-        Task second = new FakeTask();
+        install( new CtoolkitServicesAppEngineModule() );
+        install( new CtoolkitCommonServicesModule() );
 
-        first.setNext( second );
+        bind( Cache.class ).toProvider( JCacheProvider.class );
 
-        // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
-        executor.schedule( first );
+        PropertyConfig config = new PropertyConfig();
+        config.setTestAppI( "localhost" );
+        config.setProductionAppI( "localhostAsProd" );
+        Names.bindProperties( binder(), config );
     }
 }

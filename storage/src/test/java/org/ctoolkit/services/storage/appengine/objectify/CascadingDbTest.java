@@ -18,7 +18,7 @@
 
 package org.ctoolkit.services.storage.appengine.objectify;
 
-import org.ctoolkit.services.storage.appengine.ServiceTestNgCase;
+import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -34,7 +34,7 @@ import static org.testng.Assert.assertNull;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class CascadingDbTest
-        extends ServiceTestNgCase
+        extends BackendServiceTestCase
 {
     @Test
     public void twoLevelCascading()

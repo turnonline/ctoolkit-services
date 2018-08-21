@@ -19,16 +19,18 @@
 package org.ctoolkit.services.common;
 
 import com.google.common.base.Charsets;
-import junit.framework.Assert;
+import com.google.common.io.CharStreams;
 import net.sf.jsr107cache.Cache;
 import net.sf.jsr107cache.CacheFactory;
-import org.apache.commons.io.IOUtils;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.truth.Truth.assertThat;
 
 /**
  * The fully functional backend property service test.
@@ -36,14 +38,14 @@ import java.util.Map;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class PropertyServiceBeanTest
-        extends GuiceBerryTestNgCase
+        extends BackendServiceTestCase
 {
     private static final String PRODUCTION_PROPERTY = "service.property.appId.production";
 
     private static final String TEST_PROPERTY = "service.property.appId.test";
 
     @Inject
-    CacheFactory factory;
+    private CacheFactory factory;
 
     @Inject
     private PropertyService propertyService;
@@ -63,19 +65,19 @@ public class PropertyServiceBeanTest
         propertyService.setString( key, value );
 
         // test get property
-        Assert.assertEquals( value, propertyService.getString( key ) );
+        assertThat( propertyService.getString( key ) ).isEqualTo( value );
 
         // set property once again with different value
         propertyService.setString( key, modifiedValue );
 
         // test modified property value
-        Assert.assertEquals( modifiedValue, propertyService.getString( key ) );
+        assertThat( propertyService.getString( key ) ).isEqualTo( modifiedValue );
 
         // set property to null
         propertyService.setString( key, null );
 
         // test if property is null
-        Assert.assertNull( propertyService.getString( key ) );
+        assertThat( propertyService.getString( key ) ).isNull();
     }
 
     @Test
@@ -83,13 +85,13 @@ public class PropertyServiceBeanTest
     {
         String key = "long-string-property";
         InputStream stream = PropertyServiceBeanTest.class.getResourceAsStream( "text.properties" );
-        String value = IOUtils.toString( stream, Charsets.UTF_8.name() );
+        String value = CharStreams.toString( new InputStreamReader( stream, Charsets.UTF_8.name() ) );
 
         // set property
         propertyService.setString( key, value );
 
         // test get property
-        Assert.assertEquals( value, propertyService.getString( key ) );
+        assertThat( propertyService.getString( key ) ).isEqualTo( value );
     }
 
     @Test
@@ -103,19 +105,19 @@ public class PropertyServiceBeanTest
         propertyService.setDouble( key, value );
 
         // test get property
-        Assert.assertEquals( value, propertyService.getDouble( key ) );
+        assertThat( propertyService.getDouble( key ) ).isEqualTo( value );
 
         // set property once again with different value
         propertyService.setDouble( key, modifiedValue );
 
         // test modified property value
-        Assert.assertEquals( modifiedValue, propertyService.getDouble( key ) );
+        assertThat( propertyService.getDouble( key ) ).isEqualTo( modifiedValue );
 
         // set property to null
         propertyService.setDouble( key, null );
 
         // test if property is null
-        Assert.assertNull( propertyService.getDouble( key ) );
+        assertThat( propertyService.getDouble( key ) ).isNull();
     }
 
     @Test
@@ -129,19 +131,19 @@ public class PropertyServiceBeanTest
         propertyService.setInteger( key, value );
 
         // test get property
-        Assert.assertEquals( value, propertyService.getInteger( key ) );
+        assertThat( propertyService.getInteger( key ) ).isEqualTo( value );
 
         // set property once again with different value
         propertyService.setInteger( key, modifiedValue );
 
         // test modified property value
-        Assert.assertEquals( modifiedValue, propertyService.getInteger( key ) );
+        assertThat( propertyService.getInteger( key ) ).isEqualTo( modifiedValue );
 
         // set property to null
         propertyService.setInteger( key, null );
 
         // test if property is null
-        Assert.assertNull( propertyService.getInteger( key ) );
+        assertThat( propertyService.getInteger( key ) ).isNull();
     }
 
     @Test
@@ -154,9 +156,9 @@ public class PropertyServiceBeanTest
         // test application is running on testing environment
         PropertyServiceBean psb = new PropertyServiceBean( factory, config );
 
-        Assert.assertFalse( psb.isTestEnvironment() );
-        Assert.assertFalse( psb.isProductionEnvironment() );
-        Assert.assertTrue( psb.isDevelopmentEnvironment() );
+        assertThat( psb.isTestEnvironment() ).isFalse();
+        assertThat( psb.isProductionEnvironment() ).isFalse();
+        assertThat( psb.isDevelopmentEnvironment() ).isTrue();
 
         // test application is running on production environment with ID as localhostAsProd
         config.clear();
@@ -167,9 +169,9 @@ public class PropertyServiceBeanTest
         System.setProperty( "com.google.appengine.application.id", "localhostAsProd" );
         psb = new PropertyServiceBean( factory, config );
 
-        Assert.assertFalse( psb.isTestEnvironment() );
-        Assert.assertTrue( psb.isProductionEnvironment() );
-        Assert.assertFalse( psb.isDevelopmentEnvironment() );
+        assertThat( psb.isTestEnvironment() ).isFalse();
+        assertThat( psb.isProductionEnvironment() ).isTrue();
+        assertThat( psb.isDevelopmentEnvironment() ).isFalse();
 
         // test application is running on production environment with ID as localhostAsTest
         config.clear();
@@ -180,8 +182,8 @@ public class PropertyServiceBeanTest
         System.setProperty( "com.google.appengine.application.id", "localhostAsTest" );
         psb = new PropertyServiceBean( factory, config );
 
-        Assert.assertTrue( psb.isTestEnvironment() );
-        Assert.assertFalse( psb.isProductionEnvironment() );
-        Assert.assertFalse( psb.isDevelopmentEnvironment() );
+        assertThat( psb.isTestEnvironment() ).isTrue();
+        assertThat( psb.isProductionEnvironment() ).isFalse();
+        assertThat( psb.isDevelopmentEnvironment() ).isFalse();
     }
 }

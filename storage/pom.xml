@@ -17,7 +17,8 @@
   ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.ctoolkit.services</groupId>
@@ -87,6 +88,20 @@
             <artifactId>slf4j-jdk14</artifactId>
             <scope>provided</scope>
         </dependency>
+        <!-- App Engine testing-->
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-testing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-stubs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!--Test dependencies-->
         <dependency>
             <groupId>org.jmockit</groupId>
@@ -95,10 +110,6 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.ctoolkit.test</groupId>
-            <artifactId>ctoolkit-test</artifactId>
         </dependency>
     </dependencies>
 
