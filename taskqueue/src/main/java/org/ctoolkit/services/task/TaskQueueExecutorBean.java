@@ -248,7 +248,7 @@ class TaskQueueExecutorBean
     {
         Queue queue;
 
-        if ( "default".equalsIgnoreCase( task.getQueueName() ) )
+        if ( DEFAULT_QUEUE.equalsIgnoreCase( task.getQueueName() ) )
         {
             queue = QueueFactory.getDefaultQueue();
         }
@@ -270,7 +270,7 @@ class TaskQueueExecutorBean
     {
         Queue queue;
 
-        if ( "default".equalsIgnoreCase( task.getQueueName() ) )
+        if ( DEFAULT_QUEUE.equalsIgnoreCase( task.getQueueName() ) )
         {
             queue = QueueFactory.getDefaultQueue();
         }

@@ -73,6 +73,8 @@ import java.util.Map;
  */
 public interface TaskExecutor
 {
+    String DEFAULT_QUEUE = "default";
+
     /**
      * Adds task to the queue to be executed asynchronously.
      *
