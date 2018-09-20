@@ -32,6 +32,6 @@ public class TestModule
     protected void configure()
     {
         install( new CtoolkitServicesTaskModule() );
-        install( new CtoolkitServicesTaskServletModule() );
+        install( new CtoolkitServicesCronTaskModule() );
     }
 }

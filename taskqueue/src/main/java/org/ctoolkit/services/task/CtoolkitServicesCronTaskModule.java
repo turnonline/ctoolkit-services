@@ -26,7 +26,7 @@ import com.google.inject.servlet.ServletModule;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see CronServlet
  */
-public class CtoolkitServicesTaskServletModule
+public class CtoolkitServicesCronTaskModule
         extends ServletModule
 {
     @Override

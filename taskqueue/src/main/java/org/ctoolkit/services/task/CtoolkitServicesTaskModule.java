@@ -34,7 +34,7 @@ import java.util.Set;
  * an asynchronous {@link Task}.
  * <p>
  * If you need cron task (asynchronously executed in defined time) install
- * {@link CtoolkitServicesTaskServletModule} too and configure your cron task
+ * {@link CtoolkitServicesCronTaskModule} too and configure your cron task
  * implementation via {@link CronTaskRegistrar}
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
