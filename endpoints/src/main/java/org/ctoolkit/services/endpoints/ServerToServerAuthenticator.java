@@ -41,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @see OnBehalfOfUser
  */
 @Singleton
-public class OnBehalfOfEmailAuthenticator
+public class ServerToServerAuthenticator
         extends GoogleOAuth2Authenticator
 {
     public static final String ON_BEHALF_OF_EMAIL = "X-On-Behalf-Of-Email";
@@ -50,12 +50,12 @@ public class OnBehalfOfEmailAuthenticator
 
     private final String applicationId;
 
-    public OnBehalfOfEmailAuthenticator()
+    public ServerToServerAuthenticator()
     {
         this( SystemProperty.applicationId.get() );
     }
 
-    public OnBehalfOfEmailAuthenticator( String appId )
+    public ServerToServerAuthenticator( String appId )
     {
         this.applicationId = checkNotNull( appId );
     }

@@ -29,13 +29,15 @@ import org.testng.annotations.Test;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.ctoolkit.services.endpoints.OnBehalfOfEmailAuthenticator.ON_BEHALF_OF_EMAIL;
-import static org.ctoolkit.services.endpoints.OnBehalfOfEmailAuthenticator.ON_BEHALF_OF_USER_ID;
+import static org.ctoolkit.services.endpoints.ServerToServerAuthenticator.ON_BEHALF_OF_EMAIL;
+import static org.ctoolkit.services.endpoints.ServerToServerAuthenticator.ON_BEHALF_OF_USER_ID;
 
 /**
+ * {@link ServerToServerAuthenticator} unit testing.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class OnBehalfOfEmailAuthenticatorTest
+public class ServerToServerAuthenticatorTest
 {
     private static final String PROJECT_ID = "my-project-id";
 
@@ -48,7 +50,7 @@ public class OnBehalfOfEmailAuthenticatorTest
     private static final String USER_ID = "765098234";
 
     @Tested
-    private OnBehalfOfEmailAuthenticator tested;
+    private ServerToServerAuthenticator tested;
 
     @Injectable
     private String appId = PROJECT_ID;
