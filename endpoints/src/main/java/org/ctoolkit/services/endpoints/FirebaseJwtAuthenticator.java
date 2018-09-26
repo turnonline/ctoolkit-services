@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Pattern;
 
 /**
  * The Firebase JWT token thread-safe authenticator that ignores validated token's audience and issuer.
@@ -51,12 +50,6 @@ public class FirebaseJwtAuthenticator
         implements Authenticator
 {
     private static final Logger logger = LoggerFactory.getLogger( FirebaseJwtAuthenticator.class );
-
-    // Identifies JSON Web Tokens, from GoogleAuth.java
-    private static final String BASE64_REGEX = "[a-zA-Z0-9+/=_-]{6,}+";
-
-    private static final Pattern JWT_PATTERN =
-            Pattern.compile( String.format( "%s\\.%s\\.%s", BASE64_REGEX, BASE64_REGEX, BASE64_REGEX ) );
 
     private static final String PUBLIC_CERTS_URL = "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
@@ -77,17 +70,12 @@ public class FirebaseJwtAuthenticator
         verifier = builder.build();
     }
 
-    public static boolean isJwt( String token )
-    {
-        return token != null && JWT_PATTERN.matcher( token ).matches();
-    }
-
     @Override
     public User authenticate( HttpServletRequest request )
     {
         String token = GoogleAuth.getAuthToken( request );
 
-        if ( !isJwt( token ) )
+        if ( !GoogleAuth.isJwt( token ) )
         {
             logger.warn( "Not a JWT token." );
             return null;

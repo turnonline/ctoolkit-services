@@ -32,6 +32,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class VerifiedUser
         extends User
 {
+    private static final long serialVersionUID = -5338777667946885418L;
+
     private String token;
 
     private String audience;
