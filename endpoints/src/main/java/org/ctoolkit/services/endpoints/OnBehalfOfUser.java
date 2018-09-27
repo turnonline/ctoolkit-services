@@ -32,18 +32,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class OnBehalfOfUser
         extends User
 {
-    private static final long serialVersionUID = -4300320336073016157L;
+    private static final long serialVersionUID = -7930251018570269360L;
 
     private String serviceAccount;
-
-    private String serviceAccountId;
 
     OnBehalfOfUser( Builder builder )
     {
         super( checkNotNull( builder.userId, "On behalf of User ID is mandatory." ),
                 checkNotNull( builder.email, "On behalf of Email is mandatory." ) );
         this.serviceAccount = checkNotNull( builder.serviceAccount, "Service Account Email is mandatory." );
-        this.serviceAccountId = builder.serviceAccountId;
     }
 
     /**
@@ -68,16 +65,6 @@ public class OnBehalfOfUser
         return serviceAccount;
     }
 
-    /**
-     * Returns the origin service account ID.
-     *
-     * @return the service account ID
-     */
-    public String getServiceAccountId()
-    {
-        return serviceAccountId;
-    }
-
     @Override
     public boolean equals( Object o )
     {
@@ -86,20 +73,19 @@ public class OnBehalfOfUser
         if ( !super.equals( o ) ) return false;
 
         OnBehalfOfUser that = ( OnBehalfOfUser ) o;
-        return Objects.equals( serviceAccountId, that.serviceAccountId );
+        return Objects.equals( serviceAccount, that.serviceAccount );
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( super.hashCode(), serviceAccountId );
+        return Objects.hash( super.hashCode(), serviceAccount );
     }
 
     @Override
     public String toString()
     {
-        return String.format( "userId:%s, email:%s, serviceAccount:%s, serviceAccountId:%s",
-                getId(), getEmail(), this.serviceAccount, this.serviceAccountId );
+        return String.format( "userId:%s, email:%s, serviceAccount:%s", getId(), getEmail(), this.serviceAccount );
     }
 
     static class Builder
@@ -109,8 +95,6 @@ public class OnBehalfOfUser
         private String email;
 
         private String serviceAccount;
-
-        private String serviceAccountId;
 
         Builder userId( String userId )
         {
@@ -127,12 +111,6 @@ public class OnBehalfOfUser
         Builder serviceAccount( String serviceAccount )
         {
             this.serviceAccount = serviceAccount;
-            return this;
-        }
-
-        Builder serviceAccountId( String serviceAccountId )
-        {
-            this.serviceAccountId = serviceAccountId;
             return this;
         }
     }

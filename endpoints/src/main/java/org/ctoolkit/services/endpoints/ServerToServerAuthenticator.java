@@ -69,7 +69,6 @@ public class ServerToServerAuthenticator
      * the email as an identification of the user on behalf of whom the service account has been authenticated</li>
      * <li>{@link User#getId()} populated from the request header {@link #ON_BEHALF_OF_USER_ID}</li>
      * <li>{@link OnBehalfOfUser#getServiceAccount()} email taken from the authenticated user</li>
-     * <li>{@link OnBehalfOfUser#getServiceAccountId()} user Id taken from the authenticated user</li>
      * </ul>
      */
     @Override
@@ -92,8 +91,7 @@ public class ServerToServerAuthenticator
                     OnBehalfOfUser.Builder builder = new OnBehalfOfUser.Builder();
                     builder.email( email )
                             .userId( userId )
-                            .serviceAccount( serviceAccount )
-                            .serviceAccountId( authenticated.getId() );
+                            .serviceAccount( serviceAccount );
 
                     return new OnBehalfOfUser( builder );
                 }

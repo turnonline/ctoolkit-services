@@ -84,7 +84,6 @@ public class ServerToServerAuthenticatorTest
         assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
         assertThat( authenticated.getId() ).isEqualTo( USER_ID );
         assertThat( ( ( OnBehalfOfUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
-        assertThat( ( ( OnBehalfOfUser ) authenticated ).getServiceAccountId() ).isEqualTo( SERVICE_ACCOUNT_ID );
     }
 
     @Test

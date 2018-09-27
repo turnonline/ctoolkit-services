@@ -20,7 +20,6 @@ package org.ctoolkit.services.endpoints;
 
 import com.google.api.control.ServiceManagementConfigFilter;
 import com.google.api.control.extensions.appengine.GoogleAppEngineControlFilter;
-import com.google.api.server.spi.guice.GuiceEndpointsServlet;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.inject.servlet.ServletModule;
 
@@ -62,8 +61,5 @@ public class EndpointsMonitorConfig
 
         bind( GoogleAppEngineControlFilter.class ).in( Singleton.class );
         filter( ENDPOINTS_SERVLET_PATH ).through( GoogleAppEngineControlFilter.class, apiController );
-
-        //https://stackoverflow.com/questions/50339907/using-google-cloud-endpoint-framework-2-0-with-custom-domain
-        serve( "/*" ).with( GuiceEndpointsServlet.class );
     }
 }
