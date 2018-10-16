@@ -68,7 +68,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public abstract class Task<T>
         implements DeferredTask
 {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7237491181926605662L;
 
     @Inject
     private static Injector injector;
@@ -242,24 +242,12 @@ public abstract class Task<T>
      * Schedules the given task as the next one to execute once the this (parent) task has been successfully finished.
      * The parent task is the first one to be executed.
      *
-     * @param task the task as the next one to execute
-     * @return just added task to chain calls
-     */
-    public final Task setNext( @Nonnull Task task )
-    {
-        return setNext( task, null );
-    }
-
-    /**
-     * Schedules the given task as the next one to execute once the this (parent) task has been successfully finished.
-     * The parent task is the first one to be executed.
-     *
      * @param task        the task as the next one to execute
      * @param postponeFor the number of seconds to be added to current time for this,
      *                    that's a time when the task will be started. Max 30 days.
      * @return just added task to chain calls
      */
-    public final Task setNext( @Nonnull Task task, int postponeFor )
+    private Task setNext( @Nonnull Task task, int postponeFor )
     {
         this.next = checkNotNull( task );
         return task.postponeFor( postponeFor );
@@ -273,7 +261,7 @@ public abstract class Task<T>
      * @param options the task configuration
      * @return just added task to chain calls
      */
-    public final Task setNext( @Nonnull Task task, @Nullable TaskOptions options )
+    private Task setNext( @Nonnull Task task, @Nullable TaskOptions options )
     {
         this.next = checkNotNull( task );
         return task.options( options );
@@ -287,6 +275,72 @@ public abstract class Task<T>
     public final Task next()
     {
         return next;
+    }
+
+    /**
+     * Adds task to be scheduled as a last one in the current chain.
+     * The parent task is the first one to be executed.
+     *
+     * @param task        the task to be scheduled
+     * @param postponeFor the number of seconds to be added to current time for this,
+     *                    that's a time when the task will be started. Max 30 days.
+     * @return just added task to chain calls
+     */
+    public final Task addNext( @Nonnull Task task, int postponeFor )
+    {
+        return leaf().setNext( task, postponeFor );
+    }
+
+    /**
+     * Adds task to be scheduled as a last one in the current chain.
+     * The parent task is the first one to be executed.
+     *
+     * @param task the task to be scheduled
+     * @return just added task to chain calls
+     */
+    public final Task addNext( @Nonnull Task task )
+    {
+        return addNext( task, null );
+    }
+
+    /**
+     * Adds task to be scheduled as a last one in the current chain.
+     * The parent task is the first one to be executed.
+     *
+     * @param task    the task to be scheduled
+     * @param options the task configuration
+     * @return just added task to chain calls
+     */
+    public final Task addNext( @Nonnull Task task, @Nullable TaskOptions options )
+    {
+        return leaf().setNext( task, options );
+    }
+
+    /**
+     * Returns a boolean indication whether current task has a next task to be scheduled once this will be done.
+     *
+     * @return {@code true} if has next task
+     */
+    public final boolean hasNext()
+    {
+        return next != null;
+    }
+
+    /**
+     * Traverses and returns a task to be scheduled as last (leaf) in the chain.
+     * If there is no next task, it will return {@code this}.
+     *
+     * @return the leaf task
+     */
+    private Task leaf()
+    {
+        Task task = this;
+        while ( task.hasNext() )
+        {
+            task = task.next();
+        }
+
+        return task;
     }
 
     /**
@@ -362,14 +416,28 @@ public abstract class Task<T>
 
     /**
      * Returns the entity resolved by {@link #getEntityKey()}.
+     * <p>Objectify instances are {@link com.googlecode.objectify.Objectify#cache(boolean)}
+     * {@code true} by default.</p>
      *
      * @return the entity the task will handle or {@code null} if not found
      */
     public final T workWith()
     {
+        return workWith( true );
+    }
+
+    /**
+     * Returns the entity resolved by {@link #getEntityKey()}.
+     *
+     * @param cache {@code true} to use (or not use) a 2nd-level memcache
+     * @return the entity the task will handle or {@code null} if not found
+     * @see com.googlecode.objectify.annotation.Cache
+     */
+    public final T workWith( boolean cache )
+    {
         Key<T> key = getEntityKey();
         checkNotNull( key, "Entity key is null" );
-        return ofy().load().key( key ).now();
+        return ofy().cache( cache ).load().key( key ).now();
     }
 
     @Override

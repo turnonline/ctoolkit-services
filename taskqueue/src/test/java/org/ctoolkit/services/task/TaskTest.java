@@ -35,6 +35,7 @@ import static org.testng.Assert.assertTrue;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
+@SuppressWarnings( "ResultOfMethodCallIgnored" )
 public class TaskTest
 {
     @Tested
@@ -49,15 +50,16 @@ public class TaskTest
     @Test
     public void chainingNextNoOptions()
     {
-        final Task next = new FakeTask();
-        tested.setNext( next );
-
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                tested.execute();
+                tested.hasNext();
+                result = false;
             }
         };
+
+        final Task next = new FakeTask();
+        tested.addNext( next );
 
         tested.run();
 
@@ -68,16 +70,17 @@ public class TaskTest
     @Test
     public void chainingNextRemovedByFirstTask()
     {
-        final TaskOptions options = TaskOptions.Builder.withDefaults();
-        final Task next = new FakeTask();
-        tested.setNext( next );
-
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                tested.execute();
+                tested.hasNext();
+                result = false;
             }
         };
+
+        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        final Task next = new FakeTask();
+        tested.addNext( next );
 
         assertTrue( tested.clear() );
         tested.run();
@@ -85,6 +88,7 @@ public class TaskTest
         new Verifications()
         {
             {
+                //noinspection ConstantConditions
                 executor.schedule( ( Task ) any );
                 times = 0;
 
@@ -97,16 +101,17 @@ public class TaskTest
     @Test
     public void chainingNextWithOptions()
     {
-        final Task next = new FakeTask();
-        final TaskOptions options = TaskOptions.Builder.withDefaults();
-        tested.setNext( next ).options( options );
-
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                tested.execute();
+                tested.hasNext();
+                result = false;
             }
         };
+
+        final Task next = new FakeTask();
+        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        tested.addNext( next ).options( options );
 
         tested.run();
 
@@ -117,16 +122,17 @@ public class TaskTest
     @Test
     public void chainingNextWithOptionsAsArgument()
     {
-        final Task next = new FakeTask();
-        final TaskOptions options = TaskOptions.Builder.withDefaults();
-        tested.setNext( next, options );
-
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                tested.execute();
+                tested.hasNext();
+                result = false;
             }
         };
+
+        final Task next = new FakeTask();
+        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        tested.addNext( next, options );
 
         tested.run();
 
@@ -137,15 +143,16 @@ public class TaskTest
     @Test
     public void chainingNextWithPostponeFor()
     {
-        final Task next = new FakeTask();
-        tested.setNext( next ).postponeFor( 20 );
-
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                tested.execute();
+                tested.hasNext();
+                result = false;
             }
         };
+
+        final Task next = new FakeTask();
+        tested.addNext( next ).postponeFor( 20 );
 
         tested.run();
 
@@ -156,15 +163,16 @@ public class TaskTest
     @Test
     public void chainingNextWithPostponeForAsArgument()
     {
-        final Task next = new FakeTask();
-        tested.setNext( next, 10 );
-
-        new Expectations()
+        new Expectations( tested )
         {
             {
-                tested.execute();
+                tested.hasNext();
+                result = false;
             }
         };
+
+        final Task next = new FakeTask();
+        tested.addNext( next, 10 );
 
         tested.run();
 
@@ -177,6 +185,7 @@ public class TaskTest
         new Verifications()
         {
             {
+                //noinspection ConstantConditions
                 executor.schedule( ( Task ) any );
                 times = 0;
 
