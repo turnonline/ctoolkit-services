@@ -27,7 +27,9 @@ import com.googlecode.objectify.Key;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import java.io.Serializable;
 import java.util.Objects;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -68,7 +70,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public abstract class Task<T>
         implements DeferredTask
 {
-    private static final long serialVersionUID = 7237491181926605662L;
+    private static final long serialVersionUID = -5003745121838693308L;
 
     @Inject
     private static Injector injector;
@@ -83,6 +85,8 @@ public abstract class Task<T>
     private boolean makeUnique;
 
     private Task next;
+
+    private SerializableFunction<T, Boolean> function;
 
     private String queueName;
 
@@ -247,7 +251,7 @@ public abstract class Task<T>
      *                    that's a time when the task will be started. Max 30 days.
      * @return just added task to chain calls
      */
-    private Task setNext( @Nonnull Task task, int postponeFor )
+    private <S> Task<S> setNext( @Nonnull Task<S> task, int postponeFor )
     {
         this.next = checkNotNull( task );
         return task.postponeFor( postponeFor );
@@ -261,7 +265,7 @@ public abstract class Task<T>
      * @param options the task configuration
      * @return just added task to chain calls
      */
-    private Task setNext( @Nonnull Task task, @Nullable TaskOptions options )
+    private <S> Task<S> setNext( @Nonnull Task<S> task, @Nullable TaskOptions options )
     {
         this.next = checkNotNull( task );
         return task.options( options );
@@ -272,7 +276,7 @@ public abstract class Task<T>
      *
      * @return the next task to execute
      */
-    public final Task next()
+    public final Task<?> next()
     {
         return next;
     }
@@ -286,7 +290,7 @@ public abstract class Task<T>
      *                    that's a time when the task will be started. Max 30 days.
      * @return just added task to chain calls
      */
-    public final Task addNext( @Nonnull Task task, int postponeFor )
+    public final <S> Task<S> addNext( @Nonnull Task<S> task, int postponeFor )
     {
         return leaf().setNext( task, postponeFor );
     }
@@ -298,9 +302,9 @@ public abstract class Task<T>
      * @param task the task to be scheduled
      * @return just added task to chain calls
      */
-    public final Task addNext( @Nonnull Task task )
+    public final <S> Task<S> addNext( @Nonnull Task<S> task )
     {
-        return addNext( task, null );
+        return addNext( task, ( TaskOptions ) null );
     }
 
     /**
@@ -311,9 +315,42 @@ public abstract class Task<T>
      * @param options the task configuration
      * @return just added task to chain calls
      */
-    public final Task addNext( @Nonnull Task task, @Nullable TaskOptions options )
+    public final <S> Task<S> addNext( @Nonnull Task<S> task, @Nullable TaskOptions options )
     {
         return leaf().setNext( task, options );
+    }
+
+    /**
+     * Adds task to be scheduled as a last one in the current chain.
+     * The parent task is the first one to be executed.
+     *
+     * @param task      the task to be scheduled
+     * @param condition the serializable functional interface to evaluate a condition
+     *                  whether to enqueue given task, right before scheduling
+     * @return just added task to chain calls
+     */
+    public final <S> Task<S> addNext( @Nonnull Task<S> task, @Nullable SerializableFunction<T, Boolean> condition )
+    {
+        this.function = condition;
+        return addNext( task, ( TaskOptions ) null );
+    }
+
+    /**
+     * Adds task to be scheduled as a last one in the current chain.
+     * The parent task is the first one to be executed.
+     *
+     * @param task      the task to be scheduled
+     * @param condition the serializable functional interface to evaluate a condition
+     *                  whether to enqueue given task, right before scheduling
+     * @param options   the task configuration
+     * @return just added task to chain calls
+     */
+    public final <S> Task<S> addNext( @Nonnull Task<S> task,
+                                      @Nullable TaskOptions options,
+                                      @Nullable SerializableFunction<T, Boolean> condition )
+    {
+        this.function = condition;
+        return addNext( task, options );
     }
 
     /**
@@ -332,7 +369,7 @@ public abstract class Task<T>
      *
      * @return the leaf task
      */
-    private Task leaf()
+    private Task<?> leaf()
     {
         Task task = this;
         while ( task.hasNext() )
@@ -375,7 +412,7 @@ public abstract class Task<T>
      * @param options the configuration options instance
      * @return this task to chain configuration
      */
-    public final Task options( @Nullable TaskOptions options )
+    public final Task<T> options( @Nullable TaskOptions options )
     {
         this.options = options;
         return this;
@@ -398,7 +435,7 @@ public abstract class Task<T>
      * @param countdown the countdown to be set in seconds
      * @return this task to chain configuration
      */
-    public final Task postponeFor( @Nullable Integer countdown )
+    public final Task<T> postponeFor( @Nullable Integer countdown )
     {
         this.postponeFor = countdown;
         return this;
@@ -478,8 +515,19 @@ public abstract class Task<T>
 
         execute();
 
+        boolean condition;
+        if ( function != null )
+        {
+            T entity = workWith();
+            condition = entity != null && function.apply( entity );
+        }
+        else
+        {
+            condition = true;
+        }
+
         // once parent task has been successfully executed, enqueue the next task
-        if ( next != null )
+        if ( next != null && condition )
         {
             TaskOptions nextTaskOptions = next.getOptions();
             if ( nextTaskOptions == null )
@@ -497,4 +545,13 @@ public abstract class Task<T>
      * The client implementation to be executed asynchronously.
      */
     protected abstract void execute();
+
+    /**
+     * Serializable {@link Function}.
+     */
+    @FunctionalInterface
+    public interface SerializableFunction<T, R>
+            extends Function<T, R>, Serializable
+    {
+    }
 }
