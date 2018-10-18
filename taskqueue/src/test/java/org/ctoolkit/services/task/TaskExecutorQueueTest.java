@@ -34,10 +34,10 @@ public class TaskExecutorQueueTest
     @Test
     public void testExecute()
     {
-        Task first = new FakeTask().postponeFor( 10 );
-        Task second = new FakeTask();
+        Task<TestModel> first = new FakeTask().postponeFor( 10 );
+        Task<?> second = new FakeTask();
 
-        first.addNext( second );
+        first.addNext( second, TestModel::isChanged );
 
         // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
         executor.schedule( first );

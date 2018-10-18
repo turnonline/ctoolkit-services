@@ -103,10 +103,10 @@ public class TaskQueueExecutorBeanTest
     }
 
     @Test
-    public void scheduleWithUniqueTaskName( @Mocked final Key<Object> key )
+    public void scheduleWithUniqueTaskName( @Mocked final Key<TestModel> key )
     {
         final Long id = 651987L;
-        final Task<Object> task = new FakeTask( "my-prefix", true );
+        final Task<TestModel> task = new FakeTask( "my-prefix", true );
         task.setEntityKey( key );
 
         new Expectations()
@@ -143,12 +143,12 @@ public class TaskQueueExecutorBeanTest
     }
 
     @Test
-    public void scheduleFulOptions( @Mocked final Key<Object> key )
+    public void scheduleFulOptions( @Mocked final Key<TestModel> key )
     {
         final Integer postponeFor = 300;
         final Long id = 123987L;
 
-        final Task<Object> task = new FakeTask( "my-prefix", false, "my-queue" );
+        final Task<TestModel> task = new FakeTask( "my-prefix", false, "my-queue" );
         task.postponeFor( postponeFor );
         task.setEntityKey( key );
 

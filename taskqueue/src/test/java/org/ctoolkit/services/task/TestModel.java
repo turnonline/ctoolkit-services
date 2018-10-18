@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2018 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,38 +18,27 @@
 
 package org.ctoolkit.services.task;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 /**
+ * Test model for unit testing only.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class FakeTask
-        extends Task<TestModel>
+class TestModel
 {
-    private static final long serialVersionUID = 1L;
+    private boolean changed;
 
-    public FakeTask()
+    TestModel()
     {
+        this( true );
     }
 
-    public FakeTask( @Nonnull String namePrefix )
+    TestModel( boolean changed )
     {
-        super( namePrefix );
+        this.changed = changed;
     }
 
-    public FakeTask( @Nonnull String namePrefix, boolean makeUnique )
+    boolean isChanged()
     {
-        super( namePrefix, makeUnique );
-    }
-
-    public FakeTask( @Nullable String namePrefix, boolean makeUnique, @Nonnull String queueName )
-    {
-        super( namePrefix, makeUnique, queueName );
-    }
-
-    @Override
-    public void execute()
-    {
+        return changed;
     }
 }

@@ -39,7 +39,7 @@ import static org.testng.Assert.assertTrue;
 public class TaskTest
 {
     @Tested
-    private Task tested;
+    private Task<TestModel> tested;
 
     @Injectable
     private Injector injector;
@@ -50,15 +50,7 @@ public class TaskTest
     @Test
     public void chainingNextNoOptions()
     {
-        new Expectations( tested )
-        {
-            {
-                tested.hasNext();
-                result = false;
-            }
-        };
-
-        final Task next = new FakeTask();
+        FakeTask next = new FakeTask();
         tested.addNext( next );
 
         tested.run();
@@ -70,16 +62,8 @@ public class TaskTest
     @Test
     public void chainingNextRemovedByFirstTask()
     {
-        new Expectations( tested )
-        {
-            {
-                tested.hasNext();
-                result = false;
-            }
-        };
-
-        final TaskOptions options = TaskOptions.Builder.withDefaults();
-        final Task next = new FakeTask();
+        TaskOptions options = TaskOptions.Builder.withDefaults();
+        FakeTask next = new FakeTask();
         tested.addNext( next );
 
         assertTrue( tested.clear() );
@@ -101,16 +85,8 @@ public class TaskTest
     @Test
     public void chainingNextWithOptions()
     {
-        new Expectations( tested )
-        {
-            {
-                tested.hasNext();
-                result = false;
-            }
-        };
-
-        final Task next = new FakeTask();
-        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        FakeTask next = new FakeTask();
+        TaskOptions options = TaskOptions.Builder.withDefaults();
         tested.addNext( next ).options( options );
 
         tested.run();
@@ -122,16 +98,8 @@ public class TaskTest
     @Test
     public void chainingNextWithOptionsAsArgument()
     {
-        new Expectations( tested )
-        {
-            {
-                tested.hasNext();
-                result = false;
-            }
-        };
-
-        final Task next = new FakeTask();
-        final TaskOptions options = TaskOptions.Builder.withDefaults();
+        FakeTask next = new FakeTask();
+        TaskOptions options = TaskOptions.Builder.withDefaults();
         tested.addNext( next, options );
 
         tested.run();
@@ -143,15 +111,7 @@ public class TaskTest
     @Test
     public void chainingNextWithPostponeFor()
     {
-        new Expectations( tested )
-        {
-            {
-                tested.hasNext();
-                result = false;
-            }
-        };
-
-        final Task next = new FakeTask();
+        FakeTask next = new FakeTask();
         tested.addNext( next ).postponeFor( 20 );
 
         tested.run();
@@ -163,21 +123,109 @@ public class TaskTest
     @Test
     public void chainingNextWithPostponeForAsArgument()
     {
-        new Expectations( tested )
-        {
-            {
-                tested.hasNext();
-                result = false;
-            }
-        };
-
-        final Task next = new FakeTask();
+        FakeTask next = new FakeTask();
         tested.addNext( next, 10 );
 
         tested.run();
 
         assertEquals( next.getPostponeFor(), Integer.valueOf( 10 ) );
         verificationsNoOptions( next );
+    }
+
+    @Test
+    public void addNext_FunctionTrue()
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.workWith();
+                result = new TestModel();
+
+                tested.getTaskName();
+                result = "First task";
+            }
+        };
+
+        final Task<?> next = new FakeTask( "Second task" );
+        tested.addNext( next, TestModel::isChanged );
+
+        tested.run();
+
+        verificationsNoOptions( next );
+    }
+
+    @Test
+    public void addNext_FunctionFalse()
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.workWith();
+                result = new TestModel( false );
+
+                tested.getTaskName();
+                result = "Parent task";
+            }
+        };
+
+        Task<?> next = new FakeTask( "Second task" );
+        tested.addNext( next, TestModel::isChanged );
+
+        tested.run();
+
+        new Verifications()
+        {
+            {
+                executor.schedule( next );
+                times = 0;
+
+                //noinspection ConstantConditions
+                executor.schedule( next, ( TaskOptions ) any );
+                times = 0;
+            }
+        };
+    }
+
+    @Test
+    public void addNext_FunctionFalseButOneMoreTask()
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.workWith();
+                result = new TestModel( false );
+
+                tested.getTaskName();
+                result = "First task";
+            }
+        };
+
+        Task<?> next = new FakeTask( "Second task" );
+        tested.addNext( next, TestModel::isChanged );
+
+        Task<?> last = new FakeTask( "Last task" );
+        tested.addNext( last );
+
+        tested.run();
+
+        new Verifications()
+        {
+            {
+                executor.schedule( next );
+                times = 0;
+
+                //noinspection ConstantConditions
+                executor.schedule( next, ( TaskOptions ) any );
+                times = 0;
+
+                executor.schedule( last );
+                times = 1;
+
+                //noinspection ConstantConditions
+                executor.schedule( last, ( TaskOptions ) any );
+                times = 0;
+            }
+        };
     }
 
     private void verificationsWithOptions( final Task next, final TaskOptions options )

@@ -23,6 +23,8 @@ import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.inject.Injector;
 import com.googlecode.objectify.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -70,7 +72,9 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public abstract class Task<T>
         implements DeferredTask
 {
-    private static final long serialVersionUID = -5003745121838693308L;
+    private static final long serialVersionUID = 4482738102030372071L;
+
+    private static final Logger logger = LoggerFactory.getLogger( Task.class );
 
     @Inject
     private static Injector injector;
@@ -326,7 +330,7 @@ public abstract class Task<T>
      *
      * @param task      the task to be scheduled
      * @param condition the serializable functional interface to evaluate a condition
-     *                  whether to enqueue given task, right before scheduling
+     *                  whether to enqueue given task, applied only for given task
      * @return just added task to chain calls
      */
     public final <S> Task<S> addNext( @Nonnull Task<S> task, @Nullable SerializableFunction<T, Boolean> condition )
@@ -341,7 +345,7 @@ public abstract class Task<T>
      *
      * @param task      the task to be scheduled
      * @param condition the serializable functional interface to evaluate a condition
-     *                  whether to enqueue given task, right before scheduling
+     *                  whether to enqueue given task, applied only for given task
      * @param options   the task configuration
      * @return just added task to chain calls
      */
@@ -393,6 +397,7 @@ public abstract class Task<T>
     {
         boolean cleared = this.next != null;
         this.next = null;
+        this.function = null;
         return cleared;
     }
 
@@ -511,23 +516,37 @@ public abstract class Task<T>
     @Override
     public final void run()
     {
+        logger.info( "Task '" + getTaskName() + "' has been started." );
         injector.injectMembers( this );
 
         execute();
 
-        boolean condition;
-        if ( function != null )
+        boolean scheduleNext;
+        if ( hasNext() && function != null )
         {
             T entity = workWith();
-            condition = entity != null && function.apply( entity );
+            scheduleNext = entity != null && function.apply( entity );
+            logger.info( "Task's function has been evaluated with value: " + scheduleNext );
         }
         else
         {
-            condition = true;
+            scheduleNext = true;
+        }
+
+        if ( hasNext() && !scheduleNext )
+        {
+            logger.info( "The task with name '" + next.getTaskName() + "' is being skipped" );
+            // Next task will be skipped, however if there is an another task, schedule it!
+            next = next.next();
+        }
+
+        if ( hasNext() )
+        {
+            logger.info( "The task with name '" + next.getTaskName() + "' is being scheduled to be executed as next." );
         }
 
         // once parent task has been successfully executed, enqueue the next task
-        if ( next != null && condition )
+        if ( hasNext() )
         {
             TaskOptions nextTaskOptions = next.getOptions();
             if ( nextTaskOptions == null )
