@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.services</groupId>
     <artifactId>ctoolkit-services</artifactId>
-    <version>0.15-SNAPSHOT</version>
+    <version>0.15</version>
     <packaging>pom</packaging>
     <name>CtoolkiT Services - Google App Engine</name>
     <description>
@@ -40,7 +40,7 @@
         <connection>scm:git:[fetch=]git@github.com:turnonline/ctoolkit-services.git</connection>
         <developerConnection>scm:git:[push=]git@github.com:turnonline/ctoolkit-services.git</developerConnection>
         <url>https://github.com/turnonline/ctoolkit-services</url>
-        <tag>HEAD</tag>
+        <tag>ctoolkit-services-0.15</tag>
     </scm>
 
     <issueManagement>
