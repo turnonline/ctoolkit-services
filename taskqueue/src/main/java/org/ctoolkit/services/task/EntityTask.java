@@ -39,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class EntityTask<T>
         extends Task<T>
 {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -2500873815267224035L;
 
     private final static Logger logger = LoggerFactory.getLogger( EntityTask.class );
 

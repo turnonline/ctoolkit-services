@@ -24,9 +24,12 @@ import com.google.api.server.spi.response.ServiceUnavailableException;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotNull;
+import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -70,6 +73,8 @@ public class ServerToServerAuthenticator
      * <li>{@link User#getId()} populated from the request header {@link #ON_BEHALF_OF_USER_ID}</li>
      * <li>{@link OnBehalfOfUser#getServiceAccount()} email taken from the authenticated user</li>
      * </ul>
+     * For the use case with authenticated default service account but 'on behalf of' headers are missing,
+     * it will return authenticated service account.
      */
     @Override
     public User authenticate( HttpServletRequest request ) throws ServiceUnavailableException
@@ -81,25 +86,36 @@ public class ServerToServerAuthenticator
             String serviceAccount = authenticated.getEmail().toLowerCase();
             Iterable<String> strings = Splitter.on( "@" ).omitEmptyStrings().trimResults().split( serviceAccount );
 
-            for ( String next : strings )
+            String email = request.getHeader( ON_BEHALF_OF_EMAIL );
+            String userId = request.getHeader( ON_BEHALF_OF_USER_ID );
+
+            if ( isApplicationIdEquals( strings ) )
             {
-                if ( applicationId.toLowerCase().equals( next.toLowerCase() ) )
+                if ( Strings.isNullOrEmpty( email ) || Strings.isNullOrEmpty( userId ) )
                 {
-                    String email = request.getHeader( ON_BEHALF_OF_EMAIL );
-                    String userId = request.getHeader( ON_BEHALF_OF_USER_ID );
-
-                    OnBehalfOfUser.Builder builder = new OnBehalfOfUser.Builder();
-                    builder.email( email )
-                            .userId( userId )
-                            .serviceAccount( serviceAccount );
-
-                    return new OnBehalfOfUser( builder );
+                    // no on behalf user, return authenticated service account
+                    return authenticated;
                 }
+
+                OnBehalfOfUser.Builder builder = new OnBehalfOfUser.Builder();
+                builder.email( email )
+                        .userId( userId )
+                        .serviceAccount( serviceAccount );
+
+                return new OnBehalfOfUser( builder );
             }
         }
         // unauthenticated
         return null;
     }
+
+    private boolean isApplicationIdEquals( @NotNull Iterable<String> strings )
+    {
+        Iterator<String> it = strings.iterator();
+        String next = it.hasNext() ? it.next() : "";
+        return applicationId.toLowerCase().equals( next.toLowerCase() );
+    }
+
 
     @VisibleForTesting
     User internalAuthenticate( HttpServletRequest request ) throws ServiceUnavailableException

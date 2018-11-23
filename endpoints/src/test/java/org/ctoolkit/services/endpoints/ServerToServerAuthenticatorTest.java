@@ -133,4 +133,31 @@ public class ServerToServerAuthenticatorTest
 
         assertThat( tested.authenticate( request ) ).isNull();
     }
+
+    @Test
+    public void authenticate_ApplicationIdMatchedButMissingHeaders() throws ServiceUnavailableException
+    {
+        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT );
+
+        new Expectations( tested )
+        {
+            {
+                tested.internalAuthenticate( request );
+                result = user;
+
+                request.getHeader( ON_BEHALF_OF_EMAIL );
+                result = null;
+
+                request.getHeader( ON_BEHALF_OF_USER_ID );
+                result = null;
+            }
+        };
+
+        User authenticated = tested.authenticate( request );
+        assertThat( authenticated ).isNotNull();
+        assertThat( authenticated ).isInstanceOf( User.class );
+        assertThat( authenticated ).isNotInstanceOf( OnBehalfOfUser.class );
+        assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
+        assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
+    }
 }

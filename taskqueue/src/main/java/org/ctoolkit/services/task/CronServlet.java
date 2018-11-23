@@ -43,7 +43,7 @@ import java.util.Map;
 class CronServlet
         extends HttpServlet
 {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6984813104634301746L;
 
     private final TaskExecutor executor;
 
