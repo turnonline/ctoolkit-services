@@ -23,6 +23,8 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.googlecode.objectify.ObjectifyService;
+import org.ctoolkit.services.storage.EntityLongIdentityHasherTestEntity;
+import org.ctoolkit.services.storage.EntityStringIdentityHasherTestEntity;
 import org.ctoolkit.services.storage.appengine.objectify.Child2LevelEntity;
 import org.ctoolkit.services.storage.appengine.objectify.ChildEntity;
 import org.ctoolkit.services.storage.appengine.objectify.FakeEntity;
@@ -61,6 +63,10 @@ public class BackendServiceTestCase
         ObjectifyService.register( ChildEntity.class );
         ObjectifyService.register( SiblingChildEntity.class );
         ObjectifyService.register( Child2LevelEntity.class );
+        ObjectifyService.register( EntityLongIdentityHasherTestEntity.class );
+        ObjectifyService.register( EntityLongIdentityHasherTestEntity.MyHashCode.class );
+        ObjectifyService.register( EntityStringIdentityHasherTestEntity.class );
+        ObjectifyService.register( EntityStringIdentityHasherTestEntity.MyHashCode.class );
     }
 
     @AfterMethod

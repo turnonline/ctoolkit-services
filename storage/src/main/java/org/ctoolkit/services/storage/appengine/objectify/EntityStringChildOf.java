@@ -44,7 +44,7 @@ public abstract class EntityStringChildOf<P extends EntityIdentity>
         extends EntityStringIdentity
         implements ChildEntityOf<P, String>
 {
-    private static final long serialVersionUID = -1376750598754818988L;
+    private static final long serialVersionUID = 5348308859660432462L;
 
     @Parent
     private Ref<P> parent;

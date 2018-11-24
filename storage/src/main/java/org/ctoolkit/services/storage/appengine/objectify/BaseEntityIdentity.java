@@ -66,7 +66,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public abstract class BaseEntityIdentity<ID_TYPE>
         implements EntityIdentity<ID_TYPE>, EntityIdentity.HasIgnored
 {
-    private static final long serialVersionUID = 3420341402350232214L;
+    private static final long serialVersionUID = -398124693126635909L;
 
     private Integer version;
 
