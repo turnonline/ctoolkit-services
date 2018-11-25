@@ -32,7 +32,7 @@ public class PropertiesHasherTest
         extends BackendServiceTestCase
 {
     @Test
-    public void getHashCode_SavedButNotInitializedYet()
+    public void getHashCode_LongId_SavedButNotInitializedYet()
     {
         EntityLongIdentityHasherTestEntity entity = new EntityLongIdentityHasherTestEntity();
         entity.save();
@@ -43,7 +43,7 @@ public class PropertiesHasherTest
     }
 
     @Test
-    public void isPropsHashCodeChanged_InitializedAndCalculated()
+    public void isPropsHashCodeChanged_LongId_InitializedAndCalculated()
     {
         EntityLongIdentityHasherTestEntity entity = new EntityLongIdentityHasherTestEntity();
         entity.save();
@@ -68,7 +68,7 @@ public class PropertiesHasherTest
     }
 
     @Test
-    public void putPropsHashCode_CalculatedThenChanged()
+    public void putPropsHashCode_LongId_CalculatedThenChanged()
     {
         EntityLongIdentityHasherTestEntity entity = new EntityLongIdentityHasherTestEntity();
         entity.save();
@@ -90,7 +90,7 @@ public class PropertiesHasherTest
     }
 
     @Test
-    public void getHashCode2_SavedButNotInitializedYet()
+    public void getHashCode_StringId_SavedButNotInitializedYet()
     {
         EntityStringIdentityHasherTestEntity entity = new EntityStringIdentityHasherTestEntity();
         entity.setId( "my-id-123" );
@@ -102,7 +102,7 @@ public class PropertiesHasherTest
     }
 
     @Test
-    public void isPropsHashCodeChanged2_InitializedAndCalculated()
+    public void isPropsHashCodeChanged_StringId_InitializedAndCalculated()
     {
         EntityStringIdentityHasherTestEntity entity = new EntityStringIdentityHasherTestEntity();
         entity.setId( "my-id-123" );
@@ -124,11 +124,11 @@ public class PropertiesHasherTest
 
         String hashCode = hashCodeEntity.getHashCode();
         assertThat( hashCode ).isNotNull();
-        assertThat( hashCode ).isEqualTo( "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" );
+        assertThat( hashCode ).isEqualTo( "5fea62f1155fa63f3872a03fe9af20f14cc3d2966f914a74d845b55e7388261d" );
     }
 
     @Test
-    public void putPropsHashCode2_CalculatedThenChanged()
+    public void putPropsHashCode_StringId_CalculatedThenChanged()
     {
         EntityStringIdentityHasherTestEntity entity = new EntityStringIdentityHasherTestEntity();
         entity.setId( "my-id-123" );
@@ -147,6 +147,6 @@ public class PropertiesHasherTest
 
         String hashCode = hashCodeEntity.getHashCode();
         assertThat( hashCode ).isNotNull();
-        assertThat( hashCode ).isEqualTo( "c742891325ca2a5199d2b1c6846a4be59ad8a1b24c48288ce331aec103997a1a" );
+        assertThat( hashCode ).isEqualTo( "1c55b869961672d5befbd58a01a732172bad50b0781e890b89a5984279791590" );
     }
 }

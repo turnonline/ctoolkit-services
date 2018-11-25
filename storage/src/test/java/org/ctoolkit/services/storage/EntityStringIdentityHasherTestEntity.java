@@ -18,12 +18,11 @@
 
 package org.ctoolkit.services.storage;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.Funnel;
-import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
 import com.googlecode.objectify.annotation.Entity;
 import org.ctoolkit.services.storage.appengine.objectify.EntityStringIdentityHasher;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -40,21 +39,23 @@ public class EntityStringIdentityHasherTestEntity
 
     private String xyz;
 
+    @SuppressWarnings( "UnstableApiUsage" )
     @Override
     public String calcPropsHashCode()
     {
-        Funnel<EntityStringIdentityHasherTestEntity> funnel;
-        funnel = ( Funnel<EntityStringIdentityHasherTestEntity> ) ( item, into ) -> {
-            if ( item.getXyz() != null )
-            {
-                into.putString( item.getXyz(), Charsets.UTF_8 );
-            }
-        };
+        Map<String, Object> properties = new HashMap<>();
+        properties.put( "xyz", getXyz() );
+        properties.put( "boolean", true );
+        properties.put( "integer", Integer.MAX_VALUE );
+        properties.put( "double", 13579.6D );
 
-        Hasher hasher = Hashing.sha256().newHasher();
-        hasher = hasher.putObject( this, funnel );
+        Map<String, Object> nested = new HashMap<>();
+        nested.put( "float", 3.6F );
+        nested.put( "character", 'g' );
+        nested.put( "long", Long.MAX_VALUE );
+        properties.put( "nested", nested );
 
-        return hasher.hash().toString();
+        return calcPropsHashCode( properties );
     }
 
     @Override

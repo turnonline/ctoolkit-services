@@ -40,6 +40,7 @@ public class EntityLongIdentityHasherTestEntity
 
     private String abc;
 
+    @SuppressWarnings( "UnstableApiUsage" )
     @Override
     public String calcPropsHashCode()
     {
