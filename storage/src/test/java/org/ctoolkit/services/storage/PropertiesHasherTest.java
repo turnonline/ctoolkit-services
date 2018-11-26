@@ -56,7 +56,7 @@ public class PropertiesHasherTest
         assertThat( entity.isPropsHashCodeChanged() ).isTrue();
 
         // calculates and persists
-        assertThat( entity.putPropsHashCode() ).isTrue();
+        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
         assertThat( entity.isPropsHashCodeChanged() ).isFalse();
 
         hashCodeEntity = entity.getPropsHashCode();
@@ -79,7 +79,7 @@ public class PropertiesHasherTest
 
         // change value, calculate and persist
         entity.setAbc( "abc_efg" );
-        assertThat( entity.putPropsHashCode() ).isTrue();
+        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
 
         hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
@@ -116,7 +116,7 @@ public class PropertiesHasherTest
         assertThat( entity.isPropsHashCodeChanged() ).isTrue();
 
         // calculates and persists
-        assertThat( entity.putPropsHashCode() ).isTrue();
+        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
         assertThat( entity.isPropsHashCodeChanged() ).isFalse();
 
         hashCodeEntity = entity.getPropsHashCode();
@@ -140,7 +140,7 @@ public class PropertiesHasherTest
 
         // change value, calculate and persist
         entity.setXyz( "abc_efg" );
-        assertThat( entity.putPropsHashCode() ).isTrue();
+        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
 
         hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
