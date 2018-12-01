@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.storage.appengine.objectify;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
@@ -34,7 +35,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -104,6 +107,46 @@ public abstract class BaseEntityIdentity<ID_TYPE>
         }
 
         return Key.create( this ).getString();
+    }
+
+    /**
+     * Converts string based locale to {@link Locale}.
+     *
+     * @param locale        the string locale
+     * @param defaultLocale a default value to return if locale param is {@code null}
+     * @return the java locale
+     */
+    protected Locale convertJavaLocale( @Nullable String locale, @Nullable Locale defaultLocale )
+    {
+        if ( locale == null )
+        {
+            return defaultLocale;
+        }
+
+        Iterator<String> it = Splitter.on( "_" ).omitEmptyStrings().trimResults().split( locale ).iterator();
+        List<String> parts = new ArrayList<>();
+
+        while ( it.hasNext() )
+        {
+            parts.add( it.next() );
+        }
+
+        if ( parts.size() == 0 )
+        {
+            return defaultLocale;
+        }
+        else if ( parts.size() == 1 )
+        {
+            return new Locale( parts.get( 0 ) );
+        }
+        else
+        {
+            parts.size();
+            String language = parts.get( 0 );
+            String country = parts.get( 1 );
+
+            return new Locale( language.toLowerCase(), country.toUpperCase() );
+        }
     }
 
     @Override
