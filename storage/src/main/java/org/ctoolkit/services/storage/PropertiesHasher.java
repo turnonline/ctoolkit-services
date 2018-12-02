@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.storage;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.hash.Funnel;
@@ -143,7 +144,7 @@ public interface PropertiesHasher
      *
      * @return true if recalculated properties hashcode has been applied
      */
-    default boolean snapshotOfPropsHashCode()
+    default boolean snapshot()
     {
         PropertiesHashCode propsHashCode = getPropsHashCode();
         if ( propsHashCode == null )
@@ -169,5 +170,13 @@ public interface PropertiesHasher
             return false;
         }
         return !calcPropsHashCode().equals( propsHashCode.getHashCode() );
+    }
+
+    /**
+     * Map type {@code Map<String, Object>} reference definition.
+     */
+    class MapType
+            extends TypeReference<Map<String, Object>>
+    {
     }
 }

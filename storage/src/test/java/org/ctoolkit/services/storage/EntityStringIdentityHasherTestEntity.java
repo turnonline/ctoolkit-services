@@ -18,8 +18,11 @@
 
 package org.ctoolkit.services.storage;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.OnSave;
 import org.ctoolkit.services.storage.appengine.objectify.EntityStringIdentityHasher;
+import org.ctoolkit.services.storage.appengine.objectify.StandaloneHasher;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +41,8 @@ public class EntityStringIdentityHasherTestEntity
     private static final long serialVersionUID = -79109897537646409L;
 
     private String xyz;
+
+    private Ref<SecondHasher> anotherHashCode;
 
     @SuppressWarnings( "UnstableApiUsage" )
     @Override
@@ -81,6 +86,22 @@ public class EntityStringIdentityHasherTestEntity
         return 1508565600000L;
     }
 
+    public SecondHasher getAnotherHashCode()
+    {
+        return anotherHashCode == null ? null : anotherHashCode.get();
+    }
+
+    @OnSave
+    private void onSave()
+    {
+        if ( anotherHashCode == null )
+        {
+            SecondHasher hashCode = new SecondHasher();
+            hashCode.save();
+            this.anotherHashCode = Ref.create( hashCode );
+        }
+    }
+
     @Override
     public void save()
     {
@@ -101,5 +122,27 @@ public class EntityStringIdentityHasherTestEntity
             extends PropertiesHashCode
     {
         private static final long serialVersionUID = -9126064441435013244L;
+    }
+
+    /**
+     * The second standalone hash code that shares some of the properties but final map is different
+     */
+    @Entity( name = "Second_HashCode" )
+    public class SecondHasher
+            extends StandaloneHasher
+    {
+        private static final long serialVersionUID = -8975054344504635643L;
+
+        @Override
+        protected Map<String, Object> propertiesMap()
+        {
+            Map<String, Object> properties = new HashMap<>();
+            properties.put( "xyz", getXyz() );
+            properties.put( "something", "Something else" );
+            properties.put( "integer", Integer.MAX_VALUE );
+            properties.put( "price", 457.6D );
+
+            return properties;
+        }
     }
 }

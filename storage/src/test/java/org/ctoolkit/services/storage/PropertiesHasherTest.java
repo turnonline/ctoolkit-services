@@ -56,7 +56,7 @@ public class PropertiesHasherTest
         assertThat( entity.isPropsHashCodeChanged() ).isTrue();
 
         // calculates and persists
-        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
+        assertThat( entity.snapshot() ).isTrue();
         assertThat( entity.isPropsHashCodeChanged() ).isFalse();
 
         hashCodeEntity = entity.getPropsHashCode();
@@ -79,7 +79,7 @@ public class PropertiesHasherTest
 
         // change value, calculate and persist
         entity.setAbc( "abc_efg" );
-        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
+        assertThat( entity.snapshot() ).isTrue();
 
         hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
@@ -115,8 +115,14 @@ public class PropertiesHasherTest
         // entity with initialized PropertiesHashCode already saved, but recalculated hashcode snapshot not yet
         assertThat( entity.isPropsHashCodeChanged() ).isTrue();
 
+        // the second standalone (independent, that shares some properties) hash code
+        EntityStringIdentityHasherTestEntity.SecondHasher another = entity.getAnotherHashCode();
+        assertThat( another ).isNotNull();
+        assertThat( another.getHashCode() ).isNull();
+        assertThat( another.isPropsHashCodeChanged() ).isTrue();
+
         // calculates and persists
-        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
+        assertThat( entity.snapshot() ).isTrue();
         assertThat( entity.isPropsHashCodeChanged() ).isFalse();
 
         hashCodeEntity = entity.getPropsHashCode();
@@ -125,6 +131,14 @@ public class PropertiesHasherTest
         String hashCode = hashCodeEntity.getHashCode();
         assertThat( hashCode ).isNotNull();
         assertThat( hashCode ).isEqualTo( "5fea62f1155fa63f3872a03fe9af20f14cc3d2966f914a74d845b55e7388261d" );
+
+        // the second standalone (independent) hash code
+        assertThat( another.snapshot() ).isTrue();
+        assertThat( another.isPropsHashCodeChanged() ).isFalse();
+
+        hashCode = another.getHashCode();
+        assertThat( hashCode ).isNotNull();
+        assertThat( hashCode ).isEqualTo( "b7cd687f79c11015872c7e4dc1e8caa2becee2c132da78867e9ccec2d94d07b3" );
     }
 
     @Test
@@ -138,9 +152,15 @@ public class PropertiesHasherTest
         assertThat( hashCodeEntity ).isNotNull();
         assertThat( hashCodeEntity.getHashCode() ).isNull();
 
-        // change value, calculate and persist
+        // the second standalone (independent, that shares some properties) hash code
+        EntityStringIdentityHasherTestEntity.SecondHasher another = entity.getAnotherHashCode();
+        assertThat( another ).isNotNull();
+        assertThat( another.getHashCode() ).isNull();
+
+        // change value of the shared property, calculate and persist
         entity.setXyz( "abc_efg" );
-        assertThat( entity.snapshotOfPropsHashCode() ).isTrue();
+        assertThat( entity.snapshot() ).isTrue();
+        assertThat( another.snapshot() ).isTrue();
 
         hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
@@ -148,5 +168,10 @@ public class PropertiesHasherTest
         String hashCode = hashCodeEntity.getHashCode();
         assertThat( hashCode ).isNotNull();
         assertThat( hashCode ).isEqualTo( "1c55b869961672d5befbd58a01a732172bad50b0781e890b89a5984279791590" );
+
+        // the second standalone (independent) hash code
+        hashCode = another.getHashCode();
+        assertThat( hashCode ).isNotNull();
+        assertThat( hashCode ).isEqualTo( "873b0bf8809ad748928f4beb562b663c151a2958be30bc3d73ff560c75e53b50" );
     }
 }

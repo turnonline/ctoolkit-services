@@ -111,6 +111,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
 
     /**
      * Converts string based locale to {@link Locale}.
+     * Note, if you need something more robust, consider to use LocaleUtils from the commons-lang library.
      *
      * @param locale        the string locale
      * @param defaultLocale a default value to return if locale param is {@code null}
