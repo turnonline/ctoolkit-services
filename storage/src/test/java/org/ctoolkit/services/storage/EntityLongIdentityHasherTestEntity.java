@@ -101,5 +101,12 @@ public class EntityLongIdentityHasherTestEntity
             extends PropertiesHashCode
     {
         private static final long serialVersionUID = -3537535133134395675L;
+
+        @Override
+        protected long getModelVersion()
+        {
+            //21.10.2017 08:00:00 GMT+0200
+            return 1508565600000L;
+        }
     }
 }

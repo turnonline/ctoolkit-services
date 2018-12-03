@@ -144,7 +144,7 @@ public interface PropertiesHasher
      *
      * @return true if recalculated properties hashcode has been applied
      */
-    default boolean snapshot()
+    default boolean hashCodeSnapshot()
     {
         PropertiesHashCode propsHashCode = getPropsHashCode();
         if ( propsHashCode == null )

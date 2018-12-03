@@ -122,6 +122,13 @@ public class EntityStringIdentityHasherTestEntity
             extends PropertiesHashCode
     {
         private static final long serialVersionUID = -9126064441435013244L;
+
+        @Override
+        protected long getModelVersion()
+        {
+            //21.10.2017 08:00:00 GMT+0200
+            return 1508565600000L;
+        }
     }
 
     /**
@@ -143,6 +150,13 @@ public class EntityStringIdentityHasherTestEntity
             properties.put( "price", 457.6D );
 
             return properties;
+        }
+
+        @Override
+        protected long getModelVersion()
+        {
+            //21.10.2017 08:00:00 GMT+0200
+            return 1508565600000L;
         }
     }
 }

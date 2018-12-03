@@ -24,8 +24,12 @@ import org.ctoolkit.services.storage.PropertiesHasher;
 import java.util.Map;
 
 /**
- * Use this as entity reference if you need more {@link PropertiesHasher} implementations
- * within single entity.
+ * Use this as entity reference if:
+ * <ul>
+ * <li>you need more {@link PropertiesHasher} implementations within single entity.</li>
+ * <li>you need to keep inheritance hierarchy independent from {@link EntityLongIdentityHasher}
+ * or {@link EntityStringIdentityHasher}</li>
+ * </ul>
  * <p>
  * <strong>Example of the implementation:</strong>
  * <pre>

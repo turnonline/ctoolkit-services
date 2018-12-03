@@ -76,11 +76,4 @@ public abstract class PropertiesHashCode
     {
         ofy().transact( () -> ofy().delete().entity( this ).now() );
     }
-
-    @Override
-    protected long getModelVersion()
-    {
-        //21.10.2017 08:00:00 GMT+0200
-        return 1508565600000L;
-    }
 }

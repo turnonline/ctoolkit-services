@@ -56,7 +56,7 @@ public class PropertiesHasherTest
         assertThat( entity.isPropsHashCodeChanged() ).isTrue();
 
         // calculates and persists
-        assertThat( entity.snapshot() ).isTrue();
+        assertThat( entity.hashCodeSnapshot() ).isTrue();
         assertThat( entity.isPropsHashCodeChanged() ).isFalse();
 
         hashCodeEntity = entity.getPropsHashCode();
@@ -79,7 +79,7 @@ public class PropertiesHasherTest
 
         // change value, calculate and persist
         entity.setAbc( "abc_efg" );
-        assertThat( entity.snapshot() ).isTrue();
+        assertThat( entity.hashCodeSnapshot() ).isTrue();
 
         hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
@@ -122,7 +122,7 @@ public class PropertiesHasherTest
         assertThat( another.isPropsHashCodeChanged() ).isTrue();
 
         // calculates and persists
-        assertThat( entity.snapshot() ).isTrue();
+        assertThat( entity.hashCodeSnapshot() ).isTrue();
         assertThat( entity.isPropsHashCodeChanged() ).isFalse();
 
         hashCodeEntity = entity.getPropsHashCode();
@@ -133,7 +133,7 @@ public class PropertiesHasherTest
         assertThat( hashCode ).isEqualTo( "5fea62f1155fa63f3872a03fe9af20f14cc3d2966f914a74d845b55e7388261d" );
 
         // the second standalone (independent) hash code
-        assertThat( another.snapshot() ).isTrue();
+        assertThat( another.hashCodeSnapshot() ).isTrue();
         assertThat( another.isPropsHashCodeChanged() ).isFalse();
 
         hashCode = another.getHashCode();
@@ -159,8 +159,8 @@ public class PropertiesHasherTest
 
         // change value of the shared property, calculate and persist
         entity.setXyz( "abc_efg" );
-        assertThat( entity.snapshot() ).isTrue();
-        assertThat( another.snapshot() ).isTrue();
+        assertThat( entity.hashCodeSnapshot() ).isTrue();
+        assertThat( another.hashCodeSnapshot() ).isTrue();
 
         hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
