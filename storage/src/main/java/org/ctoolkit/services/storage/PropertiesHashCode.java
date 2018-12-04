@@ -22,9 +22,12 @@ import com.googlecode.objectify.annotation.Entity;
 import org.ctoolkit.services.storage.appengine.objectify.EntityLongIdentity;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.googlecode.objectify.ObjectifyService.ofy;
+import static org.ctoolkit.services.storage.PropertiesHasher.DEFAULT;
 
 /**
  * Extend this class to have its own implementation annotated with {@link Entity}
@@ -42,17 +45,25 @@ public abstract class PropertiesHashCode
 {
     private static final long serialVersionUID = 4060827189662623450L;
 
-    private String hashCode;
+    private Map<String, String> hashCodes;
+
+    public PropertiesHashCode()
+    {
+        hashCodes = new HashMap<>();
+    }
 
     /**
      * Calculates and assigns the current value of the entity properties HashCode.
      *
+     * @param name   the name to be associated with specified hasher
      * @param hasher the managing hasher
      */
-    void putHashCode( @Nonnull PropertiesHasher hasher )
+    void snapshot( @Nonnull String name, @Nonnull PropertiesHasher hasher )
     {
         checkNotNull( hasher );
-        this.hashCode = hasher.calcPropsHashCode();
+        checkNotNull( name );
+        String hashCode = hasher.calcPropsHashCode( name );
+        this.hashCodes.put( name, hashCode );
     }
 
     /**
@@ -62,7 +73,19 @@ public abstract class PropertiesHashCode
      */
     public String getHashCode()
     {
-        return hashCode;
+        return getHashCode( DEFAULT );
+    }
+
+    /**
+     * Returns the persisted value of the hashcode.
+     *
+     * @param name the name of the hasher for which to get the hash code
+     * @return the current hashcode
+     */
+    public String getHashCode( @Nonnull String name )
+    {
+        checkNotNull( name );
+        return hashCodes.get( name );
     }
 
     @Override

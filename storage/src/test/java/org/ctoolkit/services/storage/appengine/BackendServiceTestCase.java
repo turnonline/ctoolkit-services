@@ -67,7 +67,6 @@ public class BackendServiceTestCase
         ObjectifyService.register( EntityLongIdentityHasherTestEntity.MyHashCode.class );
         ObjectifyService.register( EntityStringIdentityHasherTestEntity.class );
         ObjectifyService.register( EntityStringIdentityHasherTestEntity.MyHashCode.class );
-        ObjectifyService.register( EntityStringIdentityHasherTestEntity.SecondHasher.class );
     }
 
     @AfterMethod

@@ -18,16 +18,15 @@
 
 package org.ctoolkit.services.storage;
 
-import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
-import com.googlecode.objectify.annotation.OnSave;
 import org.ctoolkit.services.storage.appengine.objectify.EntityStringIdentityHasher;
-import org.ctoolkit.services.storage.appengine.objectify.StandaloneHasher;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
+import static org.ctoolkit.services.storage.PropertiesHasherTest.HASHER_NAME;
 
 /**
  * Concrete {@link EntityStringIdentityHasher} entity impl for testing and demonstration purpose.
@@ -42,23 +41,36 @@ public class EntityStringIdentityHasherTestEntity
 
     private String xyz;
 
-    private Ref<SecondHasher> anotherHashCode;
-
-    @SuppressWarnings( "UnstableApiUsage" )
     @Override
-    public String calcPropsHashCode()
+    public String calcPropsHashCode( @Nonnull String name )
     {
-        Map<String, Object> properties = new HashMap<>();
-        properties.put( "xyz", getXyz() );
-        properties.put( "boolean", true );
-        properties.put( "integer", Integer.MAX_VALUE );
-        properties.put( "double", 13579.6D );
+        Map<String, Object> properties;
+        if ( DEFAULT.equals( name ) )
+        {
+            properties = new HashMap<>();
+            properties.put( "xyz", getXyz() );
+            properties.put( "boolean", true );
+            properties.put( "integer", Integer.MAX_VALUE );
+            properties.put( "double", 13579.6D );
 
-        Map<String, Object> nested = new HashMap<>();
-        nested.put( "float", 3.6F );
-        nested.put( "character", 'g' );
-        nested.put( "long", Long.MAX_VALUE );
-        properties.put( "nested", nested );
+            Map<String, Object> nested = new HashMap<>();
+            nested.put( "float", 3.6F );
+            nested.put( "character", 'g' );
+            nested.put( "long", Long.MAX_VALUE );
+            properties.put( "nested", nested );
+        }
+        else if ( HASHER_NAME.equals( name ) )
+        {
+            properties = new HashMap<>();
+            properties.put( "xyz", getXyz() );
+            properties.put( "something", "Something else" );
+            properties.put( "integer", Integer.MAX_VALUE );
+            properties.put( "price", 457.6D );
+        }
+        else
+        {
+            throw new IllegalArgumentException( "Unsupported HashCode name: " + name );
+        }
 
         return calcPropsHashCode( properties );
     }
@@ -86,22 +98,6 @@ public class EntityStringIdentityHasherTestEntity
         return 1508565600000L;
     }
 
-    public SecondHasher getAnotherHashCode()
-    {
-        return anotherHashCode == null ? null : anotherHashCode.get();
-    }
-
-    @OnSave
-    private void onSave()
-    {
-        if ( anotherHashCode == null )
-        {
-            SecondHasher hashCode = new SecondHasher();
-            hashCode.save();
-            this.anotherHashCode = Ref.create( hashCode );
-        }
-    }
-
     @Override
     public void save()
     {
@@ -122,35 +118,6 @@ public class EntityStringIdentityHasherTestEntity
             extends PropertiesHashCode
     {
         private static final long serialVersionUID = -9126064441435013244L;
-
-        @Override
-        protected long getModelVersion()
-        {
-            //21.10.2017 08:00:00 GMT+0200
-            return 1508565600000L;
-        }
-    }
-
-    /**
-     * The second standalone hash code that shares some of the properties but final map is different
-     */
-    @Entity( name = "Second_HashCode" )
-    public class SecondHasher
-            extends StandaloneHasher
-    {
-        private static final long serialVersionUID = -8975054344504635643L;
-
-        @Override
-        protected Map<String, Object> propertiesMap()
-        {
-            Map<String, Object> properties = new HashMap<>();
-            properties.put( "xyz", getXyz() );
-            properties.put( "something", "Something else" );
-            properties.put( "integer", Integer.MAX_VALUE );
-            properties.put( "price", 457.6D );
-
-            return properties;
-        }
 
         @Override
         protected long getModelVersion()

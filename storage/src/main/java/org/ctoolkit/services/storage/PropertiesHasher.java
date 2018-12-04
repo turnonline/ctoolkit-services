@@ -39,13 +39,30 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public interface PropertiesHasher
 {
+    String DEFAULT = "default";
+
     /**
      * Calculates (in memory only) the hashcode based on the client selected properties.
      * It does not affect the persisted hashcode.
      *
      * @return the final hash code
      */
-    String calcPropsHashCode();
+    default String calcPropsHashCode()
+    {
+        return calcPropsHashCode( DEFAULT );
+    }
+
+    /**
+     * Calculates (in memory only) the hashcode based on the client selected properties.
+     * It does not affect the persisted hashcode.
+     * <p>
+     * In case there are more then one {@link #DEFAULT} hasher defined,
+     * use the param name to distinguish between them.
+     *
+     * @param name the hasher name to distinguish which hasher to be used for hash calculation
+     * @return the final hash code
+     */
+    String calcPropsHashCode( @Nonnull String name );
 
     /**
      * Calculates (in memory only) the hashcode. It's based on the client provided map of the properties.
@@ -146,12 +163,27 @@ public interface PropertiesHasher
      */
     default boolean hashCodeSnapshot()
     {
+        return hashCodeSnapshot( DEFAULT );
+    }
+
+    /**
+     * Calculates and persists the current snapshot of the entity properties hashcode.
+     * <p>
+     * In case there are more then one {@link #DEFAULT} hasher defined,
+     * use the param name to distinguish between them.
+     *
+     * @param name the hasher name to distinguish between used hashers
+     * @return true if recalculated properties hashcode has been applied
+     * @see #hashCodeSnapshot()
+     */
+    default boolean hashCodeSnapshot( @Nonnull String name )
+    {
         PropertiesHashCode propsHashCode = getPropsHashCode();
         if ( propsHashCode == null )
         {
             return false;
         }
-        propsHashCode.putHashCode( this );
+        propsHashCode.snapshot( name, this );
         propsHashCode.save();
         return true;
     }
@@ -164,12 +196,30 @@ public interface PropertiesHasher
      */
     default boolean isPropsHashCodeChanged()
     {
+        return isPropsHashCodeChanged( DEFAULT );
+    }
+
+    /**
+     * Checks whether current values of the client selected properties has changed.
+     * Returns {@code false} if {@link #getPropsHashCode()} returns {@code null}.
+     * <p>
+     * In case there are more then one {@link #DEFAULT} hasher defined,
+     * use the param name to distinguish between them.
+     *
+     * @param name the hasher name to distinguish between used hashers
+     * @return true if any of the value has changed
+     * @see #isPropsHashCodeChanged()  
+     */
+    default boolean isPropsHashCodeChanged( @Nonnull String name )
+    {
+        checkNotNull( name );
+
         PropertiesHashCode propsHashCode = getPropsHashCode();
         if ( propsHashCode == null )
         {
             return false;
         }
-        return !calcPropsHashCode().equals( propsHashCode.getHashCode() );
+        return !calcPropsHashCode( name ).equals( propsHashCode.getHashCode( name ) );
     }
 
     /**

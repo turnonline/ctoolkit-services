@@ -25,6 +25,8 @@ import com.google.common.hash.Hashing;
 import com.googlecode.objectify.annotation.Entity;
 import org.ctoolkit.services.storage.appengine.objectify.EntityLongIdentityHasher;
 
+import javax.annotation.Nonnull;
+
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
@@ -42,7 +44,7 @@ public class EntityLongIdentityHasherTestEntity
 
     @SuppressWarnings( "UnstableApiUsage" )
     @Override
-    public String calcPropsHashCode()
+    public String calcPropsHashCode( @Nonnull String name )
     {
         Funnel<EntityLongIdentityHasherTestEntity> productFunnel;
         productFunnel = ( Funnel<EntityLongIdentityHasherTestEntity> ) ( item, into ) -> {
