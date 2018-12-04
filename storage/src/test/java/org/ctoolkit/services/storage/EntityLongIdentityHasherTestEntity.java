@@ -28,6 +28,7 @@ import org.ctoolkit.services.storage.appengine.objectify.EntityLongIdentityHashe
 import javax.annotation.Nonnull;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
+import static org.ctoolkit.services.storage.PropertiesHasherTest.UNKNOWN_HASHER;
 
 /**
  * Concrete {@link EntityLongIdentityHasher} entity impl for testing and demonstration purpose.
@@ -46,6 +47,11 @@ public class EntityLongIdentityHasherTestEntity
     @Override
     public String calcPropsHashCode( @Nonnull String name )
     {
+        if ( UNKNOWN_HASHER.equals( name ) )
+        {
+            return null;
+        }
+
         Funnel<EntityLongIdentityHasherTestEntity> productFunnel;
         productFunnel = ( Funnel<EntityLongIdentityHasherTestEntity> ) ( item, into ) -> {
             if ( item.getAbc() != null )

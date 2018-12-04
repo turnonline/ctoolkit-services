@@ -43,27 +43,9 @@ public abstract class EntityStringIdentityHasher
 
     private Ref<PropertiesHashCode> hashCode;
 
-    /**
-     * Check whether client selected properties are ready to be calculated.
-     * By default it returns {@code true}, override for customized behavior.
-     * <p>
-     * If this returns {@code false}, call to the {@link PropertiesHasher#hashCodeSnapshot()}
-     * will not persist anything and method itself will return {@code false} indicating call has been ignored.
-     *
-     * @return true if ready to calculate
-     */
-    public boolean isPropertiesReady()
-    {
-        return true;
-    }
-
     @Override
     public final PropertiesHashCode getPropsHashCode()
     {
-        if ( !isPropertiesReady() )
-        {
-            return null;
-        }
         return hashCode == null ? null : hashCode.get();
     }
 

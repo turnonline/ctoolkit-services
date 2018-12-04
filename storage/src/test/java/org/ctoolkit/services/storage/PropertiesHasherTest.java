@@ -33,6 +33,8 @@ public class PropertiesHasherTest
 {
     static final String HASHER_NAME = "PubSub";
 
+    static final String UNKNOWN_HASHER = "unknown";
+
     @Test
     public void getHashCode_LongId_SavedButNotInitializedYet()
     {
@@ -42,6 +44,27 @@ public class PropertiesHasherTest
         PropertiesHashCode hashCodeEntity = entity.getPropsHashCode();
         assertThat( hashCodeEntity ).isNotNull();
         assertThat( hashCodeEntity.getHashCode() ).isNull();
+    }
+
+    @Test
+    public void getHashCode_LongId_CalcPropsHashCodeReturnsNull()
+    {
+        EntityLongIdentityHasherTestEntity entity = new EntityLongIdentityHasherTestEntity();
+        entity.save();
+
+        PropertiesHashCode hashCodeEntity = entity.getPropsHashCode();
+        assertThat( hashCodeEntity ).isNotNull();
+
+        // calculates and persists for default
+        assertThat( entity.hashCodeSnapshot() ).isTrue();
+
+        // calcPropsHashCode() test of the null return value
+        assertThat( hashCodeEntity.getHashCode( UNKNOWN_HASHER ) ).isNull();
+        assertThat( entity.isPropsHashCodeChanged( UNKNOWN_HASHER ) ).isFalse();
+
+        // calculates and persists, however there is nothing to calculate
+        assertThat( entity.hashCodeSnapshot( UNKNOWN_HASHER ) ).isFalse();
+        assertThat( entity.isPropsHashCodeChanged( UNKNOWN_HASHER ) ).isFalse();
     }
 
     @Test

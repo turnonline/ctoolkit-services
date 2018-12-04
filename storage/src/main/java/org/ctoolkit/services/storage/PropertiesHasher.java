@@ -44,6 +44,8 @@ public interface PropertiesHasher
     /**
      * Calculates (in memory only) the hashcode based on the client selected properties.
      * It does not affect the persisted hashcode.
+     * <p>
+     * It's valid to return {@code null}, however then no hash code will be stored for specified hasher name.
      *
      * @return the final hash code
      */
@@ -150,7 +152,7 @@ public interface PropertiesHasher
 
     /**
      * Returns the associated properties hashcode entity instance.
-     * It returns {@code null} if there is nothing to calculate.
+     * It might return {@code null}, in this case hash code calculation will be ignored.
      *
      * @return the properties hashcode entity instance
      */
@@ -183,9 +185,9 @@ public interface PropertiesHasher
         {
             return false;
         }
-        propsHashCode.snapshot( name, this );
+        boolean applied = propsHashCode.snapshot( name, this );
         propsHashCode.save();
-        return true;
+        return applied;
     }
 
     /**
@@ -219,7 +221,12 @@ public interface PropertiesHasher
         {
             return false;
         }
-        return !calcPropsHashCode( name ).equals( propsHashCode.getHashCode( name ) );
+        String hashCode = calcPropsHashCode( name );
+        if ( hashCode == null )
+        {
+            return false;
+        }
+        return !hashCode.equals( propsHashCode.getHashCode( name ) );
     }
 
     /**

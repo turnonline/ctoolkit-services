@@ -58,12 +58,17 @@ public abstract class PropertiesHashCode
      * @param name   the name to be associated with specified hasher
      * @param hasher the managing hasher
      */
-    void snapshot( @Nonnull String name, @Nonnull PropertiesHasher hasher )
+    boolean snapshot( @Nonnull String name, @Nonnull PropertiesHasher hasher )
     {
         checkNotNull( hasher );
         checkNotNull( name );
         String hashCode = hasher.calcPropsHashCode( name );
+        if ( hashCode == null )
+        {
+            return false;
+        }
         this.hashCodes.put( name, hashCode );
+        return true;
     }
 
     /**
