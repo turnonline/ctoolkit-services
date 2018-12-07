@@ -26,6 +26,7 @@ import mockit.Tested;
 import mockit.Verifications;
 import org.testng.annotations.Test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
@@ -179,7 +180,6 @@ public class TaskTest
                 executor.schedule( next );
                 times = 0;
 
-                //noinspection ConstantConditions
                 executor.schedule( next, ( TaskOptions ) any );
                 times = 0;
             }
@@ -214,18 +214,44 @@ public class TaskTest
                 executor.schedule( next );
                 times = 0;
 
-                //noinspection ConstantConditions
                 executor.schedule( next, ( TaskOptions ) any );
                 times = 0;
 
                 executor.schedule( last );
                 times = 1;
 
-                //noinspection ConstantConditions
                 executor.schedule( last, ( TaskOptions ) any );
                 times = 0;
             }
         };
+    }
+
+    @Test
+    public void workWith_WithErrorMessageButOk()
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.workWith( true );
+                result = new TestModel( false );
+            }
+        };
+
+        assertThat( tested.workWith( "Not found" ) ).isNotNull();
+    }
+
+    @Test( expectedExceptions = IllegalArgumentException.class )
+    public void workWith_EntityNotFound()
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.workWith( true );
+                result = null;
+            }
+        };
+
+        tested.workWith( "Not found" );
     }
 
     private void verificationsWithOptions( final Task next, final TaskOptions options )

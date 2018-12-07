@@ -21,6 +21,7 @@ package org.ctoolkit.services.task;
 import com.google.appengine.api.taskqueue.DeferredTask;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.common.base.Strings;
 import com.google.inject.Injector;
 import com.googlecode.objectify.Key;
 import org.slf4j.Logger;
@@ -329,8 +330,9 @@ public abstract class Task<T>
      * The parent task is the first one to be executed.
      *
      * @param task      the task to be scheduled
-     * @param condition the serializable functional interface to evaluate a condition
-     *                  whether to enqueue given task, applied only for given task
+     * @param condition the functional interface to evaluate a condition whether to enqueue given task.
+     *                  If {@code false}, this task will be skipped however a following task (if exist)
+     *                  will be scheduled.
      * @return just added task to chain calls
      */
     public final <S> Task<S> addNext( @Nonnull Task<S> task, @Nullable SerializableFunction<T, Boolean> condition )
@@ -344,8 +346,9 @@ public abstract class Task<T>
      * The parent task is the first one to be executed.
      *
      * @param task      the task to be scheduled
-     * @param condition the serializable functional interface to evaluate a condition
-     *                  whether to enqueue given task, applied only for given task
+     * @param condition the functional interface to evaluate a condition whether to enqueue given task.
+     *                  If {@code false}, this task will be skipped however a following task (if exist)
+     *                  will be scheduled.
      * @param options   the task configuration
      * @return just added task to chain calls
      */
@@ -466,6 +469,36 @@ public abstract class Task<T>
     public final T workWith()
     {
         return workWith( true );
+    }
+
+    /**
+     * Returns the entity resolved by {@link #getEntityKey()}.
+     *
+     * @param errorMessage the specified detail message for {@code IllegalArgumentException}
+     * @return the entity the task will handle or throws {@link IllegalArgumentException} if not found
+     */
+    public final T workWith( String errorMessage )
+    {
+        return workWith( true, errorMessage );
+    }
+
+    /**
+     * Returns the entity resolved by {@link #getEntityKey()}.
+     *
+     * @param cache        {@code true} to use (or not use) a 2nd-level memcache
+     * @param errorMessage the specified detail message for {@code IllegalArgumentException}
+     * @return the entity the task will handle or throws {@link IllegalArgumentException} if not found
+     */
+    public final T workWith( boolean cache, String errorMessage )
+    {
+        T t = workWith( cache );
+        if ( t == null )
+        {
+            String key = "; Key: " + getEntityKey();
+            String message = Strings.isNullOrEmpty( errorMessage ) ? "Entity not found" : errorMessage;
+            throw new IllegalArgumentException( message + key );
+        }
+        return t;
     }
 
     /**
