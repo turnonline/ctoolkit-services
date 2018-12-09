@@ -78,9 +78,18 @@ public class EntityStringIdentityHasherTestEntity
             listMap2.put( "items", nested1List );
             nested2List.add( listMap2 );
 
+            List<String> jsonArray = new ArrayList<>();
+            jsonArray.add( "email.1@turnonline.biz" );
+            jsonArray.add( "email.2@turnonline.biz" );
+
+            List<Double> jsonArray2 = new ArrayList<>();
+            jsonArray2.add( 1578.0 );
+            jsonArray2.add( 2598.0 );
+
             Map<String, Object> listMap3 = new HashMap<>();
             listMap3.put( "first", 6.6F );
-            listMap3.put( "second", 'o' );
+            listMap3.put( "array", jsonArray2 );
+            listMap3.put( "pricing", jsonArray2 );
             nested1List.add( listMap3 );
 
             properties.put( "items", nested2List );

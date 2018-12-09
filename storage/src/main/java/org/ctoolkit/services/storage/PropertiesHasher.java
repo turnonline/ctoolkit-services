@@ -27,6 +27,7 @@ import com.google.common.hash.Hashing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -149,15 +150,24 @@ public interface PropertiesHasher
                 String itemKey;
                 String keySuffix;
 
-                @SuppressWarnings( "unchecked" ) List<Map> list = ( List<Map> ) value;
+                List list = ( List ) value;
                 for ( int index = 0; index < list.size(); index++ )
                 {
                     keySuffix = key + "[" + index + "]";
                     itemKey = Strings.isNullOrEmpty( parentKey ) ? keySuffix : parentKey + "." + keySuffix;
-                    Map map = list.get( index );
-
-                    @SuppressWarnings( "unchecked" ) Map<String, Object> nested = ( Map<String, Object> ) map;
-                    flatMap.putAll( flatMap( nested, itemKey ) );
+                    Object itemValue = list.get( index );
+                    if ( itemValue instanceof Map )
+                    {
+                        Map map = ( Map ) itemValue;
+                        @SuppressWarnings( "unchecked" ) Map<String, Object> nested = ( Map<String, Object> ) map;
+                        flatMap.putAll( flatMap( nested, itemKey ) );
+                    }
+                    else
+                    {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put( keySuffix, itemValue );
+                        flatMap.putAll( flatMap( map, parentKey ) );
+                    }
                 }
             }
             else
