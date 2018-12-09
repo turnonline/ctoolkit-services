@@ -27,6 +27,7 @@ import com.google.common.hash.Hashing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -119,8 +120,9 @@ public interface PropertiesHasher
     }
 
     /**
-     * Flattens the given map to the flat map of the properties where the original property
-     * nested within another map will have a dot separated key, for example 'postalAddress.firstName'.
+     * Flattens the given map (incl. support of the list of maps) to the flat map of the properties where
+     * the original property nested within another map will have a dot separated key,
+     * for example 'postalAddress.firstName' or 'items[1].items[0].first'.
      * <p>
      * It's using the natural ordering of its keys.
      *
@@ -141,6 +143,22 @@ public interface PropertiesHasher
             {
                 @SuppressWarnings( "unchecked" ) Map<String, Object> nested = ( Map<String, Object> ) value;
                 flatMap.putAll( flatMap( nested, newKey ) );
+            }
+            else if ( value instanceof List )
+            {
+                String itemKey;
+                String keySuffix;
+
+                @SuppressWarnings( "unchecked" ) List<Map> list = ( List<Map> ) value;
+                for ( int index = 0; index < list.size(); index++ )
+                {
+                    keySuffix = key + "[" + index + "]";
+                    itemKey = Strings.isNullOrEmpty( parentKey ) ? keySuffix : parentKey + "." + keySuffix;
+                    Map map = list.get( index );
+
+                    @SuppressWarnings( "unchecked" ) Map<String, Object> nested = ( Map<String, Object> ) map;
+                    flatMap.putAll( flatMap( nested, itemKey ) );
+                }
             }
             else
             {

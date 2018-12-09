@@ -22,7 +22,9 @@ import com.googlecode.objectify.annotation.Entity;
 import org.ctoolkit.services.storage.appengine.objectify.EntityStringIdentityHasher;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
@@ -58,6 +60,30 @@ public class EntityStringIdentityHasherTestEntity
             nested.put( "character", 'g' );
             nested.put( "long", Long.MAX_VALUE );
             properties.put( "nested", nested );
+
+            List<Map> nested1List = new ArrayList<>();
+            List<Map> nested2List = new ArrayList<>();
+
+            Map<String, Object> listMap1 = new HashMap<>();
+
+            listMap1.put( "float", 4.6F );
+            listMap1.put( "character", 'd' );
+            listMap1.put( "long", Long.MAX_VALUE );
+            nested2List.add( listMap1 );
+
+            Map<String, Object> listMap2 = new HashMap<>();
+
+            listMap2.put( "first", 5.6F );
+            listMap2.put( "second", 'f' );
+            listMap2.put( "items", nested1List );
+            nested2List.add( listMap2 );
+
+            Map<String, Object> listMap3 = new HashMap<>();
+            listMap3.put( "first", 6.6F );
+            listMap3.put( "second", 'o' );
+            nested1List.add( listMap3 );
+
+            properties.put( "items", nested2List );
         }
         else if ( HASHER_NAME.equals( name ) )
         {
