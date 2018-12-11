@@ -36,7 +36,6 @@ import static org.testng.Assert.assertTrue;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@SuppressWarnings( "ResultOfMethodCallIgnored" )
 public class TaskTest
 {
     @Tested
@@ -81,6 +80,18 @@ public class TaskTest
                 times = 0;
             }
         };
+    }
+
+    @Test
+    public void countTasks()
+    {
+        FakeTask second = new FakeTask();
+        FakeTask third = new FakeTask();
+        FakeTask last = new FakeTask();
+
+        tested.addNext( second ).addNext( third ).addNext( last );
+
+        assertThat( tested.countTasks() ).isEqualTo( 4 );
     }
 
     @Test

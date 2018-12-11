@@ -388,6 +388,25 @@ public abstract class Task<T>
     }
 
     /**
+     * Counts number of tasks to be executed starting from this task (including).
+     *
+     * @return the number of tasks to be executed
+     */
+    public int countTasks()
+    {
+        int count = 1;
+        Task child = this;
+
+        while ( child.hasNext() )
+        {
+            child = child.next();
+            count++;
+        }
+
+        return count;
+    }
+
+    /**
      * Removes the next task from the actual instance to be queued if defined.
      * <p>
      * <strong>Note</strong>: call to this method will not persist this change back to the queue
