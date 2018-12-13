@@ -38,8 +38,7 @@ public class OnBehalfOfUser
 
     OnBehalfOfUser( Builder builder )
     {
-        super( checkNotNull( builder.userId, "On behalf of User ID is mandatory." ),
-                checkNotNull( builder.email, "On behalf of Email is mandatory." ) );
+        super( builder.userId, checkNotNull( builder.email, "On behalf of Email is mandatory." ) );
         this.serviceAccount = checkNotNull( builder.serviceAccount, "Service Account Email is mandatory." );
     }
 

@@ -70,7 +70,7 @@ public class ServerToServerAuthenticator
      * <ul>
      * <li>{@link User#getEmail()} populated from the request header {@link #ON_BEHALF_OF_EMAIL},
      * the email as an identification of the user on behalf of whom the service account has been authenticated</li>
-     * <li>{@link User#getId()} populated from the request header {@link #ON_BEHALF_OF_USER_ID}</li>
+     * <li>{@link User#getId()} populated from the request header {@link #ON_BEHALF_OF_USER_ID} optional</li>
      * <li>{@link OnBehalfOfUser#getServiceAccount()} email taken from the authenticated user</li>
      * </ul>
      * For the use case with authenticated default service account but 'on behalf of' headers are missing,
@@ -91,7 +91,7 @@ public class ServerToServerAuthenticator
 
             if ( isApplicationIdEquals( strings ) )
             {
-                if ( Strings.isNullOrEmpty( email ) || Strings.isNullOrEmpty( userId ) )
+                if ( Strings.isNullOrEmpty( email ) )
                 {
                     // no on behalf user, return authenticated service account
                     return authenticated;
