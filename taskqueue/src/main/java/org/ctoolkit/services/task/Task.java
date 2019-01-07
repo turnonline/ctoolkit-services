@@ -200,14 +200,14 @@ public abstract class Task<T>
                 if ( id == 0 )
                 {
                     // 0 if this key has a name
-                    identification = entityKey.getName();
+                    identification = null;
                 }
                 else
                 {
                     identification = id;
                 }
 
-                return namePrefix + "_" + entityKey.getKind() + "_" + identification;
+                return namePrefix + "_" + entityKey.getKind() + ( identification == null ? "" : "_" + identification );
             }
         }
 
