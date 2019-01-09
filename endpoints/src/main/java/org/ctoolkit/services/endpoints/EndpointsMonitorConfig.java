@@ -44,7 +44,7 @@ import java.util.Map;
 public class EndpointsMonitorConfig
         extends ServletModule
 {
-    public static final String ENDPOINTS_SERVLET_PATH = "/_ah/api/*";
+    public static final String ENDPOINTS_SERVLET_PATH = "/api/*";
 
     @Override
     protected void configureServlets()
