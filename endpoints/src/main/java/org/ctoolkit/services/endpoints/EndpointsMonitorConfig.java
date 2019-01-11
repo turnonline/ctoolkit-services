@@ -44,6 +44,11 @@ import java.util.Map;
 public class EndpointsMonitorConfig
         extends ServletModule
 {
+    /**
+     * The base path as an initial part of the endpoint, this will make an endpoint look like:
+     * <p>
+     * account.turnon.cloud<strong>/api</strong>/steward/v1/accounts
+     */
     public static final String ENDPOINTS_SERVLET_PATH = "/api/*";
 
     @Override
