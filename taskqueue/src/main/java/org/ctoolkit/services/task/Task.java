@@ -485,7 +485,7 @@ public abstract class Task<T>
      *
      * @return the entity the task will handle or {@code null} if not found
      */
-    public final T workWith()
+    public T workWith()
     {
         return workWith( true );
     }

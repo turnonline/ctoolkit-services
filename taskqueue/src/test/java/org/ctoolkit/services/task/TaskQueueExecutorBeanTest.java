@@ -20,6 +20,7 @@ package org.ctoolkit.services.task;
 
 import com.google.appengine.api.modules.ModulesService;
 import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.TaskHandle;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.google.inject.Injector;
 import com.googlecode.objectify.Key;
@@ -57,12 +58,13 @@ public class TaskQueueExecutorBeanTest
     @Mocked
     private Queue queue;
 
-    @Test( expectedExceptions = NullPointerException.class )
+    @Test
     public void batchScheduleEmpty()
     {
         final Task[] tasks = new Task[0];
 
-        tested.schedule( "my-queue", tasks );
+        List<TaskHandle> handles = tested.schedule( "my-queue", tasks );
+        assertEquals( handles.size(), 0 );
     }
 
     @Test( expectedExceptions = NullPointerException.class )

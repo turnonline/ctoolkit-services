@@ -79,7 +79,8 @@ class TaskQueueExecutorBean
 
         if ( tasks.length == 0 )
         {
-            throw new NullPointerException( "No task is being provided, task array is empty!" );
+            logger.info( "Nothing to schedule, task array is empty." );
+            return new ArrayList<>();
         }
 
         List<TaskOptions> options = new ArrayList<>();
