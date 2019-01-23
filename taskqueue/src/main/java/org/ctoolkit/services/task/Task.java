@@ -482,6 +482,7 @@ public abstract class Task<T>
      * Returns the entity resolved by {@link #getEntityKey()}.
      * <p>Objectify instances are {@link com.googlecode.objectify.Objectify#cache(boolean)}
      * {@code true} by default.</p>
+     * Override this method if target entity to work with comes from the customized storage (serialized etc).
      *
      * @return the entity the task will handle or {@code null} if not found
      */
