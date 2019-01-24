@@ -39,8 +39,6 @@ public abstract class EntityStringIdentityHasher
         extends EntityStringIdentity
         implements PropertiesHasher
 {
-    private static final long serialVersionUID = 3271139311798310036L;
-
     private Ref<PropertiesHashCode> hashCode;
 
     @Override

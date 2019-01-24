@@ -39,8 +39,6 @@ import com.googlecode.objectify.annotation.Id;
 public abstract class EntityLongIdentity
         extends BaseEntityIdentity<Long>
 {
-    private static final long serialVersionUID = 9110271991963758555L;
-
     /**
      * Objectify checks the explicit type, cannot be generic.
      */

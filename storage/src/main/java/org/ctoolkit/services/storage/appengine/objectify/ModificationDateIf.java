@@ -22,7 +22,7 @@ import com.googlecode.objectify.condition.PojoIf;
 
 /**
  * The implementation of the {@link com.googlecode.objectify.condition.If} that defines a condition
- * to test whether {@link BaseEntityIdentity#modificationDate} should be in indexed
+ * to test whether {@link BaseEntityIdentity#getModificationDate()} should be in indexed
  * in the datastore or not.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>

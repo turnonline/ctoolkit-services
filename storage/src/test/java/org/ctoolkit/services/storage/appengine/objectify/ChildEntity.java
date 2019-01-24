@@ -36,8 +36,6 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class ChildEntity
         extends EntityLongChildOf<ParentEntity>
 {
-    private static final long serialVersionUID = 1L;
-
     @IgnoreSave( IfNoIdOtherwiseCascading.class )
     private Ref<Child2LevelEntity> childEntity;
 

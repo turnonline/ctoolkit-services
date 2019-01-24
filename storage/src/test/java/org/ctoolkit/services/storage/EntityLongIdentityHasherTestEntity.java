@@ -39,8 +39,6 @@ import static org.ctoolkit.services.storage.PropertiesHasherTest.UNKNOWN_HASHER;
 public class EntityLongIdentityHasherTestEntity
         extends EntityLongIdentityHasher
 {
-    private static final long serialVersionUID = 1513360814022848409L;
-
     private String abc;
 
     @SuppressWarnings( "UnstableApiUsage" )

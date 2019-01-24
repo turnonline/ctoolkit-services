@@ -43,8 +43,6 @@ import static org.ctoolkit.services.storage.PropertiesHasher.DEFAULT;
 public abstract class PropertiesHashCode
         extends EntityLongIdentity
 {
-    private static final long serialVersionUID = 4060827189662623450L;
-
     private Map<String, String> hashCodes;
 
     public PropertiesHashCode()

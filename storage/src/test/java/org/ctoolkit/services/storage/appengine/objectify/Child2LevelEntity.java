@@ -31,8 +31,6 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 public class Child2LevelEntity
         extends EntityStringChildOf<ChildEntity>
 {
-    private static final long serialVersionUID = 1L;
-
     Child2LevelEntity()
     {
     }

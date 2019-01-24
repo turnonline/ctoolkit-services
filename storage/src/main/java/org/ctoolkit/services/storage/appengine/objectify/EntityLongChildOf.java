@@ -44,8 +44,6 @@ public abstract class EntityLongChildOf<P extends EntityIdentity>
         extends EntityLongIdentity
         implements ChildEntityOf<P, Long>
 {
-    private static final long serialVersionUID = -2303894033843789805L;
-
     @Parent
     private Ref<P> parent;
 
