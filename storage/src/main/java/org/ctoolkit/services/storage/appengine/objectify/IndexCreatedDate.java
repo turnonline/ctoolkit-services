@@ -19,7 +19,7 @@
 package org.ctoolkit.services.storage.appengine.objectify;
 
 /**
- * The marker interface to let index {@link BaseEntityIdentity#getCreatedDate()} property.
+ * The marker interface to let index {@link BaseEntityIdentity#createdDate} property.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */

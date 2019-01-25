@@ -30,6 +30,7 @@ import java.util.Set;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public interface EntityIdentity<ID_TYPE>
+        extends Serializable
 {
     /**
      * Returns the unique string identification unique across all entities of all kinds and parents.

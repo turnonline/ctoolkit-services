@@ -39,6 +39,8 @@ import static org.ctoolkit.services.storage.PropertiesHasherTest.HASHER_NAME;
 public class EntityStringIdentityHasherTestEntity
         extends EntityStringIdentityHasher
 {
+    private static final long serialVersionUID = -79109897537646409L;
+
     private String xyz;
 
     @Override

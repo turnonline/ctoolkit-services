@@ -39,7 +39,9 @@ public abstract class EntityLongIdentityHasher
         extends EntityLongIdentity
         implements PropertiesHasher
 {
-    private Ref<PropertiesHashCode> hashCode;
+    private static final long serialVersionUID = -1896073241038885185L;
+
+    private Key<PropertiesHashCode> hashCode;
 
     /**
      * Check whether client selected properties are ready to be calculated.
