@@ -18,10 +18,12 @@
 
 package org.ctoolkit.services.storage.appengine.objectify;
 
-import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.OnSave;
 import org.ctoolkit.services.storage.PropertiesHashCode;
 import org.ctoolkit.services.storage.PropertiesHasher;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
  * The base objectify entity to be used in the client code that implements
@@ -39,7 +41,7 @@ public abstract class EntityLongIdentityHasher
         extends EntityLongIdentity
         implements PropertiesHasher
 {
-    private static final long serialVersionUID = -1896073241038885185L;
+    private static final long serialVersionUID = 7444984756468293559L;
 
     private Key<PropertiesHashCode> hashCode;
 
@@ -64,7 +66,7 @@ public abstract class EntityLongIdentityHasher
         {
             return null;
         }
-        return hashCode == null ? null : hashCode.get();
+        return hashCode == null ? null : ofy().load().key( hashCode ).now();
     }
 
     @OnSave
@@ -74,7 +76,7 @@ public abstract class EntityLongIdentityHasher
         {
             PropertiesHashCode hashCode = newPropertiesHashCode();
             hashCode.save();
-            this.hashCode = Ref.create( hashCode );
+            this.hashCode = Key.create( hashCode );
         }
     }
 
