@@ -44,7 +44,7 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
 /**
  * Google App Engine Task Queue (Push Queues) convenient methods implementation.
  *
- * @author <a href="mailto:aurel.medvegy@ctoolkit.org>Aurel Medvegy</a>"
+ * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
 class TaskQueueExecutorBean
