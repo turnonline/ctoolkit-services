@@ -68,6 +68,7 @@ import java.util.Set;
  *      if ( getId() == null )
  *      {
  *          // first, parent entity needs to be saved itself without references (children has no IDs yet)
+ *          // Needed only if there is a parent child relationship, see {@link ChildEntityOf#setParent(EntityIdentity)}
  *          ofy().save().entity( this ).now();
  *      }
  *
