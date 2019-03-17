@@ -16,10 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.storage.appengine;
 
 import com.google.api.client.util.DateTime;
 import com.googlecode.objectify.annotation.Entity;
+import org.ctoolkit.services.storage.appengine.objectify.Timestamp;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -28,6 +29,7 @@ import java.util.List;
 
 /**
  * Extended {@link Timestamp} for testing purpose.
+ * Keep it outside of the {@link Timestamp} package.
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */

@@ -3,6 +3,7 @@ package org.ctoolkit.services.storage.appengine.objectify;
 import com.google.api.client.util.DateTime;
 import com.googlecode.objectify.ObjectifyService;
 import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
+import org.ctoolkit.services.storage.appengine.TimestampEntity;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;

@@ -44,17 +44,17 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  *         // non private no arg constructor for Objectify
  *     }
  *
- *     public TimestampEntity( &#64;Nonnull List<String> uniqueKey, &#64;Nonnull Date last )
+ *     public TimestampEntity( &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nonnull Date last )
  *     {
  *         super( uniqueKey, last );
  *     }
  *
- *     public static TimestampEntity of( &#64;Nonnull List<String> uniqueKey, &#64;Nullable DateTime last )
+ *     public static TimestampEntity of( &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nullable DateTime last )
  *     {
  *         return of( uniqueKey, last, TimestampEntity.class );
  *     }
  *
- *     public static TimestampEntity of( &#64;Nonnull List<String> uniqueKey, &#64;Nullable Date last )
+ *     public static TimestampEntity of( &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nullable Date last )
  *     {
  *         return of( uniqueKey, last, TimestampEntity.class );
  *     }
@@ -76,8 +76,7 @@ public abstract class Timestamp
     @Ignore
     private Date incoming;
 
-    @SuppressWarnings( "unused" )
-    Timestamp()
+    protected Timestamp()
     {
     }
 
