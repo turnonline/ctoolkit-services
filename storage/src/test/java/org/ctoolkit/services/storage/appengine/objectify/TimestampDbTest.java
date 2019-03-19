@@ -45,7 +45,7 @@ public class TimestampDbTest
     public void getName()
     {
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, new Date() );
-        timestamp.end();
+        timestamp.done();
 
         assertThat( timestamp.getName() ).isEqualTo( "7392991330598912::1112282472694100::5369461238768899" );
     }
@@ -54,7 +54,7 @@ public class TimestampDbTest
     public void isObsolete_IncomingOlderChanges()
     {
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, new Date( dateMillis ) );
-        timestamp.end();
+        timestamp.done();
         ofy().clear();
 
         // incoming changes are older
@@ -67,12 +67,12 @@ public class TimestampDbTest
     {
         Date originLast = new Date( dateMillis );
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, originLast );
-        timestamp.end();
+        timestamp.done();
         ofy().clear();
 
         // incoming changes are older
         timestamp = TimestampEntity.of( uniqueKey, new Date( dateMillis - 1 ) );
-        timestamp.end();
+        timestamp.done();
 
         assertThat( timestamp.getLastModification() ).named( "Last modification date" ).isEqualTo( originLast );
     }
@@ -81,7 +81,7 @@ public class TimestampDbTest
     public void isObsolete_IncomingNewerChanges()
     {
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, new Date( dateMillis ) );
-        timestamp.end();
+        timestamp.done();
         ofy().clear();
 
         // incoming changes are newer
@@ -93,13 +93,13 @@ public class TimestampDbTest
     public void getLastModification_AfterSaveIncomingNewerChanges()
     {
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, new Date( dateMillis ) );
-        timestamp.end();
+        timestamp.done();
         ofy().clear();
 
         // incoming changes are newer
         Date newer = new Date( dateMillis + 1 );
         timestamp = TimestampEntity.of( uniqueKey, newer );
-        timestamp.end();
+        timestamp.done();
 
         assertThat( timestamp.getLastModification() ).named( "Last modification date" ).isEqualTo( newer );
     }
@@ -110,7 +110,7 @@ public class TimestampDbTest
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, new Date( dateMillis ) );
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isFalse();
 
-        timestamp.end();
+        timestamp.done();
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isTrue();
     }
 
@@ -120,7 +120,7 @@ public class TimestampDbTest
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, new DateTime( dateMillis ) );
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isFalse();
 
-        timestamp.end();
+        timestamp.done();
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isTrue();
     }
 
@@ -128,7 +128,7 @@ public class TimestampDbTest
     public void isObsolete_SameDateOfIncomingChangesAndLastModification()
     {
         TimestampEntity timestamp = Timestamp.of( uniqueKey, new Date( dateMillis ), TimestampEntity.class );
-        timestamp.end();
+        timestamp.done();
         ofy().clear();
 
         timestamp = Timestamp.of( uniqueKey, new Date( dateMillis ), TimestampEntity.class );
@@ -139,7 +139,7 @@ public class TimestampDbTest
     public void isObsolete_SameDateTimeOfIncomingChangesAndLastModification()
     {
         TimestampEntity timestamp = Timestamp.of( uniqueKey, new DateTime( dateMillis ), TimestampEntity.class );
-        timestamp.end();
+        timestamp.done();
         ofy().clear();
 
         timestamp = TimestampEntity.of( uniqueKey, new Date( dateMillis ) );
@@ -153,7 +153,7 @@ public class TimestampDbTest
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, ( Date ) null );
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isFalse();
 
-        timestamp.end();
+        timestamp.done();
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isTrue();
     }
 
@@ -164,7 +164,7 @@ public class TimestampDbTest
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, ( DateTime ) null );
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isFalse();
 
-        timestamp.end();
+        timestamp.done();
         assertThat( timestamp.isObsolete() ).named( "Incoming obsolete changes" ).isTrue();
     }
 
@@ -172,7 +172,7 @@ public class TimestampDbTest
     public void delete()
     {
         TimestampEntity timestamp = TimestampEntity.of( uniqueKey, ( DateTime ) null );
-        timestamp.end();
+        timestamp.done();
 
         int count = ofy().load().type( TimestampEntity.class ).count();
         assertThat( count ).named( "Number of Timestamps" ).isEqualTo( 1 );

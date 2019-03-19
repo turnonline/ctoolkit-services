@@ -25,8 +25,8 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  *     // act based on the result
  * }
  *
- * // once you are done, call end() (best within transaction)
- * timestamp.end();
+ * // once you are done, call done() (best within transaction)
+ * timestamp.done();
  *
  * // Timestamp with specified concrete entity type
  * TimestampEntity timestamp = Timestamp.of( uniqueKey, order.getModificationDate(), TimestampEntity.class );
@@ -223,7 +223,7 @@ public abstract class Timestamp
      * (time is being also considered in to comparison) against stored one,
      * this incoming resource date will be set as a last modification date.
      */
-    public void end()
+    public void done()
     {
         if ( lastModification.before( incoming ) )
         {
