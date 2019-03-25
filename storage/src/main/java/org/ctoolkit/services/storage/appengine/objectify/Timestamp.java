@@ -8,6 +8,7 @@ import com.googlecode.objectify.annotation.Ignore;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -44,19 +45,19 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  *         // non private no arg constructor for Objectify
  *     }
  *
- *     public TimestampEntity( &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nonnull Date last )
+ *     public TimestampEntity( &#64;Nonnull String type, &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nonnull Date last )
  *     {
- *         super( uniqueKey, last );
+ *         super( type, uniqueKey, last );
  *     }
  *
- *     public static TimestampEntity of( &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nullable DateTime last )
+ *     public static TimestampEntity of( &#64;Nonnull String type, &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nullable DateTime last )
  *     {
- *         return of( uniqueKey, last, TimestampEntity.class );
+ *         return of( type, uniqueKey, last, TimestampEntity.class );
  *     }
  *
- *     public static TimestampEntity of( &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nullable Date last )
+ *     public static TimestampEntity of( &#64;Nonnull String type, &#64;Nonnull List&#60;String&#62; uniqueKey, &#64;Nullable Date last )
  *     {
- *         return of( uniqueKey, last, TimestampEntity.class );
+ *         return of( type, uniqueKey, last, TimestampEntity.class );
  *     }
  * }
  *
@@ -86,69 +87,76 @@ public abstract class Timestamp
      * Sets the last modification date of the original resource.
      * It will be used to distinguish whether an incoming changes are obsolete or not.
      *
+     * @param type      the type name of the resource the timestamp tracks modification date and time
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource
      */
-    public Timestamp( @Nonnull List<String> uniqueKey, @Nonnull Date last )
+    public Timestamp( @Nonnull String type, @Nonnull List<String> uniqueKey, @Nonnull Date last )
     {
-        this.name = uniqueKey( uniqueKey );
+        this.name = uniqueKey( type, uniqueKey );
         this.lastModification = checkNotNull( last );
     }
 
     /**
      * Get timestamp for specified unique key.
      *
+     * @param type      the type name of the resource the timestamp tracks modification date and time
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource, {@code null} for now
      * @return the timestamp
      */
-    public static Timestamp of( @Nonnull List<String> uniqueKey, @Nullable DateTime last )
+    public static Timestamp of( @Nonnull String type, @Nonnull List<String> uniqueKey, @Nullable DateTime last )
     {
-        return of( uniqueKey, last == null ? new Date() : new Date( last.getValue() ), Timestamp.class );
+        return of( type, uniqueKey, last == null ? new Date() : new Date( last.getValue() ), Timestamp.class );
     }
 
     /**
      * Get timestamp for specified unique key.
      *
+     * @param type      the type name of the resource the timestamp tracks modification date and time
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource, {@code null} for now
      * @param target    the entity target type, a type that will be stored in datastore
      * @return the timestamp
      */
-    public static <T extends Timestamp> T of( @Nonnull List<String> uniqueKey,
+    public static <T extends Timestamp> T of( @Nonnull String type,
+                                              @Nonnull List<String> uniqueKey,
                                               @Nullable DateTime last,
                                               @Nonnull Class<T> target )
     {
-        return of( uniqueKey, last == null ? new Date() : new Date( last.getValue() ), target );
+        return of( type, uniqueKey, last == null ? new Date() : new Date( last.getValue() ), target );
     }
 
     /**
      * Get timestamp for specified unique key.
      *
+     * @param type      the type name of the resource the timestamp tracks modification date and time
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource, {@code null} for now
      * @return the timestamp
      */
-    public static Timestamp of( @Nonnull List<String> uniqueKey, @Nullable Date last )
+    public static Timestamp of( @Nonnull String type, @Nonnull List<String> uniqueKey, @Nullable Date last )
     {
-        return of( uniqueKey, last, Timestamp.class );
+        return of( type, uniqueKey, last, Timestamp.class );
     }
 
     /**
      * Get timestamp for specified unique key.
      *
+     * @param type      the type name of the resource the timestamp tracks modification date and time
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource, {@code null} for now
      * @param target    the entity target type, a type that will be stored in datastore
      * @return the timestamp
      */
-    public static <T extends Timestamp> T of( @Nonnull List<String> uniqueKey,
+    public static <T extends Timestamp> T of( @Nonnull String type,
+                                              @Nonnull List<String> uniqueKey,
                                               @Nullable Date last,
                                               @Nonnull Class<T> target )
     {
         checkNotNull( target, "Target entity type is mandatory" );
 
-        String key = uniqueKey( uniqueKey );
+        String key = uniqueKey( type, uniqueKey );
         T timestamp = ofy().load().type( target ).id( key ).now();
 
         last = last == null ? new Date() : last;
@@ -158,7 +166,9 @@ public abstract class Timestamp
             {
                 // -1 only used while it's not saved
                 Date ld = new Date( last.getTime() - 1 );
-                timestamp = target.getConstructor( List.class, Date.class ).newInstance( uniqueKey, ld );
+                timestamp = target
+                        .getConstructor( String.class, List.class, Date.class )
+                        .newInstance( type, uniqueKey, ld );
             }
             catch ( NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e )
             {
@@ -170,13 +180,18 @@ public abstract class Timestamp
         return timestamp;
     }
 
-    private static String uniqueKey( @Nonnull List<String> uniqueKey )
+    private static String uniqueKey( @Nonnull String type, @Nonnull List<String> uniqueKey )
     {
+        checkNotNull( type, "Class type is mandatory" );
         if ( uniqueKey.isEmpty() )
         {
             throw new IllegalArgumentException( "Timestamp identification cannot be empty" );
         }
-        return Joiner.on( KEY_SEPARATOR ).join( uniqueKey );
+        List<String> enriched = new ArrayList<>();
+        enriched.add( type );
+        enriched.addAll( uniqueKey );
+
+        return Joiner.on( KEY_SEPARATOR ).join( enriched );
     }
 
     /**

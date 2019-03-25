@@ -41,19 +41,18 @@ public class TimestampEntity
     {
     }
 
-    public TimestampEntity( @Nonnull List<String> uniqueKey,
-                            @Nonnull Date last )
+    public TimestampEntity( @Nonnull String type, @Nonnull List<String> uniqueKey, @Nonnull Date last )
     {
-        super( uniqueKey, last );
+        super( type, uniqueKey, last );
     }
 
-    public static TimestampEntity of( @Nonnull List<String> uniqueKey, @Nullable DateTime last )
+    public static TimestampEntity of( @Nonnull String type, @Nonnull List<String> uniqueKey, @Nullable DateTime last )
     {
-        return of( uniqueKey, last, TimestampEntity.class );
+        return of( type, uniqueKey, last, TimestampEntity.class );
     }
 
-    public static TimestampEntity of( @Nonnull List<String> uniqueKey, @Nullable Date last )
+    public static TimestampEntity of( @Nonnull String type, @Nonnull List<String> uniqueKey, @Nullable Date last )
     {
-        return of( uniqueKey, last, TimestampEntity.class );
+        return of( type, uniqueKey, last, TimestampEntity.class );
     }
 }
