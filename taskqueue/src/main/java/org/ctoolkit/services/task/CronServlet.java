@@ -18,23 +18,33 @@
 
 package org.ctoolkit.services.task;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
 /**
- * Cron servlet handler to add scheduled task to the configured queue.
+ * Cron tasks servlet handler.
  * <p>
- * For correct functionality (security constraint) is being required to follow convention how to compose an URL
+ * For correct functionality (security constraint) is being required that follows convention how to compose an URL
  * configured in App Engine queue.xml configuration file.
  * <p>
- * The contract: it consists from, for example: '/cron/whatever1/whatever2'
+ * Contract:
  * <ul>
- * <li>part 1: 'cron' as a default namespace as servlet mapping for the <code>CronServlet</code></li>
- * <li>part 2: 'whatever1', 'whatever2' etc it's up to you</li>
+ * <li>/cron/whatever1/whatever2</li>
+ * <li>/cron/sync/whatever1/whatever2</li>
+ * </ul>
+ * <ul>
+ * <li>'cron' as a default and mandatory parameter that maps {@link CronServlet} as a handler of the cron tasks.</li>
+ * <li>'sync' as an operator that instructs the cron task to run as a synchronous job.
+ * If omitted the target task will be enqueued in to task queue and executed asynchronously.</li>
+ * <li>'whatever1', 'whatever2' as an unique identifiers of the cron task.</li>
  * </ul>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -57,6 +67,47 @@ class CronServlet
     @SuppressWarnings( value = "unchecked" )
     protected void doGet( HttpServletRequest request, HttpServletResponse response )
     {
-        executor.schedule( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
+        String uri = request.getRequestURI();
+        if ( uri == null )
+        {
+            throw new IllegalArgumentException( "Invalid URI (null)" );
+        }
+
+        if ( Strings.isNullOrEmpty( uri ) )
+        {
+            throw new IllegalArgumentException( "Missing cron URI" );
+        }
+
+        @SuppressWarnings( "UnstableApiUsage" )
+        List<String> params = Splitter.on( "/" ).omitEmptyStrings().trimResults().splitToList( uri );
+        if ( params.isEmpty() )
+        {
+            throw new IllegalArgumentException( "Invalid cron URI: " + uri );
+        }
+
+        if ( params.size() < 2 )
+        {
+            throw new IllegalArgumentException( "Invalid cron URI (missing identifier): " + uri );
+        }
+
+        String cronParam = params.get( 0 );
+        if ( !"cron".equalsIgnoreCase( cronParam ) )
+        {
+            throw new IllegalArgumentException( "Cron URI does not start with 'cron' " + uri );
+        }
+
+        String syncParam = params.get( 1 );
+        if ( "sync".equalsIgnoreCase( syncParam ) )
+        {
+            if ( params.size() < 3 )
+            {
+                throw new IllegalArgumentException( "Invalid sync cron URI (missing identifier): " + uri );
+            }
+            executor.syncCron( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
+        }
+        else
+        {
+            executor.schedule( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
+        }
     }
 }

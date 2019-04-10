@@ -123,14 +123,23 @@ public interface TaskExecutor
     TaskHandle schedule( @Nonnull String cronUri );
 
     /**
-     * Adds cron task to the queue to be executed asynchronously registered under cronUri,
-     * see {@link CronTaskRegistrar}.
+     * Adds cron task to the queue to be executed asynchronously registered under cronUri.
      *
      * @param cronUri    the URI under which is cron task registered
      * @param parameters the additional parameters to be added to registered task
-     * @return the task definition (given or computed) already in queue
+     * @return the task definition (given or computed) already in queue, or {@code null} if not found
+     * @see CronTaskRegistrar
      */
     TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters );
+
+    /**
+     * Runs associated cron task synchronously.
+     *
+     * @param cronUri    the URI under which is cron task registered
+     * @param parameters the additional parameters to be added to registered task
+     * @see CronTaskRegistrar
+     */
+    void syncCron( @Nonnull String cronUri, @Nullable Map<String, String> parameters );
 
     /**
      * Deletes a task from the default queue.
@@ -146,7 +155,7 @@ public interface TaskExecutor
      * @param task the task instance
      * @return the associated queue
      */
-    Queue getQueue( Task task );
+    Queue getQueue( @Nonnull Task task );
 
     /**
      * Returns the {@link Queue} by name.
@@ -159,5 +168,5 @@ public interface TaskExecutor
      * @param queueName the name of the queue to be returned
      * @return the queue
      */
-    Queue getQueue( String queueName );
+    Queue getQueue( @Nonnull String queueName );
 }

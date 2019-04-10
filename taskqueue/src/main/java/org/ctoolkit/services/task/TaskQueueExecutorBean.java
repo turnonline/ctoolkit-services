@@ -74,10 +74,7 @@ class TaskQueueExecutorBean
     @Override
     public List<TaskHandle> schedule( @Nonnull String queueName, @Nonnull Task... tasks )
     {
-        checkNotNull( queueName );
-        checkNotNull( tasks );
-
-        if ( tasks.length == 0 )
+        if ( checkNotNull( tasks, "Task array is mandatory" ).length == 0 )
         {
             logger.info( "Nothing to schedule, task array is empty." );
             return new ArrayList<>();
@@ -94,25 +91,21 @@ class TaskQueueExecutorBean
             options.add( populateTaskOptions( next, next.getOptions() ) );
         }
 
-        Queue queue = getQueue( queueName );
+        Queue queue = getQueue( checkNotNull( queueName, "Queue name is mandatory" ) );
         return queue.add( options );
     }
 
     @Override
     public TaskHandle schedule( @Nonnull Task task, int postponeFor )
     {
-        checkNotNull( task );
-
-        task.postponeFor( postponeFor );
+        checkNotNull( task, "Task is mandatory" ).postponeFor( postponeFor );
         return schedule( task, TaskOptions.Builder.withDefaults() );
     }
 
     @Override
     public final TaskHandle schedule( @Nonnull Task task, @Nullable TaskOptions options )
     {
-        checkNotNull( task );
-
-        Queue queue = getQueue( task );
+        Queue queue = getQueue( checkNotNull( task, "Task is mandatory" ) );
         TaskOptions ready = populateTaskOptions( task, options );
         TaskHandle handler = queue.add( ready );
 
@@ -122,7 +115,6 @@ class TaskQueueExecutorBean
 
     public void register( @Nonnull CronTaskRegistrar registrar )
     {
-        checkNotNull( registrar );
         map.putAll( registrar.getClassMap() );
     }
 
@@ -132,12 +124,9 @@ class TaskQueueExecutorBean
         return schedule( cronUri, ( Map<String, String> ) null );
     }
 
-    @Override
-    public final TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
+    private CronTask findCronTask( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
     {
-        checkNotNull( cronUri );
-
-        Class<? extends CronTask> clazz = map.get( cronUri );
+        Class<? extends CronTask> clazz = map.get( checkNotNull( cronUri, "Cron URI is mandatory" ) );
 
         if ( parameters == null )
         {
@@ -146,7 +135,7 @@ class TaskQueueExecutorBean
 
         if ( clazz == null )
         {
-            logger.warn( "No CronTask impl. class registered for cron URI: " + cronUri );
+            logger.warn( "No CronTask impl. class registered with cron URI: " + cronUri );
             return null;
         }
 
@@ -156,10 +145,29 @@ class TaskQueueExecutorBean
         {
             task.addParameter( params.getKey(), params.getValue() );
         }
+        return task;
+    }
 
-        logger.info( "Creating cron: " + task );
+    @Override
+    public final TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
+    {
+        CronTask task = findCronTask( cronUri, parameters );
+        if ( task == null )
+        {
+            return null;
+        }
 
-        return addPayload( task );
+        return schedule( task );
+    }
+
+    @Override
+    public void syncCron( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
+    {
+        CronTask task = findCronTask( cronUri, parameters );
+        if ( task != null )
+        {
+            task.execute();
+        }
     }
 
     @Override
@@ -170,14 +178,13 @@ class TaskQueueExecutorBean
 
     private TaskOptions populateTaskOptions( @Nonnull Task task, @Nullable TaskOptions options )
     {
-        checkNotNull( task );
 
         if ( options == null )
         {
             options = TaskOptions.Builder.withDefaults();
         }
 
-        Integer countdown = task.getPostponeFor();
+        Integer countdown = checkNotNull( task, "Task is mandatory" ).getPostponeFor();
         Long eta = options.getEtaMillis();
 
         // Set only if there is no eta value, the TaskOptions value has preference
@@ -224,28 +231,8 @@ class TaskQueueExecutorBean
         return ofy().factory().allocateId( TaskUniqueIdGenerator.class ).getId();
     }
 
-    private TaskHandle addPayload( CronTask task )
-    {
-        Queue queue = getQueue( task );
-
-        TaskOptions options = TaskOptions.Builder.withDefaults();
-
-        String module = modulesService.getCurrentModule();
-        String version = modulesService.getCurrentVersion();
-        String hostname = modulesService.getVersionHostname( module, version );
-
-        // header added to make sure run against current module (even non default module)
-        // see https://code.google.com/p/googleappengine/issues/detail?id=10457
-        options.header( "Host", hostname );
-
-        logger.info( "Enqueued in: " + task.getQueueName() + ",  module: " + module + ", version: " + version
-                + ", Module hostname: " + hostname );
-
-        return queue.add( options.payload( new CronTaskWrapper( task ) ) );
-    }
-
     @Override
-    public Queue getQueue( Task task )
+    public Queue getQueue( @Nonnull Task task )
     {
         Queue queue;
 
@@ -262,12 +249,12 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public Queue getQueue( String queueName )
+    public Queue getQueue( @Nonnull String queueName )
     {
         return QueueFactory.getQueue( queueName );
     }
 
-    private Queue getQueue( CronTask task )
+    private Queue getQueue( @Nonnull CronTask task )
     {
         Queue queue;
 
