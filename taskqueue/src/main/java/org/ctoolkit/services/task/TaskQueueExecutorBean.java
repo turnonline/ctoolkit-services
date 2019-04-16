@@ -121,10 +121,10 @@ class TaskQueueExecutorBean
     @Override
     public TaskHandle schedule( @Nonnull String cronUri )
     {
-        return schedule( cronUri, ( Map<String, String> ) null );
+        return schedule( cronUri, ( Map<String, String[]> ) null );
     }
 
-    private CronTask findCronTask( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
+    private CronTask findCronTask( @Nonnull String cronUri, @Nullable Map<String, String[]> parameters )
     {
         Class<? extends CronTask> clazz = map.get( checkNotNull( cronUri, "Cron URI is mandatory" ) );
 
@@ -141,7 +141,7 @@ class TaskQueueExecutorBean
 
         CronTask task = injector.getInstance( clazz );
 
-        for ( Map.Entry<String, String> params : parameters.entrySet() )
+        for ( Map.Entry<String, String[]> params : parameters.entrySet() )
         {
             task.addParameter( params.getKey(), params.getValue() );
         }
@@ -149,7 +149,7 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public final TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
+    public final TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String[]> parameters )
     {
         CronTask task = findCronTask( cronUri, parameters );
         if ( task == null )
@@ -161,7 +161,7 @@ class TaskQueueExecutorBean
     }
 
     @Override
-    public void syncCron( @Nonnull String cronUri, @Nullable Map<String, String> parameters )
+    public void syncCron( @Nonnull String cronUri, @Nullable Map<String, String[]> parameters )
     {
         CronTask task = findCronTask( cronUri, parameters );
         if ( task != null )

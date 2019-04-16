@@ -25,12 +25,12 @@ import com.google.appengine.api.blobstore.FileInfo;
 import com.google.appengine.api.blobstore.UploadOptions;
 import com.google.appengine.api.images.ImagesService;
 import com.google.appengine.api.images.ServingUrlOptions;
-import com.google.appengine.repackaged.com.google.common.base.Strings;
-import com.google.appengine.repackaged.com.google.gson.Gson;
-import com.google.appengine.repackaged.com.google.gson.GsonBuilder;
-import com.google.appengine.repackaged.com.google.gson.JsonObject;
 import com.google.common.base.Charsets;
+import com.google.common.base.Strings;
 import com.google.common.net.MediaType;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.ctoolkit.services.upload.DataUploadHandler;
 import org.ctoolkit.services.upload.DataUploadListener;
 import org.slf4j.Logger;
@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -110,7 +109,6 @@ public class DataUploadHandlerServlet
 
     @Override
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
-            throws ServletException, IOException
     {
         if ( !isMultipartContent( request ) )
         {
@@ -138,7 +136,7 @@ public class DataUploadHandlerServlet
             response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
 
             String message = "Incorrect upload form 'name' field, requested: " + UPLOAD_NAME_FIELD_MARKER;
-            message = message + " " + String.valueOf( fileInfos );
+            message = message + " " + fileInfos;
 
             throw new IllegalArgumentException( message );
         }
@@ -177,12 +175,14 @@ public class DataUploadHandlerServlet
 
                 if ( isAnyImageContentType( info ) )
                 {
-                    ServingUrlOptions options;
-                    options = ServingUrlOptions.Builder.withGoogleStorageFileName( gStorageName );
-                    options = options.crop( false ).secureUrl( true );
+                    ServingUrlOptions options = ServingUrlOptions.Builder
+                            .withGoogleStorageFileName( gStorageName )
+                            .crop( false )
+                            .secureUrl( true );
+
                     if ( size > 0 )
                     {
-                        options = options.imageSize( size );
+                        options.imageSize( size );
                     }
 
                     servingUrl = imageService.getServingUrl( options );
@@ -256,7 +256,7 @@ public class DataUploadHandlerServlet
 
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response )
-            throws ServletException, IOException
+            throws IOException
     {
         response.setCharacterEncoding( Charsets.UTF_8.displayName() );
 

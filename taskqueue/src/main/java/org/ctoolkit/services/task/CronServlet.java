@@ -103,11 +103,11 @@ class CronServlet
             {
                 throw new IllegalArgumentException( "Invalid sync cron URI (missing identifier): " + uri );
             }
-            executor.syncCron( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
+            executor.syncCron( request.getRequestURI(), ( Map<String, String[]> ) request.getParameterMap() );
         }
         else
         {
-            executor.schedule( request.getRequestURI(), ( Map<String, String> ) request.getParameterMap() );
+            executor.schedule( request.getRequestURI(), ( Map<String, String[]> ) request.getParameterMap() );
         }
     }
 }

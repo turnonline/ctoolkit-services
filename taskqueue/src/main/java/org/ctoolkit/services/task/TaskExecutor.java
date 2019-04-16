@@ -130,7 +130,7 @@ public interface TaskExecutor
      * @return the task definition (given or computed) already in queue, or {@code null} if not found
      * @see CronTaskRegistrar
      */
-    TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String> parameters );
+    TaskHandle schedule( @Nonnull String cronUri, @Nullable Map<String, String[]> parameters );
 
     /**
      * Runs associated cron task synchronously.
@@ -139,7 +139,7 @@ public interface TaskExecutor
      * @param parameters the additional parameters to be added to registered task
      * @see CronTaskRegistrar
      */
-    void syncCron( @Nonnull String cronUri, @Nullable Map<String, String> parameters );
+    void syncCron( @Nonnull String cronUri, @Nullable Map<String, String[]> parameters );
 
     /**
      * Deletes a task from the default queue.

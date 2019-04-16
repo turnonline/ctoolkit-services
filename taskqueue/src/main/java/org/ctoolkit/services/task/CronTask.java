@@ -43,7 +43,7 @@ public abstract class CronTask
     /**
      * Parameter map to pass params for job execution.
      */
-    private Map<String, String> parameters = new HashMap<>();
+    private Map<String, String[]> parameters = new HashMap<>();
 
     /**
      * Constructs cron task instance and sets the default queue name to be task added in.
@@ -92,7 +92,7 @@ public abstract class CronTask
      *
      * @return the map of task parameters
      */
-    public Map<String, String> getParameters()
+    public Map<String, String[]> getParameters()
     {
         return parameters;
     }
@@ -103,7 +103,7 @@ public abstract class CronTask
      * @param name  the parameter key
      * @param value the parameter value
      */
-    public void addParameter( String name, String value )
+    public void addParameter( String name, String[] value )
     {
         parameters.put( name, value );
     }
@@ -114,7 +114,7 @@ public abstract class CronTask
      * @param name the parameter key
      * @return the parameter value for the given key
      */
-    public String getParameter( String name )
+    public String[] getParameter( String name )
     {
         return parameters.get( name );
     }
