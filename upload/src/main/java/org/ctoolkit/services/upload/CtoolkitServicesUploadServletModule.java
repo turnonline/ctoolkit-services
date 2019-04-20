@@ -20,7 +20,7 @@ package org.ctoolkit.services.upload;
 
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.servlet.ServletModule;
-import org.ctoolkit.services.upload.appengine.DataUploadHandlerServlet;
+import org.ctoolkit.services.upload.appengine.BlobstoreUploadServlet;
 
 /**
  * The ctoolkit services App Engine upload guice servlet module.
@@ -34,6 +34,6 @@ public class CtoolkitServicesUploadServletModule
     protected void configureServlets()
     {
         Multibinder.newSetBinder( binder(), DataUploadListener.class );
-        serve( DataUploadHandler.DATA_HANDLER_UPLOAD_URL ).with( DataUploadHandlerServlet.class );
+        serve( DataUploadHandler.DATA_HANDLER_UPLOAD_URL ).with( BlobstoreUploadServlet.class );
     }
 }

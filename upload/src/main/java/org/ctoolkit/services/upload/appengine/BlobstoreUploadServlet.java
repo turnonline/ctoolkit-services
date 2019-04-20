@@ -74,7 +74,7 @@ import java.util.Set;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Singleton
-public class DataUploadHandlerServlet
+public class BlobstoreUploadServlet
         extends HttpServlet
         implements DataUploadHandler
 {
@@ -85,7 +85,7 @@ public class DataUploadHandlerServlet
      */
     private static final String MULTIPART = "multipart/";
 
-    private final Logger log = LoggerFactory.getLogger( DataUploadHandlerServlet.class );
+    private final Logger log = LoggerFactory.getLogger( BlobstoreUploadServlet.class );
 
     private final BlobstoreService blobstoreService;
 
@@ -96,10 +96,10 @@ public class DataUploadHandlerServlet
     private final Set<DataUploadListener> listeners;
 
     @Inject
-    public DataUploadHandlerServlet( BlobstoreService blobstoreService,
-                                     ImagesService imageService,
-                                     AppIdentityService appIdentityService,
-                                     Set<DataUploadListener> listeners )
+    public BlobstoreUploadServlet( BlobstoreService blobstoreService,
+                                   ImagesService imageService,
+                                   AppIdentityService appIdentityService,
+                                   Set<DataUploadListener> listeners )
     {
         this.blobstoreService = blobstoreService;
         this.imageService = imageService;

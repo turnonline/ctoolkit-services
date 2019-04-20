@@ -51,13 +51,12 @@ import java.util.Set;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Testing of {@link DataUploadHandlerServlet}.
+ * Testing of {@link BlobstoreUploadServlet}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class DataUploadHandlerServletTest
+public class BlobstoreUploadServletTest
 {
-
     private static final String STORAGE_NAME = "StorageKey-1239j";
 
     private static final String BLOB_KEY = "blob-key-1239j";
@@ -69,7 +68,7 @@ public class DataUploadHandlerServletTest
     private static final String ARBITRARY_NAME = "my arbitrary xy name";
 
     @Tested
-    private DataUploadHandlerServlet tested;
+    private BlobstoreUploadServlet tested;
 
     @Injectable
     private BlobstoreService blobstoreService;
@@ -80,24 +79,32 @@ public class DataUploadHandlerServletTest
     @Injectable
     private AppIdentityService appIdentityService;
 
-    @SuppressWarnings( "MismatchedQueryAndUpdateOfCollection" )
     @Injectable
     private Set<DataUploadListener> listeners = new HashSet<>();
 
     @Mocked
     private DataUploadListener listener;
 
+    @Mocked
+    private HttpServletRequest request;
+
+    @Mocked
+    private HttpServletResponse response;
+
+    @Mocked
+    private FileInfo fileInfo;
+
+    @Mocked
+    private BlobKey blobKey;
+
     @BeforeMethod
-    public void setUp() throws Exception
+    public void setUp()
     {
         listeners.add( listener );
     }
 
     @Test( expectedExceptions = IllegalArgumentException.class )
-    public void doPostWrongFieldName( @Mocked final HttpServletRequest request,
-                                      @Mocked final HttpServletResponse response,
-                                      @Mocked final FileInfo fileInfo )
-            throws Exception
+    public void doPostWrongFieldName()
     {
         final Map<String, List<FileInfo>> infos = new HashMap<>();
         infos.put( "__wrong_field_name", Collections.singletonList( fileInfo ) );
@@ -117,10 +124,7 @@ public class DataUploadHandlerServletTest
     }
 
     @Test
-    public void doPost( @Mocked final HttpServletRequest request,
-                        @Mocked final HttpServletResponse response,
-                        @Mocked final BlobKey blobKey,
-                        @Mocked final FileInfo fileInfo )
+    public void doPost()
             throws Exception
     {
         final Map<String, List<FileInfo>> infos = new HashMap<>();
@@ -209,8 +213,7 @@ public class DataUploadHandlerServletTest
     }
 
     @Test
-    public void doGet( @Mocked final HttpServletRequest request,
-                       @Mocked final HttpServletResponse response )
+    public void doGet()
             throws Exception
     {
         final StringWriter writer = new StringWriter();
@@ -239,7 +242,7 @@ public class DataUploadHandlerServletTest
     }
 
     @SuppressWarnings( "unused" )
-    static class JsonOutput
+    private static class JsonOutput
     {
         private String storageName;
 

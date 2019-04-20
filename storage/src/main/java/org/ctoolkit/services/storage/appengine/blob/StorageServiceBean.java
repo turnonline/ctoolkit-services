@@ -49,7 +49,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StorageServiceBean
         implements StorageService
 {
-    private static final String STORAGE_NAME_PATTERN = "/gs/{0}/{1}";
+    public static final String STORAGE_NAME_PATTERN = "/gs/{0}/{1}";
 
     private final Storage storage;
 
@@ -79,9 +79,7 @@ public class StorageServiceBean
      */
     private BucketName parseBucketAndName( @Nonnull String fullName )
     {
-        checkNotNull( fullName );
-
-        String[] split = fullName.split( "/" );
+        String[] split = checkNotNull( fullName, "Furl name is mandatory" ).split( "/" );
         if ( split.length >= 4 && "gs".equals( split[1] ) )
         {
             String bucket = split[2];
@@ -109,8 +107,6 @@ public class StorageServiceBean
     @Override
     public BlobId createBlobId( @Nonnull String fullName )
     {
-        checkNotNull( fullName );
-
         BucketName bn = parseBucketAndName( fullName );
         String bucket = bn.bucket;
         String name = bn.name;
@@ -121,7 +117,6 @@ public class StorageServiceBean
     @Override
     public String getFullStorageName( @Nonnull Blob blob )
     {
-        checkNotNull( blob );
         return MessageFormat.format( STORAGE_NAME_PATTERN, blob.getBucket(), blob.getName() );
     }
 
@@ -158,22 +153,15 @@ public class StorageServiceBean
                        @Nonnull String bucketName,
                        @Nonnull String blobName )
     {
-        checkNotNull( data );
-        checkNotNull( contentType );
-        checkNotNull( blobName );
-        checkNotNull( bucketName );
-
         BlobId blobId = BlobId.of( bucketName, blobName );
-        BlobInfo blobInfo = BlobInfo.newBuilder( blobId ).setContentType( contentType ).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder( blobId ).setContentType( checkNotNull( contentType ) ).build();
 
-        return storage.create( blobInfo, data );
+        return storage.create( blobInfo, checkNotNull( data ) );
     }
 
     @Override
     public byte[] read( @Nonnull String fullName )
     {
-        checkNotNull( fullName );
-
         BlobId blobId = createBlobId( fullName );
         return storage.readAllBytes( blobId );
     }
@@ -181,24 +169,21 @@ public class StorageServiceBean
     @Override
     public byte[] read( @Nonnull BlobId blobId )
     {
-        checkNotNull( blobId );
-        return storage.readAllBytes( blobId );
+        return storage.readAllBytes( checkNotNull( blobId ) );
     }
 
     @Override
     public byte[] read( @Nonnull String bucketName, @Nonnull String blobName )
     {
-        checkNotNull( bucketName, "In order to read blob a bucket name must be provided." );
-        checkNotNull( blobName, "In order to read blob a blob name must be provided." );
-
-        return storage.readAllBytes( bucketName, blobName );
+        return storage.readAllBytes(
+                checkNotNull( bucketName, "In order to read blob a bucket name must be provided." ),
+                checkNotNull( blobName, "In order to read blob a blob name must be provided." ) );
     }
 
     @Override
     public boolean delete( @Nonnull BlobId blobId )
     {
-        checkNotNull( blobId );
-        return storage.delete( blobId );
+        return storage.delete( checkNotNull( blobId ) );
     }
 
     @Override
@@ -211,10 +196,9 @@ public class StorageServiceBean
     @Override
     public boolean delete( @Nonnull String bucketName, @Nonnull String blobName )
     {
-        checkNotNull( bucketName, "In order to delete blob a bucket name must be provided." );
-        checkNotNull( blobName, "In order to delete blob a file name must be provided." );
-
-        BlobId blobId = BlobId.of( bucketName, blobName );
+        BlobId blobId = BlobId.of(
+                checkNotNull( bucketName, "In order to delete blob a bucket name must be provided." ),
+                checkNotNull( blobName, "In order to delete blob a file name must be provided." ) );
 
         return storage.delete( blobId );
     }
@@ -222,10 +206,8 @@ public class StorageServiceBean
     @Override
     public String getSecureServingUrl( @Nonnull String fullName )
     {
-        checkNotNull( fullName );
-
         ServingUrlOptions options;
-        options = ServingUrlOptions.Builder.withGoogleStorageFileName( fullName )
+        options = ServingUrlOptions.Builder.withGoogleStorageFileName( checkNotNull( fullName ) )
                 .crop( false )
                 .secureUrl( true );
 
@@ -235,10 +217,8 @@ public class StorageServiceBean
     @Override
     public String getSecureServingUrl( @Nonnull String fullName, int imageSize )
     {
-        checkNotNull( fullName );
-
         ServingUrlOptions options;
-        options = ServingUrlOptions.Builder.withGoogleStorageFileName( fullName )
+        options = ServingUrlOptions.Builder.withGoogleStorageFileName( checkNotNull( fullName ) )
                 .imageSize( imageSize )
                 .crop( false )
                 .secureUrl( true );
@@ -249,10 +229,8 @@ public class StorageServiceBean
     @Override
     public String getSecureServingUrl( @Nonnull BlobKey blobKey )
     {
-        checkNotNull( blobKey );
-
         ServingUrlOptions options;
-        options = ServingUrlOptions.Builder.withBlobKey( blobKey )
+        options = ServingUrlOptions.Builder.withBlobKey( checkNotNull( blobKey ) )
                 .crop( false )
                 .secureUrl( true );
 
@@ -262,10 +240,8 @@ public class StorageServiceBean
     @Override
     public String getSecureServingUrl( @Nonnull BlobKey blobKey, int imageSize )
     {
-        checkNotNull( blobKey );
-
         ServingUrlOptions options;
-        options = ServingUrlOptions.Builder.withBlobKey( blobKey )
+        options = ServingUrlOptions.Builder.withBlobKey( checkNotNull( blobKey ) )
                 .imageSize( imageSize )
                 .crop( false )
                 .secureUrl( true );

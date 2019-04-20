@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.upload;
+package org.ctoolkit.services.upload.appengine;
 
 import com.google.api.client.util.Charsets;
 import com.google.appengine.api.appidentity.AppIdentityService;
