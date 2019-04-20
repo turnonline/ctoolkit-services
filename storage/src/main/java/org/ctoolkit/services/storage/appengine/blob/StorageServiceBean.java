@@ -49,8 +49,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class StorageServiceBean
         implements StorageService
 {
-    public static final String STORAGE_NAME_PATTERN = "/gs/{0}/{1}";
-
     private final Storage storage;
 
     private final AppIdentityService appIdentityService;

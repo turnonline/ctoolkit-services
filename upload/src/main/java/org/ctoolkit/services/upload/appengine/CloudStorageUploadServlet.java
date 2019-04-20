@@ -36,6 +36,8 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -60,7 +62,7 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CACHE_CONTROL;
 import static com.google.common.net.HttpHeaders.X_REQUESTED_WITH;
-import static org.ctoolkit.services.storage.appengine.blob.StorageServiceBean.STORAGE_NAME_PATTERN;
+import static org.ctoolkit.services.storage.StorageService.STORAGE_NAME_PATTERN;
 
 /**
  * Servlet handling uploads in to Google Cloud Storage.
@@ -148,6 +150,18 @@ public class CloudStorageUploadServlet
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
+        upload( request, response, null );
+    }
+
+    /**
+     * If Account ID is provided, storage path will be prepended with directory (based on the Account ID)
+     * that acts as an owner of all account related uploads.
+     */
+    protected void upload( @Nonnull HttpServletRequest request,
+                           @Nonnull HttpServletResponse response,
+                           @Nullable Long accountId )
+            throws ServletException, IOException
+    {
         Collection<Part> parts = request.getParts();
         LOGGER.info( "Parts to be stored: " + parts );
 
@@ -163,6 +177,11 @@ public class CloudStorageUploadServlet
         {
             String filename = fileName( part );
             String fullPath = directory + "/" + filename;
+            if ( accountId != null )
+            {
+                fullPath = accountId + "/" + fullPath;
+            }
+
             BlobInfo.Builder builder = BlobInfo.newBuilder( BlobId.of( getBucketName(), fullPath ) );
             builder.setContentType( part.getContentType() );
 

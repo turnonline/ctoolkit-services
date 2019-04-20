@@ -35,6 +35,8 @@ import javax.annotation.Nonnull;
  */
 public interface StorageService
 {
+    String STORAGE_NAME_PATTERN = "/gs/{0}/{1}";
+
     /**
      * Parse and create {@link BlobId} instance as an unique blob document identification within cloud storage.
      *

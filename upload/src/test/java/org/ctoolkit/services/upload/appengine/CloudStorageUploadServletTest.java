@@ -97,7 +97,8 @@ public class CloudStorageUploadServletTest
         expectationsWithParts();
 
         // test call
-        tested.doPost( request, response );
+        long accountId = 132435L;
+        tested.upload( request, response, accountId );
 
         new Verifications()
         {
@@ -115,7 +116,7 @@ public class CloudStorageUploadServletTest
 
                 assertThat( blobInfo ).isNotNull();
                 assertThat( blobInfo.getBucket() ).isEqualTo( BUCKET );
-                assertThat( blobInfo.getName() ).isEqualTo( "uploads/" + FILE_NAME );
+                assertThat( blobInfo.getName() ).isEqualTo( accountId + "/uploads/" + FILE_NAME );
             }
         };
 
