@@ -215,6 +215,26 @@ public abstract class Task<T>
     }
 
     /**
+     * Returns a generic name of the task that is not necessarily unique, however might be useful for logging purpose.
+     *
+     * @return the generic task name
+     */
+    public String getGenericName()
+    {
+        String taskName = getTaskName();
+        if ( Strings.isNullOrEmpty( taskName ) )
+        {
+            taskName = getClass().getSimpleName();
+
+            if ( entityKey != null )
+            {
+                taskName = taskName + "_" + entityKey.getKind() + "_" + entityKey.getId();
+            }
+        }
+        return taskName;
+    }
+
+    /**
      * Returns the boolean indication whether to append an unique ID to the task name.
      * If task name prefix is {@code null} this will return {@code false}.
      *
