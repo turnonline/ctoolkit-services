@@ -108,6 +108,12 @@ import static org.ctoolkit.services.storage.StorageService.STORAGE_NAME_PATTERN;
 public class CloudStorageUploadServlet
         extends HttpServlet
 {
+    /**
+     * Optional header to instruct image service adjust image size in the response.
+     * Valid sizes must be between 0 and  1600.
+     */
+    public static final String RESPONSE_IMAGE_SIZE = "VND.turnon.cloud.Response-Image-Size";
+
     private static final Logger LOGGER = LoggerFactory.getLogger( CloudStorageUploadServlet.class );
 
     private static final int BUFFER_SIZE = 1024;
@@ -215,7 +221,18 @@ public class CloudStorageUploadServlet
                         .crop( false )
                         .secureUrl( true );
 
-                options.imageSize( 200 );
+                String imageSize = request.getHeader( RESPONSE_IMAGE_SIZE );
+                if ( imageSize != null )
+                {
+                    try
+                    {
+                        options.imageSize( Integer.valueOf( imageSize ) );
+                    }
+                    catch ( NumberFormatException e )
+                    {
+                        LOGGER.error( "Invalid response image size header value", e );
+                    }
+                }
 
                 try
                 {
@@ -233,12 +250,21 @@ public class CloudStorageUploadServlet
         }
 
         json.toJson( root, response.getWriter() );
-        MediaType jsonUtf8 = MediaType.JSON_UTF_8;
+        MediaType mediaType = responseMediaType();
 
         response.setStatus( HttpServletResponse.SC_CREATED );
         //noinspection OptionalGetWithoutIsPresent
-        response.setCharacterEncoding( jsonUtf8.charset().get().name() );
-        response.setContentType( jsonUtf8.toString() );
+        response.setCharacterEncoding( mediaType.charset().get().name() );
+
+        String contentType = mediaType.toString();
+        response.setContentType( contentType );
+
+        LOGGER.info( "Response ContentType = " + contentType );
+    }
+
+    protected MediaType responseMediaType()
+    {
+        return MediaType.PLAIN_TEXT_UTF_8;
     }
 
     private void store( Part uploaded, BlobInfo blobInfo ) throws IOException

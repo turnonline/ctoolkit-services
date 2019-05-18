@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.ctoolkit.services.upload.appengine.CloudStorageUploadServlet.RESPONSE_IMAGE_SIZE;
 
 /**
  * {@link CloudStorageUploadServlet} unit testing.
@@ -103,13 +104,20 @@ public class CloudStorageUploadServletTest
         new Verifications()
         {
             {
-                response.setContentType( "application/json; charset=utf-8" );
+                response.setContentType( "text/plain; charset=utf-8" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.setStatus( HttpServletResponse.SC_CREATED );
 
                 ServingUrlOptions suo;
                 imageService.getServingUrl( suo = withCapture() );
                 assertThat( suo ).isNotNull();
+
+                ServingUrlOptions expected = ServingUrlOptions.Builder
+                        .withGoogleStorageFileName( "/gs/test-bucket.appspot.com/132435/uploads/nice.jpeg" )
+                        .crop( false )
+                        .secureUrl( true );
+
+                assertThat( suo ).isEqualTo( expected );
 
                 BlobInfo blobInfo;
                 storage.create( blobInfo = withCapture(), ( byte[] ) any );
@@ -125,6 +133,82 @@ public class CloudStorageUploadServletTest
     }
 
     @Test
+    public void upload_ImageCreatedWithImageSize() throws ServletException, IOException, JSONException
+    {
+        expectationsWithParts();
+
+        new Expectations()
+        {
+            {
+                request.getHeader( RESPONSE_IMAGE_SIZE );
+                result = 200;
+            }
+        };
+
+        // test call
+        long accountId = 132435L;
+        tested.upload( request, response, accountId );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_CREATED );
+
+                ServingUrlOptions suo;
+                imageService.getServingUrl( suo = withCapture() );
+                assertThat( suo ).isNotNull();
+
+                ServingUrlOptions expected = ServingUrlOptions.Builder
+                        .withGoogleStorageFileName( "/gs/test-bucket.appspot.com/132435/uploads/nice.jpeg" )
+                        .crop( false )
+                        .imageSize( 200 )
+                        .secureUrl( true );
+
+                assertThat( suo ).isEqualTo( expected );
+            }
+        };
+
+        String expectedResponse = fromFile( "upload-response.json" );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+    }
+
+    @Test
+    public void upload_ImageCreatedWithInvalidImageSize() throws ServletException, IOException, JSONException
+    {
+        expectationsWithParts();
+
+        new Expectations()
+        {
+            {
+                request.getHeader( RESPONSE_IMAGE_SIZE );
+                result = "123a";
+            }
+        };
+
+        // test call
+        long accountId = 132435L;
+        tested.upload( request, response, accountId );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_CREATED );
+
+                ServingUrlOptions suo;
+                imageService.getServingUrl( suo = withCapture() );
+                assertThat( suo ).isNotNull();
+
+                ServingUrlOptions expected = ServingUrlOptions.Builder
+                        .withGoogleStorageFileName( "/gs/test-bucket.appspot.com/132435/uploads/nice.jpeg" )
+                        .crop( false )
+                        .secureUrl( true );
+
+                assertThat( suo ).isEqualTo( expected );
+            }
+        };
+    }
+
+    @Test
     public void upload_CreatedWithUnknownContentType() throws ServletException, IOException, JSONException
     {
         // no content-type
@@ -136,7 +220,7 @@ public class CloudStorageUploadServletTest
         new Verifications()
         {
             {
-                response.setContentType( "application/json; charset=utf-8" );
+                response.setContentType( "text/plain; charset=utf-8" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.setStatus( HttpServletResponse.SC_CREATED );
 
@@ -201,7 +285,7 @@ public class CloudStorageUploadServletTest
         new Verifications()
         {
             {
-                response.setContentType( "application/json; charset=utf-8" );
+                response.setContentType( "text/plain; charset=utf-8" );
                 response.setCharacterEncoding( "UTF-8" );
                 response.setStatus( HttpServletResponse.SC_CREATED );
 
