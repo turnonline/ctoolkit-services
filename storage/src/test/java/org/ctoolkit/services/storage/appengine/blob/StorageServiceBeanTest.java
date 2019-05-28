@@ -56,6 +56,9 @@ public class StorageServiceBeanTest
     @Injectable
     private BlobstoreService blobstoreService;
 
+    @Mocked
+    private Blob blob;
+
     @Test( expectedExceptions = IllegalArgumentException.class )
     public void createBlobIdWrongArg()
     {
@@ -82,7 +85,7 @@ public class StorageServiceBeanTest
     }
 
     @Test
-    public void getFullStorageName( @Mocked final Blob blob )
+    public void getFullStorageName()
     {
         new Expectations()
         {
@@ -128,7 +131,7 @@ public class StorageServiceBeanTest
     }
 
     @Test
-    public void createBlobKeyFromBlob( @Mocked final Blob blob )
+    public void createBlobKeyFromBlob()
     {
         new Expectations()
         {
