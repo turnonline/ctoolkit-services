@@ -589,7 +589,7 @@ public abstract class Task<T>
     @Override
     public final void run()
     {
-        logger.info( "Task '" + getTaskName() + "' has been started." );
+        logger.info( "Task '" + getGenericName() + "' has been started." );
         injector.injectMembers( this );
 
         execute();
@@ -608,14 +608,14 @@ public abstract class Task<T>
 
         if ( hasNext() && !scheduleNext )
         {
-            logger.info( "The task with name '" + next.getTaskName() + "' is being skipped" );
+            logger.info( "The task with name '" + next.getGenericName() + "' is being skipped" );
             // Next task will be skipped, however if there is an another task, schedule it!
             next = next.next();
         }
 
         if ( hasNext() )
         {
-            logger.info( "The task with name '" + next.getTaskName() + "' is being scheduled to be executed as next." );
+            logger.info( "The task with name '" + next.getGenericName() + "' is being scheduled to be executed as next." );
         }
 
         // once parent task has been successfully executed, enqueue the next task
