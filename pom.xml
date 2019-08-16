@@ -75,7 +75,7 @@
             <dependency>
                 <groupId>org.ctoolkit.maven</groupId>
                 <artifactId>ctoolkit-library-bom</artifactId>
-                <version>10</version>
+                <version>11</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -145,7 +145,7 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.70</gae.version>
+        <gae.version>1.9.75</gae.version>
         <jmockit.version>1.41</jmockit.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->

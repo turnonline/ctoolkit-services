@@ -70,10 +70,11 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  * @see TaskExecutor
  */
+@SuppressWarnings( "WeakerAccess" )
 public abstract class Task<T>
         implements DeferredTask
 {
-    private static final long serialVersionUID = 4482738102030372071L;
+    private static final long serialVersionUID = -3959632462820157604L;
 
     private static final Logger logger = LoggerFactory.getLogger( Task.class );
 
@@ -91,7 +92,7 @@ public abstract class Task<T>
 
     private Task next;
 
-    private SerializableFunction<T, Boolean> function;
+    private SerializableFunction<Object, Boolean> function;
 
     private String queueName;
 
@@ -269,7 +270,7 @@ public abstract class Task<T>
 
     /**
      * Schedules the given task as the next one to execute once the this (parent) task has been successfully finished.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task        the task as the next one to execute
      * @param postponeFor the number of seconds to be added to current time for this,
@@ -284,7 +285,7 @@ public abstract class Task<T>
 
     /**
      * Schedules the given task as the next one to execute once the this (parent) task has been successfully finished.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task    the task as the next one to execute
      * @param options the task configuration
@@ -308,7 +309,7 @@ public abstract class Task<T>
 
     /**
      * Adds task to be scheduled as a last one in the current chain.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task        the task to be scheduled
      * @param postponeFor the number of seconds to be added to current time for this,
@@ -322,7 +323,7 @@ public abstract class Task<T>
 
     /**
      * Adds task to be scheduled as a last one in the current chain.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task the task to be scheduled
      * @return just added task to chain calls
@@ -334,7 +335,7 @@ public abstract class Task<T>
 
     /**
      * Adds task to be scheduled as a last one in the current chain.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task    the task to be scheduled
      * @param options the task configuration
@@ -347,7 +348,7 @@ public abstract class Task<T>
 
     /**
      * Adds task to be scheduled as a last one in the current chain.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task      the task to be scheduled
      * @param condition the functional interface to evaluate a condition whether to enqueue given task.
@@ -355,15 +356,18 @@ public abstract class Task<T>
      *                  will be scheduled.
      * @return just added task to chain calls
      */
-    public final <S> Task<S> addNext( @Nonnull Task<S> task, @Nullable SerializableFunction<T, Boolean> condition )
+    public final <S> Task<S> addNext( @Nonnull Task<S> task, @Nullable SerializableFunction<S, Boolean> condition )
     {
-        this.function = condition;
-        return addNext( task, ( TaskOptions ) null );
+        // function is being evaluated on its parent task before execution
+        Task<?> leaf = leaf();
+        //noinspection unchecked
+        leaf.function = ( SerializableFunction<Object, Boolean> ) condition;
+        return leaf.setNext( task, null );
     }
 
     /**
      * Adds task to be scheduled as a last one in the current chain.
-     * The parent task is the first one to be executed.
+     * The root task is the first one to be executed.
      *
      * @param task      the task to be scheduled
      * @param condition the functional interface to evaluate a condition whether to enqueue given task.
@@ -374,10 +378,13 @@ public abstract class Task<T>
      */
     public final <S> Task<S> addNext( @Nonnull Task<S> task,
                                       @Nullable TaskOptions options,
-                                      @Nullable SerializableFunction<T, Boolean> condition )
+                                      @Nullable SerializableFunction<S, Boolean> condition )
     {
-        this.function = condition;
-        return addNext( task, options );
+        // function is being evaluated on its parent task before execution
+        Task<?> leaf = leaf();
+        //noinspection unchecked
+        leaf.function = ( SerializableFunction<Object, Boolean> ) condition;
+        return leaf.setNext( task, options );
     }
 
     /**
@@ -586,6 +593,47 @@ public abstract class Task<T>
                 '}';
     }
 
+    /**
+     * Evaluates recursively whether there is a next task to be scheduled.
+     * If a next task's non {@code null} {@link Task#function} evaluates to {@code false} that task will be skipped.
+     *
+     * @return the next task to be scheduled for execution, or {@code null} if none
+     */
+    private <S> Task nextToSchedule( @Nonnull Task<S> task )
+    {
+        boolean scheduleNext;
+        if ( task.hasNext() && task.function != null )
+        {
+            Object entity = task.next().workWith();
+            scheduleNext = entity != null && task.function.apply( entity );
+
+            if ( entity == null )
+            {
+                logger.info( "Entity not found for key: " + task.next().getEntityKey() );
+            }
+            else
+            {
+                logger.info( task.next().getGenericName() + "'s function has been evaluated with value: " + scheduleNext );
+            }
+        }
+        else
+        {
+            scheduleNext = true;
+        }
+
+        Task next;
+        if ( task.hasNext() && !scheduleNext )
+        {
+            logger.info( "The task with name '" + task.next().getGenericName() + "' is being skipped" );
+            next = nextToSchedule( task.next() );
+        }
+        else
+        {
+            next = task.next();
+        }
+        return next;
+    }
+
     @Override
     public final void run()
     {
@@ -594,42 +642,27 @@ public abstract class Task<T>
 
         execute();
 
-        boolean scheduleNext;
-        if ( hasNext() && function != null )
+        Task scheduled = nextToSchedule( this );
+        if ( scheduled == null )
         {
-            T entity = workWith();
-            scheduleNext = entity != null && function.apply( entity );
-            logger.info( "Task's function has been evaluated with value: " + scheduleNext );
+            return;
         }
         else
         {
-            scheduleNext = true;
-        }
-
-        if ( hasNext() && !scheduleNext )
-        {
-            logger.info( "The task with name '" + next.getGenericName() + "' is being skipped" );
-            // Next task will be skipped, however if there is an another task, schedule it!
-            next = next.next();
-        }
-
-        if ( hasNext() )
-        {
-            logger.info( "The task with name '" + next.getGenericName() + "' is being scheduled to be executed as next." );
+            logger.info( "The task with name '"
+                    + scheduled.getGenericName()
+                    + "' is being scheduled to be executed as next." );
         }
 
         // once parent task has been successfully executed, enqueue the next task
-        if ( hasNext() )
+        TaskOptions nextTaskOptions = scheduled.getOptions();
+        if ( nextTaskOptions == null )
         {
-            TaskOptions nextTaskOptions = next.getOptions();
-            if ( nextTaskOptions == null )
-            {
-                executor.schedule( next );
-            }
-            else
-            {
-                executor.schedule( next, nextTaskOptions );
-            }
+            executor.schedule( scheduled );
+        }
+        else
+        {
+            executor.schedule( scheduled, nextTaskOptions );
         }
     }
 

@@ -147,19 +147,19 @@ public class TaskTest
     @Test
     public void addNext_FunctionTrue()
     {
+        final Task<TestModel> next = new FakeTask( "Second task" );
+        tested.addNext( next, TestModel::isChanged );
+
         new Expectations( tested )
         {
             {
-                tested.workWith();
+                next.workWith();
                 result = new TestModel();
 
                 tested.getTaskName();
                 result = "First task";
             }
         };
-
-        final Task<?> next = new FakeTask( "Second task" );
-        tested.addNext( next, TestModel::isChanged );
 
         tested.run();
 
@@ -169,10 +169,13 @@ public class TaskTest
     @Test
     public void addNext_FunctionFalse()
     {
+        Task<TestModel> next = new FakeTask( "Second task" );
+        tested.addNext( next, TestModel::isChanged );
+
         new Expectations( tested )
         {
             {
-                tested.workWith();
+                next.workWith();
                 result = new TestModel( false );
 
                 tested.getTaskName();
@@ -180,18 +183,17 @@ public class TaskTest
             }
         };
 
-        Task<?> next = new FakeTask( "Second task" );
-        tested.addNext( next, TestModel::isChanged );
-
         tested.run();
 
         new Verifications()
         {
             {
-                executor.schedule( next );
+                //noinspection ConstantConditions
+                executor.schedule( ( Task ) any );
                 times = 0;
 
-                executor.schedule( next, ( TaskOptions ) any );
+                //noinspection ConstantConditions
+                executor.schedule( ( Task ) any, ( TaskOptions ) any );
                 times = 0;
             }
         };
@@ -200,22 +202,21 @@ public class TaskTest
     @Test
     public void addNext_FunctionFalseButOneMoreTask()
     {
+        Task<TestModel> next = new FakeTask( "Second task" );
+        Task<?> last = new FakeTask( "Last task" );
+
+        tested.addNext( next, TestModel::isChanged ).addNext( last );
+
         new Expectations( tested )
         {
             {
-                tested.workWith();
+                next.workWith();
                 result = new TestModel( false );
 
                 tested.getTaskName();
                 result = "First task";
             }
         };
-
-        Task<?> next = new FakeTask( "Second task" );
-        tested.addNext( next, TestModel::isChanged );
-
-        Task<?> last = new FakeTask( "Last task" );
-        tested.addNext( last );
 
         tested.run();
 
@@ -233,6 +234,70 @@ public class TaskTest
 
                 executor.schedule( last, ( TaskOptions ) any );
                 times = 0;
+            }
+        };
+    }
+
+    @Test
+    public void addNext_MultipleTasksExecuteLastOnly()
+    {
+        Task<TestModel> second = new FakeTask( "Second task" );
+        Task<Test2Model> third = new Fake2Task( "Third task" );
+
+        tested.addNext( second, TaskOptions.Builder.withDefaults(), TestModel::isChanged )
+                .addNext( third, Test2Model::isChanged );
+
+        Task<Test3Model> fourth = new Fake3Task( "Fourth task" );
+        tested.addNext( fourth, Test3Model::isChanged );
+
+        Task<Test4Model> last = new Fake4Task( "Last task" );
+        tested.addNext( last, TaskOptions.Builder.withDefaults(), Test4Model::isChanged );
+
+        new Expectations( second, third, fourth, last )
+        {
+            {
+                second.workWith();
+                result = new TestModel( false );
+
+                third.workWith();
+                result = new Test2Model( false );
+
+                fourth.workWith();
+                result = new Test3Model( false );
+
+                last.workWith();
+                result = new Test4Model( true );
+            }
+        };
+
+        tested.run();
+
+        new Verifications()
+        {
+            {
+                executor.schedule( second );
+                times = 0;
+
+                executor.schedule( second, ( TaskOptions ) any );
+                times = 0;
+
+                executor.schedule( third );
+                times = 0;
+
+                executor.schedule( third, ( TaskOptions ) any );
+                times = 0;
+
+                executor.schedule( fourth );
+                times = 0;
+
+                executor.schedule( fourth, ( TaskOptions ) any );
+                times = 0;
+
+                executor.schedule( last );
+                times = 0;
+
+                executor.schedule( last, ( TaskOptions ) any );
+                times = 1;
             }
         };
     }

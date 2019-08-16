@@ -22,6 +22,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * Fake task for unit testing only.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 public class FakeTask
@@ -29,21 +31,21 @@ public class FakeTask
 {
     private static final long serialVersionUID = 1L;
 
-    public FakeTask()
+    FakeTask()
     {
     }
 
-    public FakeTask( @Nonnull String namePrefix )
+    FakeTask( @Nonnull String namePrefix )
     {
         super( namePrefix );
     }
 
-    public FakeTask( @Nonnull String namePrefix, boolean makeUnique )
+    FakeTask( @Nonnull String namePrefix, boolean makeUnique )
     {
         super( namePrefix, makeUnique );
     }
 
-    public FakeTask( @Nullable String namePrefix, boolean makeUnique, @Nonnull String queueName )
+    FakeTask( @Nullable String namePrefix, boolean makeUnique, @Nonnull String queueName )
     {
         super( namePrefix, makeUnique, queueName );
     }

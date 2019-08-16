@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,28 +18,22 @@
 
 package org.ctoolkit.services.task;
 
-import org.testng.annotations.Test;
-
-import javax.inject.Inject;
-
 /**
+ * Test model for unit testing only.
+ *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class TaskExecutorQueueTest
-        extends BackendServiceTestCase
+class Test4Model
 {
-    @Inject
-    private TaskExecutor executor;
+    private boolean changed;
 
-    @Test
-    public void testExecute()
+    Test4Model( boolean changed )
     {
-        Task<TestModel> first = new FakeTask().postponeFor( 10 );
-        Task<TestModel> second = new FakeTask();
+        this.changed = changed;
+    }
 
-        first.addNext( second, TestModel::isChanged );
-
-        // first task will be postponed by 10 seconds, second will be added to the queue once first ends successfully
-        executor.schedule( first );
+    boolean isChanged()
+    {
+        return changed;
     }
 }
