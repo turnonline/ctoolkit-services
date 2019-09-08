@@ -51,10 +51,6 @@
         </dependency>
         <dependency>
             <groupId>com.google.endpoints</groupId>
-            <artifactId>endpoints-framework-guice</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.google.endpoints</groupId>
             <artifactId>endpoints-management-control-appengine-all</artifactId>
         </dependency>
         <dependency>
