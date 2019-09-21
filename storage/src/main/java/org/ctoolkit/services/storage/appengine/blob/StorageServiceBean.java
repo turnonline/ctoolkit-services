@@ -95,7 +95,7 @@ public class StorageServiceBean
         }
         else
         {
-            String message = "The full storage name does not follow expected pattern '" + STORAGE_NAME_PATTERN
+            String message = "The full storage name does not follow expected pattern '" + GOOGLE_STORAGE_NAME_PATTERN
                     + "' for given argument: '" + fullName + "' Fill: {0} - bucket name and {1} file name.";
 
             throw new IllegalArgumentException( message );
@@ -115,7 +115,7 @@ public class StorageServiceBean
     @Override
     public String getFullStorageName( @Nonnull Blob blob )
     {
-        return MessageFormat.format( STORAGE_NAME_PATTERN, blob.getBucket(), blob.getName() );
+        return MessageFormat.format( GOOGLE_STORAGE_NAME_PATTERN, blob.getBucket(), blob.getName() );
     }
 
     @Override

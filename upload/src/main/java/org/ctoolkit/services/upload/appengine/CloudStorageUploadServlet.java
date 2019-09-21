@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.ctoolkit.services.storage.GoogleStorageAwareGeneralMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,7 @@ import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
 import static com.google.common.net.HttpHeaders.CACHE_CONTROL;
 import static com.google.common.net.HttpHeaders.X_REQUESTED_WITH;
-import static org.ctoolkit.services.storage.StorageService.STORAGE_NAME_PATTERN;
+import static org.ctoolkit.services.storage.StorageService.GOOGLE_STORAGE_NAME_PATTERN;
 
 /**
  * Servlet handling uploads in to Google Cloud Storage.
@@ -107,6 +108,7 @@ import static org.ctoolkit.services.storage.StorageService.STORAGE_NAME_PATTERN;
 @SuppressWarnings( "UnstableApiUsage" )
 public class CloudStorageUploadServlet
         extends HttpServlet
+        implements GoogleStorageAwareGeneralMapping
 {
     /**
      * Optional header to instruct image service adjust image size in the response.
@@ -120,7 +122,9 @@ public class CloudStorageUploadServlet
 
     private static final String __MULTIPART_CONFIG_ELEMENT = "org.eclipse.jetty.multipartConfig";
 
-    private static final long serialVersionUID = -3618565065044722043L;
+    private static final String DIRECTORY = "uploads";
+
+    private static final long serialVersionUID = -720330088259322646L;
 
     private final Storage storage;
 
@@ -129,8 +133,6 @@ public class CloudStorageUploadServlet
     private final ImagesService imageService;
 
     private String bucketName;
-
-    private String directory = "uploads";
 
     public CloudStorageUploadServlet( Storage storage,
                                       AppIdentityService appIdentity,
@@ -182,7 +184,7 @@ public class CloudStorageUploadServlet
         for ( Part part : parts )
         {
             String filename = fileName( part );
-            String fullPath = directory + "/" + filename;
+            String fullPath = DIRECTORY + "/" + filename;
             if ( accountId != null )
             {
                 fullPath = accountId + "/" + fullPath;
@@ -204,12 +206,13 @@ public class CloudStorageUploadServlet
             }
 
             String gStorageName = MessageFormat.format(
-                    STORAGE_NAME_PATTERN,
+                    GOOGLE_STORAGE_NAME_PATTERN,
                     blobInfo.getBucket(),
                     blobInfo.getName() );
 
             jsonEntry = new JsonObject();
-            jsonEntry.addProperty( "storageName", gStorageName );
+            String storageName = storageNameInclPrefix() ? gStorageName : general( gStorageName );
+            jsonEntry.addProperty( "storageName", storageName );
             jsonEntry.addProperty( "fileName", filename );
 
             String servingUrl;
@@ -226,7 +229,7 @@ public class CloudStorageUploadServlet
                 {
                     try
                     {
-                        options.imageSize( Integer.valueOf( imageSize ) );
+                        options.imageSize( Integer.parseInt( imageSize ) );
                     }
                     catch ( NumberFormatException e )
                     {
@@ -265,6 +268,19 @@ public class CloudStorageUploadServlet
     protected MediaType responseMediaType()
     {
         return MediaType.PLAIN_TEXT_UTF_8;
+    }
+
+    /**
+     * Override if you need to change the storage name composition.
+     * If {@code true} the storage name will be in the JSON response rendered as a full Google Storage name
+     * rendered by {@link org.ctoolkit.services.storage.StorageService#GOOGLE_STORAGE_NAME_PATTERN}
+     * including its prefix.
+     *
+     * @return the storage name rendered either with Google Storage prefix or not
+     */
+    protected boolean storageNameInclPrefix()
+    {
+        return true;
     }
 
     private void store( Part uploaded, BlobInfo blobInfo ) throws IOException

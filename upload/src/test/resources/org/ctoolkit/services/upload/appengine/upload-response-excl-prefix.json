@@ -1,0 +1,9 @@
+{
+    "items": [
+        {
+            "fileName": "nice.jpeg",
+            "storageName": "test-bucket.appspot.com/132435/uploads/nice.jpeg",
+            "servingUrl": "https://cdn.google/abc683"
+        }
+    ]
+}

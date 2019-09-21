@@ -173,6 +173,50 @@ public class CloudStorageUploadServletTest
     }
 
     @Test
+    public void upload_ExcludingStorageNamePrefix() throws ServletException, IOException, JSONException
+    {
+        expectationsWithParts();
+
+        new Expectations( tested )
+        {
+            {
+                request.getHeader( RESPONSE_IMAGE_SIZE );
+                result = 200;
+
+                tested.storageNameInclPrefix();
+                result = false;
+            }
+        };
+
+        // test call
+        long accountId = 132435L;
+        tested.upload( request, response, accountId );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_CREATED );
+
+                ServingUrlOptions suo;
+                imageService.getServingUrl( suo = withCapture() );
+                assertThat( suo ).isNotNull();
+
+                ServingUrlOptions expected = ServingUrlOptions.Builder
+                        // internally we still need the storage name to be with '/gs/' prefix
+                        .withGoogleStorageFileName( "/gs/test-bucket.appspot.com/132435/uploads/nice.jpeg" )
+                        .crop( false )
+                        .imageSize( 200 )
+                        .secureUrl( true );
+
+                assertThat( suo ).isEqualTo( expected );
+            }
+        };
+
+        String expectedResponse = fromFile( "upload-response-excl-prefix.json" );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+    }
+
+    @Test
     public void upload_ImageCreatedWithInvalidImageSize() throws ServletException, IOException, JSONException
     {
         expectationsWithParts();
