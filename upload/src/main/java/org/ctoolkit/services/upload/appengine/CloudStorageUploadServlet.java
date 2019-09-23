@@ -114,7 +114,7 @@ public class CloudStorageUploadServlet
      * Optional header to instruct image service adjust image size in the response.
      * Valid sizes must be between 0 and  1600.
      */
-    public static final String RESPONSE_IMAGE_SIZE = "VND.turnon.cloud.Response-Image-Size";
+    public static final String RESPONSE_IMAGE_SIZE = "vnd.turnon.cloud.response-image-size";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CloudStorageUploadServlet.class );
 
@@ -180,11 +180,12 @@ public class CloudStorageUploadServlet
         JsonArray items = new JsonArray();
         root.add( "items", items );
         JsonObject jsonEntry;
+        String directory = uploadDirectory();
 
         for ( Part part : parts )
         {
             String filename = fileName( part );
-            String fullPath = DIRECTORY + "/" + filename;
+            String fullPath = directory + "/" + filename;
             if ( accountId != null )
             {
                 fullPath = accountId + "/" + fullPath;
@@ -281,6 +282,17 @@ public class CloudStorageUploadServlet
     protected boolean storageNameInclPrefix()
     {
         return true;
+    }
+
+    /**
+     * Override if you need to change the target directory of the cloud storage.
+     * A directory where all uploaded binaries will be stored.
+     *
+     * @return the upload directory of the cloud storage
+     */
+    protected String uploadDirectory()
+    {
+        return DIRECTORY;
     }
 
     private void store( Part uploaded, BlobInfo blobInfo ) throws IOException
