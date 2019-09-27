@@ -25,6 +25,8 @@ import com.google.cloud.WriteChannel;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.net.HttpHeaders;
@@ -55,7 +57,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS;
@@ -124,7 +129,7 @@ public class CloudStorageUploadServlet
 
     private static final String DIRECTORY = "uploads";
 
-    private static final long serialVersionUID = -720330088259322646L;
+    private static final long serialVersionUID = 6798165281784964077L;
 
     private final Storage storage;
 
@@ -132,15 +137,19 @@ public class CloudStorageUploadServlet
 
     private final ImagesService imageService;
 
+    private final Set<StorageUploadListener> listeners;
+
     private String bucketName;
 
     public CloudStorageUploadServlet( Storage storage,
                                       AppIdentityService appIdentity,
-                                      ImagesService imageService )
+                                      ImagesService imageService,
+                                      Set<StorageUploadListener> listeners )
     {
         this.storage = storage;
         this.appIdentity = appIdentity;
         this.imageService = imageService;
+        this.listeners = listeners;
     }
 
     @Override
@@ -180,18 +189,31 @@ public class CloudStorageUploadServlet
         JsonArray items = new JsonArray();
         root.add( "items", items );
         JsonObject jsonEntry;
-        String directory = uploadDirectory();
+        String directory;
+
+        try
+        {
+            directory = uploadDirectory( request );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+            return;
+        }
+
+        List<StorageUploadListener.Metadata> uploads = new ArrayList<>();
+        StorageUploadListener.Metadata.Builder metaBuilder;
 
         for ( Part part : parts )
         {
             String filename = fileName( part );
-            String fullPath = directory + "/" + filename;
+            String relativePath = directory + "/" + filename;
             if ( accountId != null )
             {
-                fullPath = accountId + "/" + fullPath;
+                relativePath = accountId + "/" + relativePath;
             }
 
-            BlobInfo.Builder builder = BlobInfo.newBuilder( BlobId.of( getBucketName(), fullPath ) );
+            BlobInfo.Builder builder = BlobInfo.newBuilder( BlobId.of( getBucketName(), relativePath ) );
             builder.setContentType( part.getContentType() );
 
             BlobInfo blobInfo = builder.build();
@@ -216,7 +238,7 @@ public class CloudStorageUploadServlet
             jsonEntry.addProperty( "storageName", storageName );
             jsonEntry.addProperty( "fileName", filename );
 
-            String servingUrl;
+            String servingUrl = null;
 
             if ( isAnyImageContentType( part ) )
             {
@@ -245,12 +267,45 @@ public class CloudStorageUploadServlet
                 }
                 catch ( Exception e )
                 {
+                    servingUrl = null;
                     // continue without 'servingUrl' property
                     LOGGER.error( "Get serving URL failure " + options, e );
                 }
             }
 
             items.add( jsonEntry );
+
+            // building metadata for upload listeners
+            if ( !listeners.isEmpty() )
+            {
+                metaBuilder = new StorageUploadListener.Metadata.Builder();
+                StorageUploadListener.Metadata metadata = metaBuilder.blobInfo( blobInfo )
+                        .cloudStorageName( gStorageName )
+                        .generalStorageName( storageName )
+                        .fileName( filename )
+                        .relativePath( relativePath )
+                        .servingUrl( servingUrl ).build();
+                uploads.add( metadata );
+            }
+        }
+
+        for ( StorageUploadListener listener : listeners )
+        {
+            try
+            {
+                listener.onStorageUpload( request, uploads, accountId );
+            }
+            catch ( Exception e )
+            {
+                LOGGER.error( "Processing of the storage upload listener has failed: "
+                        + MoreObjects.toStringHelper( "Input" )
+                        .add( "Account.ID", accountId )
+                        .add( "Number of listeners", listeners.size() )
+                        .addValue( uploads )
+                        .toString(), e );
+                response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+                return;
+            }
         }
 
         json.toJson( root, response.getWriter() );
@@ -277,7 +332,7 @@ public class CloudStorageUploadServlet
      * rendered by {@link org.ctoolkit.services.storage.StorageService#GOOGLE_STORAGE_NAME_PATTERN}
      * including its prefix.
      *
-     * @return the storage name rendered either with Google Storage prefix or not
+     * @return the boolean controller whether to render storage name either with Google Storage prefix or not
      */
     protected boolean storageNameInclPrefix()
     {
@@ -285,12 +340,26 @@ public class CloudStorageUploadServlet
     }
 
     /**
+     * Override if you want change whether to append a timestamp at the end of the file name for every uploaded binary.
+     * Default {@code false}.
+     *
+     * @return {@code true} to append a timestamp at the end of the file name
+     */
+    protected boolean fileNameInclTimestamp()
+    {
+        return false;
+    }
+
+    /**
      * Override if you need to change the target directory of the cloud storage.
      * A directory where all uploaded binaries will be stored.
      *
+     * @param request the current HTTP request
      * @return the upload directory of the cloud storage
+     * @throws IllegalArgumentException if request a parameter is invalid; once thrown response will be
+     *                                  {@link HttpServletResponse#SC_BAD_REQUEST}
      */
-    protected String uploadDirectory()
+    protected String uploadDirectory( @Nonnull HttpServletRequest request )
     {
         return DIRECTORY;
     }
@@ -327,12 +396,19 @@ public class CloudStorageUploadServlet
         }
     }
 
-    private String fileName( final Part part )
+    @VisibleForTesting
+    String fileName( Part part )
     {
         String fileName = part.getSubmittedFileName();
         if ( Strings.isNullOrEmpty( fileName ) )
         {
             fileName = UUID.randomUUID().toString();
+        }
+        else if ( fileNameInclTimestamp() )
+        {
+            // https://stackoverflow.com/questions/4545937/java-splitting-the-filename-into-a-base-and-extension
+            String[] tokens = fileName.split( "\\.(?=[^.]+$)" );
+            fileName = tokens[0] + "-" + System.currentTimeMillis() + "." + tokens[1];
         }
         return fileName;
     }

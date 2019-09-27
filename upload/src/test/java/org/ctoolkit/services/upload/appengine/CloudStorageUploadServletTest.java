@@ -27,6 +27,8 @@ import com.google.cloud.storage.Storage;
 import com.google.common.io.CharStreams;
 import mockit.Expectations;
 import mockit.Injectable;
+import mockit.Mock;
+import mockit.MockUp;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
@@ -48,8 +50,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.ctoolkit.services.upload.appengine.CloudStorageUploadServlet.RESPONSE_IMAGE_SIZE;
 
 /**
@@ -75,6 +80,9 @@ public class CloudStorageUploadServletTest
     @Injectable
     private ImagesService imageService;
 
+    @Injectable
+    private Set<StorageUploadListener> listeners;
+
     @Mocked
     private HttpServletRequest request;
 
@@ -90,6 +98,7 @@ public class CloudStorageUploadServletTest
     public void before()
     {
         writer = new StringWriter();
+        listeners = new HashSet<>();
     }
 
     @Test
@@ -217,7 +226,62 @@ public class CloudStorageUploadServletTest
     }
 
     @Test
-    public void upload_ImageCreatedWithInvalidImageSize() throws ServletException, IOException, JSONException
+    public void upload_IncludingFileNameTimestampPostfix() throws ServletException, IOException, JSONException
+    {
+        expectationsWithParts();
+        expectationsInclTimestamp();
+
+        // test call
+        long accountId = 4352L;
+        tested.upload( request, response, accountId );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_CREATED );
+
+                ServingUrlOptions suo;
+                imageService.getServingUrl( suo = withCapture() );
+                assertThat( suo ).isNotNull();
+
+                ServingUrlOptions expected = ServingUrlOptions.Builder
+                        // internally we still need the storage name to be with '/gs/' prefix
+                        .withGoogleStorageFileName( "/gs/test-bucket.appspot.com/4352/uploads/nice-1569564533490.jpeg" )
+                        .crop( false )
+                        .secureUrl( true );
+
+                assertThat( suo ).isEqualTo( expected );
+            }
+        };
+
+        String expectedResponse = fromFile( "upload-response-incl-timestamp.json" );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+    }
+
+    @Test
+    public void upload_DirectoryInvalidRequest() throws ServletException, IOException
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.uploadDirectory( request );
+                result = new IllegalArgumentException( "Invalid parameter" );
+            }
+        };
+
+        long accountId = 132435L;
+        tested.upload( request, response, accountId );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+            }
+        };
+    }
+
+    @Test
+    public void upload_ImageCreatedWithInvalidImageSize() throws ServletException, IOException
     {
         expectationsWithParts();
 
@@ -347,6 +411,85 @@ public class CloudStorageUploadServletTest
     }
 
     @Test
+    public void upload_ListenerRegistered() throws IOException, ServletException, JSONException
+    {
+        expectationsWithParts();
+
+        new Expectations( tested )
+        {
+            {
+                tested.storageNameInclPrefix();
+                result = false;
+            }
+        };
+
+        listeners.add( ( request, uploads, accountId ) -> {
+            assertThat( uploads ).isNotNull();
+
+            assertWithMessage( "Number of uploaded files" )
+                    .that( uploads )
+                    .hasSize( 1 );
+
+            StorageUploadListener.Metadata metadata = uploads.get( 0 );
+
+            assertWithMessage( "Upload metadata: Blob Info" )
+                    .that( metadata.getBlobInfo() )
+                    .isNotNull();
+
+            assertWithMessage( "Upload metadata: Cloud Storage Name" )
+                    .that( metadata.getCloudStorageName() )
+                    .isEqualTo( "/gs/test-bucket.appspot.com/132435/uploads/nice.jpeg" );
+
+            assertWithMessage( "Upload metadata: File Name" )
+                    .that( metadata.getFileName() )
+                    .isEqualTo( "nice.jpeg" );
+
+            assertWithMessage( "Upload metadata: relative path to the file incl. file name" )
+                    .that( metadata.getRelativePath() )
+                    .isEqualTo( "132435/uploads/nice.jpeg" );
+
+            assertWithMessage( "Upload metadata: General Storage Name" )
+                    .that( metadata.getGeneralStorageName() )
+                    .isEqualTo( "test-bucket.appspot.com/132435/uploads/nice.jpeg" );
+
+            assertWithMessage( "Upload metadata: Serving URL" )
+                    .that( metadata.getServingUrl() )
+                    .isEqualTo( "https://cdn.google/abc683" );
+
+            assertWithMessage( "Account ID" )
+                    .that( accountId )
+                    .isEqualTo( 132435L );
+        } );
+
+        // test call
+        long accountId = 132435L;
+        tested.upload( request, response, accountId );
+
+        String expectedResponse = fromFile( "upload-response-excl-prefix.json" );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+    }
+
+    @Test
+    public void upload_ErrorOnRegisteredListener() throws IOException, ServletException
+    {
+        expectationsWithParts();
+
+        listeners.add( ( request, uploads, accountId ) -> {
+            throw new RuntimeException( "Upload listener failure" );
+        } );
+
+        // test call
+        tested.upload( request, response, null );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+            }
+        };
+    }
+
+    @Test
     public void isAnyImageContentType_Jpeg()
     {
         new Expectations()
@@ -416,6 +559,72 @@ public class CloudStorageUploadServletTest
         assertThat( tested.isAnyImageContentType( part ) ).named( "Image content-type" ).isFalse();
     }
 
+    @Test
+    public void fileNameInclTimestamp_UUID()
+    {
+        new Expectations()
+        {
+            {
+                part.getSubmittedFileName();
+                result = null;
+            }
+        };
+
+        assertWithMessage( "UUID based file name expected" )
+                .that( tested.fileName( part ) )
+                .hasLength( 36 );
+    }
+
+    @Test
+    public void fileNameInclTimestamp_SimpleName()
+    {
+        expectationsInclTimestamp( "nice.jpeg" );
+
+        assertWithMessage( "File name incl. timestamp as postfix" )
+                .that( tested.fileName( part ) )
+                .isEqualTo( "nice-1569564533490.jpeg" );
+    }
+
+    @Test
+    public void fileNameInclTimestamp_NameWithSpace()
+    {
+        expectationsInclTimestamp( "nice image.png" );
+
+        assertWithMessage( "File name incl. timestamp as postfix" )
+                .that( tested.fileName( part ) )
+                .isEqualTo( "nice image-1569564533490.png" );
+    }
+
+    @Test
+    public void fileNameInclTimestamp_CamelCaseName()
+    {
+        expectationsInclTimestamp( "Ugly Image.svg" );
+
+        assertWithMessage( "File name incl. timestamp as postfix" )
+                .that( tested.fileName( part ) )
+                .isEqualTo( "Ugly Image-1569564533490.svg" );
+    }
+
+    @Test
+    public void fileNameInclTimestamp_NameWithNumbers()
+    {
+        expectationsInclTimestamp( "Image123.bla" );
+
+        assertWithMessage( "File name incl. timestamp as postfix" )
+                .that( tested.fileName( part ) )
+                .isEqualTo( "Image123-1569564533490.bla" );
+    }
+
+    @Test
+    public void fileNameInclTimestamp_NameWhatever()
+    {
+        expectationsInclTimestamp( "Image-@.whatever" );
+
+        assertWithMessage( "File name incl. timestamp as postfix" )
+                .that( tested.fileName( part ) )
+                .isEqualTo( "Image-@-1569564533490.whatever" );
+    }
+
     private void expectationsWithParts() throws IOException, ServletException
     {
         expectationsWithParts( "image/jpeg" );
@@ -456,7 +665,34 @@ public class CloudStorageUploadServletTest
         };
     }
 
-    @SuppressWarnings( "UnstableApiUsage" )
+    private void expectationsInclTimestamp()
+    {
+        expectationsInclTimestamp( FILE_NAME );
+    }
+
+    private void expectationsInclTimestamp( String fileName )
+    {
+        new Expectations( tested )
+        {
+            {
+                tested.fileNameInclTimestamp();
+                result = true;
+
+                part.getSubmittedFileName();
+                result = fileName;
+            }
+        };
+
+        new MockUp<System>()
+        {
+            @Mock
+            public long currentTimeMillis()
+            {
+                return 1569564533490L;
+            }
+        };
+    }
+
     private String fromFile( String fileName ) throws IOException
     {
         InputStream stream = this.getClass().getResourceAsStream( fileName );
