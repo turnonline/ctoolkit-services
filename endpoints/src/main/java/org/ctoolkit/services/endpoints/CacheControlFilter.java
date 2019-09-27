@@ -50,7 +50,10 @@ public abstract class CacheControlFilter
     public void doFilter( ServletRequest request, ServletResponse response, FilterChain chain )
             throws IOException, ServletException
     {
-        ( ( HttpServletResponse ) response ).addHeader( HttpHeaders.CACHE_CONTROL, cacheControl );
+        HttpServletResponse httpResponse = ( HttpServletResponse ) response;
+        httpResponse.addHeader( HttpHeaders.CACHE_CONTROL, cacheControl );
+        httpResponse.setHeader( HttpHeaders.VARY, getVary() );
+
         chain.doFilter( request, response );
     }
 
@@ -65,4 +68,14 @@ public abstract class CacheControlFilter
      * @return the max age in seconds
      */
     protected abstract Integer getMaxAge();
+
+    /**
+     * Override this if you want to provide custom 'Vary' header. Default is 'Referer'
+     *
+     * @return vary header value
+     */
+    protected String getVary()
+    {
+        return "Referer";
+    }
 }
