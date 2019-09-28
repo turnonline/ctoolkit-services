@@ -25,6 +25,7 @@ import org.ctoolkit.services.storage.StorageService;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -51,8 +52,12 @@ public interface StorageUploadListener
                           @Nonnull List<Metadata> uploads,
                           @Nullable Long accountId );
 
+    @SuppressWarnings( "WeakerAccess" )
     class Metadata
+            implements Serializable
     {
+        private static final long serialVersionUID = 382970411903226244L;
+
         private BlobInfo blobInfo;
 
         private String fileName;
@@ -154,43 +159,43 @@ public interface StorageUploadListener
 
             private String servingUrl;
 
-            Builder blobInfo( BlobInfo blobInfo )
+            public Builder blobInfo( BlobInfo blobInfo )
             {
                 this.blobInfo = blobInfo;
                 return this;
             }
 
-            Builder fileName( String fileName )
+            public Builder fileName( String fileName )
             {
                 this.fileName = fileName;
                 return this;
             }
 
-            Builder relativePath( String relativePath )
+            public Builder relativePath( String relativePath )
             {
                 this.path = relativePath;
                 return this;
             }
 
-            Builder cloudStorageName( String cloudStorageName )
+            public Builder cloudStorageName( String cloudStorageName )
             {
                 this.cloudStorageName = cloudStorageName;
                 return this;
             }
 
-            Builder generalStorageName( String generalStorageName )
+            public Builder generalStorageName( String generalStorageName )
             {
                 this.generalStorageName = generalStorageName;
                 return this;
             }
 
-            Builder servingUrl( String servingUrl )
+            public Builder servingUrl( String servingUrl )
             {
                 this.servingUrl = servingUrl;
                 return this;
             }
 
-            Metadata build()
+            public Metadata build()
             {
                 return new Metadata( blobInfo, fileName, path, cloudStorageName, generalStorageName, servingUrl );
             }
