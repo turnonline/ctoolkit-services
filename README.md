@@ -1,2 +1,2 @@
 # Cloud Toolkit Services
-The supporting backend libraries for microservices designed for Google App Engine standard environment.
+Cloud Toolkit Services, the backend libraries for microservices. Designed as a convenient extension for Google App Engine standard environment.
