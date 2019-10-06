@@ -145,7 +145,7 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.75</gae.version>
+        <gae.version>1.9.76</gae.version>
         <jmockit.version>1.41</jmockit.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->

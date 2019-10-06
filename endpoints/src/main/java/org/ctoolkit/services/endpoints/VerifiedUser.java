@@ -85,25 +85,25 @@ public class VerifiedUser
 
         private String audience;
 
-        public Builder userId( String userId )
+        Builder userId( String userId )
         {
             this.userId = userId;
             return this;
         }
 
-        public Builder email( String email )
+        Builder email( String email )
         {
             this.email = email;
             return this;
         }
 
-        public Builder token( String token )
+        Builder token( String token )
         {
             this.token = token;
             return this;
         }
 
-        public Builder audience( String audience )
+        Builder audience( String audience )
         {
             this.audience = audience;
             return this;

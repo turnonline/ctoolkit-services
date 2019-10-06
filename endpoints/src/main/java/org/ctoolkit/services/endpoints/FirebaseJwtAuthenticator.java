@@ -29,6 +29,8 @@ import com.google.api.server.spi.auth.GoogleJwtAuthenticator;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.config.Authenticator;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,14 +38,14 @@ import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * The Firebase JWT token thread-safe authenticator that ignores validated token's audience and issuer.
- * Inspired by {@link GoogleJwtAuthenticator}.
+ * The Firebase JWT token thread-safe authenticator that ignores (no additional checks)
+ * validated token's audience and issuer. Inspired by {@link GoogleJwtAuthenticator}.
  * <p>
  * The user is type of the {@link VerifiedUser} and is available as request attribute:
  * <p>
  * {@code (VerifiedUser) request.getAttribute( VerifiedUser.class.getName() );}
  *
- * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
 @Singleton
 public class FirebaseJwtAuthenticator
@@ -70,6 +72,15 @@ public class FirebaseJwtAuthenticator
         verifier = builder.build();
     }
 
+    /**
+     * Valid token will result in a new instance {@link VerifiedUser} with all these properties populated.
+     * <ul>
+     *     <li>subject as {@link VerifiedUser#getId()}</li>
+     *     <li>email as {@link VerifiedUser#getEmail()}</li>
+     *     <li>audience as {@link VerifiedUser#getAudience()}</li>
+     * </ul>
+     * If some of these properties are not present {@code null} will be returned.
+     */
     @Override
     public User authenticate( HttpServletRequest request )
     {
@@ -92,7 +103,7 @@ public class FirebaseJwtAuthenticator
         }
         catch ( Exception e )
         {
-            logger.warn( e.getMessage() );
+            logger.warn( "Error while verifying JWT", e );
             return null;
         }
 
@@ -101,8 +112,17 @@ public class FirebaseJwtAuthenticator
         String audience = ( String ) idToken.getPayload().getAudience();
 
         User user;
-        if ( email == null )
+        if ( Strings.isNullOrEmpty( email )
+                || Strings.isNullOrEmpty( userId )
+                || Strings.isNullOrEmpty( audience ) )
         {
+            logger.info( "All of the User properties 'email', 'subject' (userId), and 'audience' must be present: "
+                    + MoreObjects.toStringHelper( "User" )
+                    .add( "email", email )
+                    .add( "userId", userId )
+                    .add( "audience", audience )
+                    .toString() );
+
             return null;
         }
         else

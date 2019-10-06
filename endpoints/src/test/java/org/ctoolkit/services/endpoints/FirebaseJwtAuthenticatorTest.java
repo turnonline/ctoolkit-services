@@ -39,8 +39,9 @@ import static org.testng.Assert.assertNull;
 /**
  * {@link FirebaseJwtAuthenticator} unit testing.
  *
- * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
+@SuppressWarnings( "ResultOfMethodCallIgnored" )
 public class FirebaseJwtAuthenticatorTest
 {
     private static final String FAKE_TOKEN = "token-123";
@@ -51,11 +52,17 @@ public class FirebaseJwtAuthenticatorTest
     @Injectable
     private GoogleIdTokenVerifier verifier;
 
+    @Mocked
+    private HttpServletRequest request;
+
+    @Mocked
+    private GoogleAuth googleAuth;
+
+    @Mocked
+    private GoogleIdToken idToken;
+
     @Test
-    public void authenticateOk( @Mocked final HttpServletRequest request,
-                                @Mocked final GoogleIdTokenVerifier verifier,
-                                @Mocked final GoogleIdToken idToken,
-                                @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticate_Ok()
             throws GeneralSecurityException, IOException
     {
         final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
@@ -63,7 +70,7 @@ public class FirebaseJwtAuthenticatorTest
         payload.setEmail( "verified@turnonline.biz" );
         payload.setAudience( "my-audience" );
 
-        verificationPassedExpectations( tested, request, verifier, idToken, payload );
+        passedExpectations( tested, request, verifier, idToken, payload );
 
         User user = tested.authenticate( request );
         VerifiedUser verifiedUser = ( VerifiedUser ) user;
@@ -76,56 +83,42 @@ public class FirebaseJwtAuthenticatorTest
     }
 
     @Test
-    public void authenticateOkUserIdNull( @Mocked final HttpServletRequest request,
-                                          @Mocked final GoogleIdTokenVerifier verifier,
-                                          @Mocked final GoogleIdToken idToken,
-                                          @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticate_NotOkUserIdNull()
             throws GeneralSecurityException, IOException
     {
         final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setEmail( "verified@turnonline.biz" );
+        payload.setSubject( null );
+        payload.setAudience( "my-audience" );
 
-        verificationPassedExpectations( tested, request, verifier, idToken, payload );
+        notPassedExpectations( tested, request, verifier, idToken, payload );
 
-        User user = tested.authenticate( request );
-
-        assertNotNull( user );
-        assertNull( user.getId() );
-        assertEquals( user.getEmail(), "verified@turnonline.biz" );
+        assertNull( tested.authenticate( request ) );
     }
 
     @Test
-    public void authenticateVerifiedButEmailNull( @Mocked final HttpServletRequest request,
-                                                  @Mocked final GoogleIdTokenVerifier verifier,
-                                                  @Mocked final GoogleIdToken idToken,
-                                                  @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticate_NotOkUserAudienceNull()
+            throws GeneralSecurityException, IOException
+    {
+        final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setSubject( "userId123" );
+        payload.setAudience( null );
+
+        notPassedExpectations( tested, request, verifier, idToken, payload );
+
+        assertNull( tested.authenticate( request ) );
+    }
+
+    @Test
+    public void authenticate_VerifiedButEmailNull()
             throws GeneralSecurityException, IOException
     {
         final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setSubject( "userId123" );
+        payload.setAudience( "my-audience" );
 
-        new Expectations( tested )
-        {
-            {
-                GoogleAuth.getAuthToken( request );
-                result = FAKE_TOKEN;
-
-                GoogleAuth.isJwt( FAKE_TOKEN );
-                result = true;
-
-                tested.getVerifier();
-                result = verifier;
-
-                verifier.verify( FAKE_TOKEN );
-                result = idToken;
-
-                idToken.getPayload();
-                result = payload;
-
-                request.setAttribute( VerifiedUser.class.getName(), any );
-                times = 0;
-            }
-        };
+        notPassedExpectations( tested, request, verifier, idToken, payload );
 
         User user = tested.authenticate( request );
 
@@ -133,9 +126,7 @@ public class FirebaseJwtAuthenticatorTest
     }
 
     @Test
-    public void authenticateException( @Mocked final HttpServletRequest request,
-                                       @Mocked final GoogleIdTokenVerifier verifier,
-                                       @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticate_Exception()
             throws GeneralSecurityException, IOException
     {
         new Expectations( tested )
@@ -161,8 +152,7 @@ public class FirebaseJwtAuthenticatorTest
     }
 
     @Test
-    public void authenticateInvalidJwtToken( @Mocked final HttpServletRequest request,
-                                             @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticateInvalidJwtToken()
     {
         new Expectations( tested )
         {
@@ -184,8 +174,7 @@ public class FirebaseJwtAuthenticatorTest
     }
 
     @Test
-    public void authenticateMissingToken( @Mocked final HttpServletRequest request,
-                                          @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticateMissingToken()
     {
         new Expectations( tested )
         {
@@ -204,9 +193,7 @@ public class FirebaseJwtAuthenticatorTest
     }
 
     @Test
-    public void authenticateFail( @Mocked final HttpServletRequest request,
-                                  @Mocked final GoogleIdTokenVerifier verifier,
-                                  @SuppressWarnings( "unused" ) @Mocked GoogleAuth googleAuth )
+    public void authenticateFail()
             throws GeneralSecurityException, IOException
     {
         new Expectations( tested )
@@ -231,11 +218,11 @@ public class FirebaseJwtAuthenticatorTest
         assertNull( user );
     }
 
-    private void verificationPassedExpectations( final FirebaseJwtAuthenticator tested,
-                                                 final HttpServletRequest request,
-                                                 final GoogleIdTokenVerifier verifier,
-                                                 final GoogleIdToken idToken,
-                                                 final GoogleIdToken.Payload payload )
+    private void passedExpectations( FirebaseJwtAuthenticator tested,
+                                     HttpServletRequest request,
+                                     GoogleIdTokenVerifier verifier,
+                                     GoogleIdToken idToken,
+                                     GoogleIdToken.Payload payload )
             throws GeneralSecurityException, IOException
     {
         new Expectations( tested )
@@ -258,6 +245,37 @@ public class FirebaseJwtAuthenticatorTest
 
                 request.setAttribute( VerifiedUser.class.getName(), any );
                 times = 1;
+            }
+        };
+    }
+
+    private void notPassedExpectations( FirebaseJwtAuthenticator tested,
+                                        HttpServletRequest request,
+                                        GoogleIdTokenVerifier verifier,
+                                        GoogleIdToken idToken,
+                                        GoogleIdToken.Payload payload )
+            throws GeneralSecurityException, IOException
+    {
+        new Expectations( tested )
+        {
+            {
+                GoogleAuth.getAuthToken( request );
+                result = FAKE_TOKEN;
+
+                GoogleAuth.isJwt( FAKE_TOKEN );
+                result = true;
+
+                tested.getVerifier();
+                result = verifier;
+
+                verifier.verify( FAKE_TOKEN );
+                result = idToken;
+
+                idToken.getPayload();
+                result = payload;
+
+                request.setAttribute( VerifiedUser.class.getName(), any );
+                times = 0;
             }
         };
     }
