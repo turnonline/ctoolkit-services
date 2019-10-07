@@ -23,8 +23,11 @@ import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.response.ServiceUnavailableException;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
@@ -37,11 +40,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The {@link GoogleOAuth2Authenticator} extended by following functionality.
  * Authenticator to validate Google App Engine Default Service Account, whether the authenticated email
  * comes from the same Google Cloud Project. Intended only for server to server calls.
- * It's recommended to be used only in trusted environment,
- * where caller and called server are being served within a same project.
+ * Use only in trusted environment, where caller and called server are being served within
+ * the same Google Cloud Project.
  *
- * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see OnBehalfOfUser
+ * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
+ * @see VerifiedUser
  */
 @Singleton
 public class ServerToServerAuthenticator
@@ -51,6 +54,10 @@ public class ServerToServerAuthenticator
 
     public static final String ON_BEHALF_OF_USER_ID = "X-On-Behalf-Of-User-Id";
 
+    public static final String ON_BEHALF_OF_AUDIENCE = "X-On-Behalf-Of-Audience";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( ServerToServerAuthenticator.class );
+
     private final String applicationId;
 
     public ServerToServerAuthenticator()
@@ -58,6 +65,7 @@ public class ServerToServerAuthenticator
         this( SystemProperty.applicationId.get() );
     }
 
+    @VisibleForTesting
     public ServerToServerAuthenticator( String appId )
     {
         this.applicationId = checkNotNull( appId );
@@ -66,15 +74,16 @@ public class ServerToServerAuthenticator
     /**
      * In case authenticated user it's not a default service account of the current Google Cloud Project,
      * it will return {@code null} as unauthenticated.
-     * If passed it returns instance of {@link OnBehalfOfUser} and mapping of the properties are following:
+     * If passed it returns instance of {@link VerifiedUser} and mapping of the properties are following:
      * <ul>
-     * <li>{@link User#getEmail()} populated from the request header {@link #ON_BEHALF_OF_EMAIL},
+     * <li>{@link VerifiedUser#getEmail()} populated from the request header {@link #ON_BEHALF_OF_EMAIL},
      * the email as an identification of the user on behalf of whom the service account has been authenticated</li>
-     * <li>{@link User#getId()} populated from the request header {@link #ON_BEHALF_OF_USER_ID} optional</li>
-     * <li>{@link OnBehalfOfUser#getServiceAccount()} email taken from the authenticated user</li>
+     * <li>{@link VerifiedUser#getId()} populated from the request header {@link #ON_BEHALF_OF_USER_ID}</li>
+     * <li>{@link VerifiedUser#getAudience()} populated from the request header {@link #ON_BEHALF_OF_AUDIENCE}</li>
+     * <li>{@link VerifiedUser#getServiceAccount()} email taken from the authenticated user</li>
      * </ul>
-     * For the use case with authenticated default service account but 'on behalf of' headers are missing,
-     * it will return authenticated service account.
+     * For the use case with authenticated default service account but even one of the 'on behalf of'
+     * headers are missing, it will return authenticated service account.
      */
     @Override
     public User authenticate( HttpServletRequest request ) throws ServiceUnavailableException
@@ -86,23 +95,33 @@ public class ServerToServerAuthenticator
             String serviceAccount = authenticated.getEmail().toLowerCase();
             Iterable<String> strings = Splitter.on( "@" ).omitEmptyStrings().trimResults().split( serviceAccount );
 
-            String email = request.getHeader( ON_BEHALF_OF_EMAIL );
-            String userId = request.getHeader( ON_BEHALF_OF_USER_ID );
-
             if ( isApplicationIdEquals( strings ) )
             {
-                if ( Strings.isNullOrEmpty( email ) )
+                String email = request.getHeader( ON_BEHALF_OF_EMAIL );
+                String userId = request.getHeader( ON_BEHALF_OF_USER_ID );
+                String audience = request.getHeader( ON_BEHALF_OF_AUDIENCE );
+
+                if ( Strings.isNullOrEmpty( email )
+                        || Strings.isNullOrEmpty( userId )
+                        || Strings.isNullOrEmpty( audience ) )
                 {
-                    // no on behalf user, return authenticated service account
+                    LOGGER.warn( "Not all required User properties taken from headers are present: "
+                            + MoreObjects.toStringHelper( "User" )
+                            .add( "email", email )
+                            .add( "userId", userId )
+                            .add( "audience", audience ) );
+
+                    // no on behalf of user, return authenticated service account
                     return authenticated;
                 }
 
-                OnBehalfOfUser.Builder builder = new OnBehalfOfUser.Builder();
+                VerifiedUser.Builder builder = new VerifiedUser.Builder();
                 builder.email( email )
                         .userId( userId )
+                        .audience( audience )
                         .serviceAccount( serviceAccount );
 
-                return new OnBehalfOfUser( builder );
+                return builder.build();
             }
         }
         // unauthenticated

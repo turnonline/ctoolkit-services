@@ -129,7 +129,7 @@ public class FirebaseJwtAuthenticator
         {
             VerifiedUser.Builder builder = new VerifiedUser.Builder();
             builder.email( email ).userId( userId ).audience( audience ).token( token );
-            user = new VerifiedUser( builder );
+            user = builder.build();
 
             request.setAttribute( VerifiedUser.class.getName(), user );
         }
