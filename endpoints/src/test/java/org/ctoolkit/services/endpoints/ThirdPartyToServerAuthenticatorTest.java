@@ -21,7 +21,6 @@ package org.ctoolkit.services.endpoints;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.response.ServiceUnavailableException;
 import mockit.Expectations;
-import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
 import org.testng.annotations.Test;
@@ -51,9 +50,6 @@ public class ThirdPartyToServerAuthenticatorTest
 
     @Tested
     private ThirdPartyToServerAuthenticator tested;
-
-    @Injectable
-    private String appId = PROJECT_ID;
 
     @Mocked
     private HttpServletRequest request;
