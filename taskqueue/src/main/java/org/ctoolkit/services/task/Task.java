@@ -21,6 +21,7 @@ package org.ctoolkit.services.task;
 import com.google.appengine.api.taskqueue.DeferredTask;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.inject.Injector;
 import com.googlecode.objectify.Key;
@@ -143,6 +144,12 @@ public abstract class Task<T>
         this.namePrefix = namePrefix;
         this.makeUnique = namePrefix != null && makeUnique;
         this.queueName = checkNotNull( queueName );
+    }
+
+    @VisibleForTesting
+    public void setExecutor( TaskExecutor executor )
+    {
+        this.executor = executor;
     }
 
     /**
