@@ -29,16 +29,15 @@ import org.testng.annotations.Test;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.ctoolkit.services.endpoints.ServerToServerAuthenticator.ON_BEHALF_OF_AUDIENCE;
-import static org.ctoolkit.services.endpoints.ServerToServerAuthenticator.ON_BEHALF_OF_EMAIL;
-import static org.ctoolkit.services.endpoints.ServerToServerAuthenticator.ON_BEHALF_OF_USER_ID;
+import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON_BEHALF_OF_EMAIL;
+import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON_BEHALF_OF_USER_ID;
 
 /**
- * {@link ServerToServerAuthenticator} unit testing.
+ * {@link ThirdPartyToServerAuthenticator} unit testing.
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
-public class ServerToServerAuthenticatorTest
+public class ThirdPartyToServerAuthenticatorTest
 {
     private static final String PROJECT_ID = "my-project-id";
 
@@ -50,10 +49,8 @@ public class ServerToServerAuthenticatorTest
 
     private static final String USER_ID = "765098234";
 
-    private static final String AUDIENCE = "turn-online-eu";
-
     @Tested
-    private ServerToServerAuthenticator tested;
+    private ThirdPartyToServerAuthenticator tested;
 
     @Injectable
     private String appId = PROJECT_ID;
@@ -77,9 +74,6 @@ public class ServerToServerAuthenticatorTest
 
                 request.getHeader( ON_BEHALF_OF_USER_ID );
                 result = USER_ID;
-
-                request.getHeader( ON_BEHALF_OF_AUDIENCE );
-                result = AUDIENCE;
             }
         };
 
@@ -89,7 +83,36 @@ public class ServerToServerAuthenticatorTest
         assertThat( authenticated ).isInstanceOf( VerifiedUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
         assertThat( authenticated.getId() ).isEqualTo( USER_ID );
-        assertThat( ( ( VerifiedUser ) authenticated ).getAudience() ).isEqualTo( AUDIENCE );
+        assertThat( ( ( VerifiedUser ) authenticated ).getAudience() ).isEqualTo( PROJECT_ID );
+        assertThat( ( ( VerifiedUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
+    }
+
+    @Test
+    public void authenticate_PassXHeaders() throws ServiceUnavailableException
+    {
+        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT.toUpperCase() );
+
+        new Expectations( tested )
+        {
+            {
+                tested.internalAuthenticate( request );
+                result = user;
+
+                request.getHeader( "X-On-Behalf-Of-Email" );
+                result = EMAIL;
+
+                request.getHeader( "X-On-Behalf-Of-User-Id" );
+                result = USER_ID;
+            }
+        };
+
+        User authenticated = tested.authenticate( request );
+
+        assertThat( authenticated ).isNotNull();
+        assertThat( authenticated ).isInstanceOf( VerifiedUser.class );
+        assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
+        assertThat( authenticated.getId() ).isEqualTo( USER_ID );
+        assertThat( ( ( VerifiedUser ) authenticated ).getAudience() ).isEqualTo( PROJECT_ID );
         assertThat( ( ( VerifiedUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
     }
 
@@ -109,9 +132,6 @@ public class ServerToServerAuthenticatorTest
 
                 request.getHeader( ON_BEHALF_OF_USER_ID );
                 result = USER_ID;
-
-                request.getHeader( ON_BEHALF_OF_AUDIENCE );
-                result = AUDIENCE;
             }
         };
 
@@ -139,40 +159,6 @@ public class ServerToServerAuthenticatorTest
                 result = EMAIL;
 
                 request.getHeader( ON_BEHALF_OF_USER_ID );
-                result = null;
-
-                request.getHeader( ON_BEHALF_OF_AUDIENCE );
-                result = AUDIENCE;
-            }
-        };
-
-        User authenticated = tested.authenticate( request );
-
-        assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( VerifiedUser.class );
-        assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
-        assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
-    }
-
-    @Test
-    public void authenticate_AudienceHeaderMissing() throws ServiceUnavailableException
-    {
-        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT );
-
-        new Expectations( tested )
-        {
-            {
-                tested.internalAuthenticate( request );
-                result = user;
-
-                request.getHeader( ON_BEHALF_OF_EMAIL );
-                result = EMAIL;
-
-                request.getHeader( ON_BEHALF_OF_USER_ID );
-                result = USER_ID;
-
-                request.getHeader( ON_BEHALF_OF_AUDIENCE );
                 result = null;
             }
         };
@@ -211,31 +197,7 @@ public class ServerToServerAuthenticatorTest
     }
 
     @Test
-    public void authenticate_ApplicationIdDidNotMatch() throws ServiceUnavailableException
-    {
-        User user = new User( null, "12887.nmkjdd@appspot.gserviceaccount.com" );
-
-        new Expectations( tested )
-        {
-            {
-                tested.internalAuthenticate( request );
-                result = user;
-
-                request.getHeader( ON_BEHALF_OF_EMAIL );
-                result = "john.malkovic@ctoolkit.biz";
-                minTimes = 0;
-
-                request.getHeader( ON_BEHALF_OF_USER_ID );
-                result = USER_ID;
-                minTimes = 0;
-            }
-        };
-
-        assertThat( tested.authenticate( request ) ).isNull();
-    }
-
-    @Test
-    public void authenticate_ApplicationIdMatchedButMissingHeaders() throws ServiceUnavailableException
+    public void authenticate_MissingAllHeaders() throws ServiceUnavailableException
     {
         User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT );
 
