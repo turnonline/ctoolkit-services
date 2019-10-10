@@ -35,8 +35,8 @@ import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * Intended for third-party to TurnOnline.biz Ecosystem server calls.
- * It validates Google App Engine default service account and extracts its third-party as audience.
+ * Intended for third-party to TurnOnline.biz Ecosystem server (App Engine) calls.
+ * It validates Google App Engine default service account and extracts its ProjectId as audience.
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  * @see VerifiedUser
