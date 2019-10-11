@@ -23,11 +23,13 @@ import com.google.api.server.spi.response.ServiceUnavailableException;
 import mockit.Expectations;
 import mockit.Mocked;
 import mockit.Tested;
+import mockit.Verifications;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON_BEHALF_OF_EMAIL;
 import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON_BEHALF_OF_USER_ID;
 
@@ -79,8 +81,22 @@ public class ThirdPartyToServerAuthenticatorTest
         assertThat( authenticated ).isInstanceOf( VerifiedUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
         assertThat( authenticated.getId() ).isEqualTo( USER_ID );
-        assertThat( ( ( VerifiedUser ) authenticated ).getAudience() ).isEqualTo( PROJECT_ID );
-        assertThat( ( ( VerifiedUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
+
+        VerifiedUser verifiedUser = ( VerifiedUser ) authenticated;
+        assertThat( verifiedUser.getAudience() ).isEqualTo( PROJECT_ID );
+        assertThat( verifiedUser.getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
+
+        new Verifications()
+        {
+            {
+                VerifiedUser vu;
+                request.setAttribute( VerifiedUser.class.getName(), vu = withCapture() );
+
+                assertWithMessage( "Authenticated user taken from request attribute" )
+                        .that( vu )
+                        .isSameAs( verifiedUser );
+            }
+        };
     }
 
     @Test

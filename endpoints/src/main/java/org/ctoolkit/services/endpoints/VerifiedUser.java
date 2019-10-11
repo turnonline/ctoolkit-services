@@ -23,12 +23,12 @@ import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * The Firebase verified user created by {@link FirebaseJwtAuthenticator}
- * once authentication has been successfully passed.
+ * A verified user will be instantiated once authentication successfully has passed.
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  * @see <a href="http://openid.net/specs/openid-connect-basic-1_0-27.html#id_token">ID Token</a>
@@ -148,6 +148,15 @@ public class VerifiedUser
         public Builder audience( String audience )
         {
             this.audience = audience;
+            return this;
+        }
+
+        public Builder audiences( Set<String> audiences )
+        {
+            if ( audiences != null && !audiences.isEmpty() )
+            {
+                this.audience = audiences.iterator().next();
+            }
             return this;
         }
 

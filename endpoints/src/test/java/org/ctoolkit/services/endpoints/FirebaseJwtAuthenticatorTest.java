@@ -26,12 +26,14 @@ import mockit.Expectations;
 import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
+import mockit.Verifications;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
@@ -80,6 +82,18 @@ public class FirebaseJwtAuthenticatorTest
         assertEquals( verifiedUser.getEmail(), "verified@turnonline.biz" );
         assertEquals( verifiedUser.getToken(), FAKE_TOKEN );
         assertEquals( verifiedUser.getAudience(), "my-audience" );
+
+        new Verifications()
+        {
+            {
+                VerifiedUser vu;
+                request.setAttribute( VerifiedUser.class.getName(), vu = withCapture() );
+
+                assertWithMessage( "Authenticated user taken from request attribute" )
+                        .that( vu )
+                        .isSameAs( verifiedUser );
+            }
+        };
     }
 
     @Test

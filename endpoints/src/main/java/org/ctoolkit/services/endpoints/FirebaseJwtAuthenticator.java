@@ -28,13 +28,14 @@ import com.google.api.server.spi.auth.GoogleAuth;
 import com.google.api.server.spi.auth.GoogleJwtAuthenticator;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.config.Authenticator;
+import com.google.api.server.spi.config.Singleton;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Singleton;
+import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -47,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
+@ThreadSafe
 @Singleton
 public class FirebaseJwtAuthenticator
         implements Authenticator
@@ -77,7 +79,7 @@ public class FirebaseJwtAuthenticator
      * <ul>
      *     <li>subject as {@link VerifiedUser#getId()}</li>
      *     <li>email as {@link VerifiedUser#getEmail()}</li>
-     *     <li>audience as {@link VerifiedUser#getAudience()}</li>
+     *     <li>aud as {@link VerifiedUser#getAudience()}</li>
      * </ul>
      * If some of these properties are not present {@code null} will be returned.
      */
@@ -111,7 +113,7 @@ public class FirebaseJwtAuthenticator
         String email = idToken.getPayload().getEmail();
         String audience = ( String ) idToken.getPayload().getAudience();
 
-        User user;
+        VerifiedUser user;
         if ( Strings.isNullOrEmpty( email )
                 || Strings.isNullOrEmpty( userId )
                 || Strings.isNullOrEmpty( audience ) )
@@ -134,7 +136,7 @@ public class FirebaseJwtAuthenticator
             request.setAttribute( VerifiedUser.class.getName(), user );
         }
 
-        logger.info( "Firebase authenticated user: " + user );
+        logger.info( "Firebase authenticated user: " + user.getId() );
 
         return user;
     }
