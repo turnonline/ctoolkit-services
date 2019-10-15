@@ -37,7 +37,7 @@ import java.util.Optional;
 
 /**
  * Intended for third-party to TurnOnline.biz Ecosystem server (App Engine) calls.
- * It validates Google App Engine default service account and extracts its ProjectId as audience.
+ * It validates Google App Engine default service account (OAuth2) and extracts its ProjectId as audience.
  * <p>
  * <strong>Important note</strong>
  * It gives to the caller permission to access resources on behalf of user represented by its email and userId

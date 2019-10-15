@@ -90,7 +90,6 @@ public class FirebaseJwtAuthenticator
 
         if ( !GoogleAuth.isJwt( token ) )
         {
-            logger.warn( "Not a JWT token." );
             return null;
         }
 
