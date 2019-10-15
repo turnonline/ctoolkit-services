@@ -70,12 +70,12 @@ import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON
  *     <li><strong>vnd.turnon.cloud.internal-call=true</strong></li>
  * </ul>
  * <p>
- * The authenticated user is type of the {@link VerifiedUser} and is available as request attribute:
+ * The authenticated user is type of the {@link AudienceUser} and is available as request attribute:
  * <p>
- * {@code request.getAttribute( VerifiedUser.class.getName() );}
+ * {@code request.getAttribute( AudienceUser.class.getName() );}
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
- * @see VerifiedUser
+ * @see AudienceUser
  * @see GoogleJwtAuthenticator inspired by GoogleJwtAuthenticator
  * @see <a href="https://firebase.google.com/docs/auth/admin/create-custom-tokens">Firebase Custom Tokens</a>
  */
@@ -125,7 +125,7 @@ public class ClosedServerToServerAuthenticator
     }
 
     /**
-     * Once successfully authenticated, returns impersonated {@link VerifiedUser} with intended user's audience.
+     * Once successfully authenticated, returns impersonated {@link AudienceUser} with intended user's audience.
      *
      * @return the authenticated user or {@code null} if authentication did not pass
      * (if any of the preconditions had not meet)
@@ -190,7 +190,7 @@ public class ClosedServerToServerAuthenticator
         {
             LOGGER.warn( "Claims are: " + claims );
             LOGGER.info( "All of these claim properties 'email', 'userId', 'audience' must be present: "
-                    + MoreObjects.toStringHelper( "VerifiedUser" )
+                    + MoreObjects.toStringHelper( "AudienceUser" )
                     .add( "email", email )
                     .add( "userId", userId )
                     .add( "audience", audience )
@@ -199,14 +199,14 @@ public class ClosedServerToServerAuthenticator
             return null;
         }
 
-        VerifiedUser.Builder builder = new VerifiedUser.Builder()
+        AudienceUser.Builder builder = new AudienceUser.Builder()
                 .email( email )
                 .userId( userId )
                 .audience( audience )
                 .serviceAccount( serviceAccount );
 
-        VerifiedUser verifiedUser = builder.build();
-        request.setAttribute( VerifiedUser.class.getName(), verifiedUser );
+        AudienceUser verifiedUser = builder.build();
+        request.setAttribute( AudienceUser.class.getName(), verifiedUser );
 
         return verifiedUser;
     }

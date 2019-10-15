@@ -78,19 +78,19 @@ public class ThirdPartyToServerAuthenticatorTest
         User authenticated = tested.authenticate( request );
 
         assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( VerifiedUser.class );
+        assertThat( authenticated ).isInstanceOf( AudienceUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
         assertThat( authenticated.getId() ).isEqualTo( USER_ID );
 
-        VerifiedUser verifiedUser = ( VerifiedUser ) authenticated;
+        AudienceUser verifiedUser = ( AudienceUser ) authenticated;
         assertThat( verifiedUser.getAudience() ).isEqualTo( PROJECT_ID );
         assertThat( verifiedUser.getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
 
         new Verifications()
         {
             {
-                VerifiedUser vu;
-                request.setAttribute( VerifiedUser.class.getName(), vu = withCapture() );
+                AudienceUser vu;
+                request.setAttribute( AudienceUser.class.getName(), vu = withCapture() );
 
                 assertWithMessage( "Authenticated user taken from request attribute" )
                         .that( vu )
@@ -121,11 +121,11 @@ public class ThirdPartyToServerAuthenticatorTest
         User authenticated = tested.authenticate( request );
 
         assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( VerifiedUser.class );
+        assertThat( authenticated ).isInstanceOf( AudienceUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
         assertThat( authenticated.getId() ).isEqualTo( USER_ID );
-        assertThat( ( ( VerifiedUser ) authenticated ).getAudience() ).isEqualTo( PROJECT_ID );
-        assertThat( ( ( VerifiedUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
+        assertThat( ( ( AudienceUser ) authenticated ).getAudience() ).isEqualTo( PROJECT_ID );
+        assertThat( ( ( AudienceUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ThirdPartyToServerAuthenticatorTest
 
         assertThat( authenticated ).isNotNull();
         assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( VerifiedUser.class );
+        assertThat( authenticated ).isNotInstanceOf( AudienceUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
         assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
     }
@@ -179,7 +179,7 @@ public class ThirdPartyToServerAuthenticatorTest
 
         assertThat( authenticated ).isNotNull();
         assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( VerifiedUser.class );
+        assertThat( authenticated ).isNotInstanceOf( AudienceUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
         assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
     }
@@ -230,7 +230,7 @@ public class ThirdPartyToServerAuthenticatorTest
         User authenticated = tested.authenticate( request );
         assertThat( authenticated ).isNotNull();
         assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( VerifiedUser.class );
+        assertThat( authenticated ).isNotInstanceOf( AudienceUser.class );
         assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
         assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
     }

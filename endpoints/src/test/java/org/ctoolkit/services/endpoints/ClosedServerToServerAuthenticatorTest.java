@@ -113,9 +113,9 @@ public class ClosedServerToServerAuthenticatorTest
 
         assertWithMessage( "Authenticated user" )
                 .that( authenticated )
-                .isInstanceOf( VerifiedUser.class );
+                .isInstanceOf( AudienceUser.class );
 
-        VerifiedUser verifiedUser = ( VerifiedUser ) authenticated;
+        AudienceUser verifiedUser = ( AudienceUser ) authenticated;
         assertWithMessage( "Authenticated user email" )
                 .that( verifiedUser.getEmail() )
                 .isEqualTo( EMAIL );
@@ -143,8 +143,8 @@ public class ClosedServerToServerAuthenticatorTest
         new Verifications()
         {
             {
-                VerifiedUser vu;
-                request.setAttribute( VerifiedUser.class.getName(), vu = withCapture() );
+                AudienceUser vu;
+                request.setAttribute( AudienceUser.class.getName(), vu = withCapture() );
 
                 assertWithMessage( "Authenticated user taken from request attribute" )
                         .that( vu )

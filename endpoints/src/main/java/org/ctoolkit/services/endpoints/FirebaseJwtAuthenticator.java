@@ -42,9 +42,9 @@ import javax.servlet.http.HttpServletRequest;
  * The Firebase JWT token thread-safe authenticator that ignores (no additional checks)
  * validated token's audience and issuer. Inspired by {@link GoogleJwtAuthenticator}.
  * <p>
- * The user is type of the {@link VerifiedUser} and is available as request attribute:
+ * The user is type of the {@link AudienceUser} and is available as request attribute:
  * <p>
- * {@code (VerifiedUser) request.getAttribute( VerifiedUser.class.getName() );}
+ * {@code (AudienceUser) request.getAttribute( AudienceUser.class.getName() );}
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
@@ -75,11 +75,11 @@ public class FirebaseJwtAuthenticator
     }
 
     /**
-     * Valid token will result in a new instance {@link VerifiedUser} with all these properties populated.
+     * Valid token will result in a new instance {@link AudienceUser} with all these properties populated.
      * <ul>
-     *     <li>subject as {@link VerifiedUser#getId()}</li>
-     *     <li>email as {@link VerifiedUser#getEmail()}</li>
-     *     <li>aud as {@link VerifiedUser#getAudience()}</li>
+     *     <li>subject as {@link AudienceUser#getId()}</li>
+     *     <li>email as {@link AudienceUser#getEmail()}</li>
+     *     <li>aud as {@link AudienceUser#getAudience()}</li>
      * </ul>
      * If some of these properties are not present {@code null} will be returned.
      */
@@ -112,7 +112,7 @@ public class FirebaseJwtAuthenticator
         String email = idToken.getPayload().getEmail();
         String audience = ( String ) idToken.getPayload().getAudience();
 
-        VerifiedUser user;
+        AudienceUser user;
         if ( Strings.isNullOrEmpty( email )
                 || Strings.isNullOrEmpty( userId )
                 || Strings.isNullOrEmpty( audience ) )
@@ -128,11 +128,11 @@ public class FirebaseJwtAuthenticator
         }
         else
         {
-            VerifiedUser.Builder builder = new VerifiedUser.Builder();
+            AudienceUser.Builder builder = new AudienceUser.Builder();
             builder.email( email ).userId( userId ).audience( audience ).token( token );
             user = builder.build();
 
-            request.setAttribute( VerifiedUser.class.getName(), user );
+            request.setAttribute( AudienceUser.class.getName(), user );
         }
 
         logger.info( "Firebase authenticated user: " + user.getId() );

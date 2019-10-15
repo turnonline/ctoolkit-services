@@ -75,7 +75,7 @@ public class FirebaseJwtAuthenticatorTest
         passedExpectations( tested, request, verifier, idToken, payload );
 
         User user = tested.authenticate( request );
-        VerifiedUser verifiedUser = ( VerifiedUser ) user;
+        AudienceUser verifiedUser = ( AudienceUser ) user;
 
         assertNotNull( user );
         assertEquals( verifiedUser.getId(), "userId123" );
@@ -86,8 +86,8 @@ public class FirebaseJwtAuthenticatorTest
         new Verifications()
         {
             {
-                VerifiedUser vu;
-                request.setAttribute( VerifiedUser.class.getName(), vu = withCapture() );
+                AudienceUser vu;
+                request.setAttribute( AudienceUser.class.getName(), vu = withCapture() );
 
                 assertWithMessage( "Authenticated user taken from request attribute" )
                         .that( vu )
@@ -257,7 +257,7 @@ public class FirebaseJwtAuthenticatorTest
                 idToken.getPayload();
                 result = payload;
 
-                request.setAttribute( VerifiedUser.class.getName(), any );
+                request.setAttribute( AudienceUser.class.getName(), any );
                 times = 1;
             }
         };
@@ -288,7 +288,7 @@ public class FirebaseJwtAuthenticatorTest
                 idToken.getPayload();
                 result = payload;
 
-                request.setAttribute( VerifiedUser.class.getName(), any );
+                request.setAttribute( AudienceUser.class.getName(), any );
                 times = 0;
             }
         };

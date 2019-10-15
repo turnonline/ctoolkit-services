@@ -22,6 +22,8 @@ import com.google.api.server.spi.auth.common.User;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Set;
 
@@ -29,11 +31,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A verified user will be instantiated once authentication successfully has passed.
+ * <p>
+ * It represents an user that belongs solely to one audience (tenant). User with the same email address
+ * might be part of two or more audiences and those users are operated within different Project IDs
+ * that might belong to different Organization.
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  * @see <a href="http://openid.net/specs/openid-connect-basic-1_0-27.html#id_token">ID Token</a>
  */
-public class VerifiedUser
+public class AudienceUser
         extends User
 {
     private static final long serialVersionUID = -5338777667946885418L;
@@ -44,11 +50,19 @@ public class VerifiedUser
 
     private String serviceAccount;
 
-    private VerifiedUser( Builder builder )
+    /**
+     * These values are mandatory:
+     * <ul>
+     *     <li>{@link Builder#userId(String)}</li>
+     *     <li>{@link Builder#email(String)}</li>
+     *     <li>{@link Builder#audience(String)}</li>
+     * </ul>
+     */
+    private AudienceUser( Builder builder )
     {
-        super( builder.userId, checkNotNull( builder.email, "Email is mandatory." ) );
+        super( checkNotNull( builder.userId, "User ID is mandatory" ), checkNotNull( builder.email, "Email is mandatory" ) );
         this.token = builder.token;
-        this.audience = builder.audience;
+        this.audience = checkNotNull( builder.audience, "Audience is mandatory" );
         this.serviceAccount = builder.serviceAccount;
     }
 
@@ -86,10 +100,10 @@ public class VerifiedUser
     public final boolean equals( Object o )
     {
         if ( this == o ) return true;
-        if ( !( o instanceof VerifiedUser ) ) return false;
+        if ( !( o instanceof AudienceUser ) ) return false;
         if ( !super.equals( o ) ) return false;
 
-        VerifiedUser that = ( VerifiedUser ) o;
+        AudienceUser that = ( AudienceUser ) o;
         return Objects.equals( audience, that.audience );
     }
 
@@ -127,31 +141,31 @@ public class VerifiedUser
 
         private String serviceAccount;
 
-        public Builder userId( String userId )
+        public Builder userId( @Nonnull String userId )
         {
             this.userId = userId;
             return this;
         }
 
-        public Builder email( String email )
+        public Builder email( @Nonnull String email )
         {
             this.email = email;
             return this;
         }
 
-        public Builder token( String token )
+        public Builder token( @Nullable String token )
         {
             this.token = token;
             return this;
         }
 
-        public Builder audience( String audience )
+        public Builder audience( @Nonnull String audience )
         {
             this.audience = audience;
             return this;
         }
 
-        public Builder audiences( Set<String> audiences )
+        public Builder audiences( @Nullable Set<String> audiences )
         {
             if ( audiences != null && !audiences.isEmpty() )
             {
@@ -160,15 +174,15 @@ public class VerifiedUser
             return this;
         }
 
-        public Builder serviceAccount( String serviceAccount )
+        public Builder serviceAccount( @Nullable String serviceAccount )
         {
             this.serviceAccount = serviceAccount;
             return this;
         }
 
-        public VerifiedUser build()
+        public AudienceUser build()
         {
-            return new VerifiedUser( this );
+            return new AudienceUser( this );
         }
     }
 }
