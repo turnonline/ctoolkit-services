@@ -47,14 +47,14 @@ import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON
 
 /**
  * <p>
- * Intended for server to server calls within TurnOnline.biz Ecosystem.
+ * Intended for server to server calls within TurnOnline.biz Closed Ecosystem.
  * </p>
  * <p>
  * JWT based Authenticator for App Engine;
  * service account format: <strong>my-project-id@appspot.gserviceaccount.com</strong>.
  * Project ID evaluated at runtime in Google managed environments.
- * Authenticating tokens issued as <strong>Firebase Custom Tokens</strong>.
- * Issuer and Audience of the caller must match, otherwise user will be unauthenticated.
+ * Authenticated tokens issued as <strong>Firebase Custom Tokens</strong>.
+ * Issuer of the caller must match (that means same as called), otherwise user will be unauthenticated.
  * This will work smoothly if server to server calls are within the same project (Project ID).
  * </p>
  * <p>
@@ -113,12 +113,14 @@ public class ClosedServerToServerAuthenticator
         this.verifier = verifier;
     }
 
+    @VisibleForTesting
     static String getCertUrl()
     {
         return String.format( "https://www.googleapis.com/robot/v1/metadata/x509/%s%%40appspot.gserviceaccount.com",
                 checkNotNull( projectId, "Project ID is mandatory" ) );
     }
 
+    @VisibleForTesting
     static String getIssuer()
     {
         return checkNotNull( projectId, "Project ID is mandatory" ) + "@appspot.gserviceaccount.com";

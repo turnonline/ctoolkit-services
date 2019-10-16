@@ -36,7 +36,7 @@ import java.util.Iterator;
 import java.util.Optional;
 
 /**
- * Intended for third-party to TurnOnline.biz Ecosystem server (App Engine) calls.
+ * Intended for third-party to TurnOnline.biz Open Ecosystem server (App Engine) calls.
  * It validates Google App Engine default service account (OAuth2) and extracts its ProjectId as audience.
  * <p>
  * <strong>Important note</strong>
@@ -60,8 +60,10 @@ public class ThirdPartyToServerAuthenticator
 
     public static final String ON_BEHALF_OF_USER_ID = "vnd.turnon.cloud.on-behalf-of-user-id";
 
+    @Deprecated
     private static final String X_ON_BEHALF_OF_EMAIL = "X-On-Behalf-Of-Email";
 
+    @Deprecated
     private static final String X_ON_BEHALF_OF_USER_ID = "X-On-Behalf-Of-User-Id";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ThirdPartyToServerAuthenticator.class );

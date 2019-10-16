@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * A verified user will be instantiated once authentication successfully has passed.
  * <p>
  * It represents an user that belongs solely to one audience (tenant). User with the same email address
- * might be part of two or more audiences and those users are operated within different Project IDs
+ * might be part of two or more audiences and those users are operated within different Google Cloud Project IDs
  * that might belong to different Organization.
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
@@ -42,7 +42,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AudienceUser
         extends User
 {
-    private static final long serialVersionUID = -5338777667946885418L;
+    private static final long serialVersionUID = 5538973246473903961L;
 
     private String token;
 
@@ -60,9 +60,10 @@ public class AudienceUser
      */
     private AudienceUser( Builder builder )
     {
-        super( checkNotNull( builder.userId, "User ID is mandatory" ), checkNotNull( builder.email, "Email is mandatory" ) );
-        this.token = builder.token;
+        super( checkNotNull( builder.userId, "User ID is mandatory" ),
+                checkNotNull( builder.email, "Email is mandatory" ) );
         this.audience = checkNotNull( builder.audience, "Audience is mandatory" );
+        this.token = builder.token;
         this.serviceAccount = builder.serviceAccount;
     }
 

@@ -39,6 +39,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * Intended for client to server calls within TurnOnline.biz Open Ecosystem.
  * The Firebase JWT token thread-safe authenticator that ignores (no additional checks)
  * validated token's audience and issuer. Inspired by {@link GoogleJwtAuthenticator}.
  * <p>
