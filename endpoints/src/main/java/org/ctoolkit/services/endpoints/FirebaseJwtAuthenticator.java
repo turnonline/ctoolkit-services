@@ -21,8 +21,6 @@ package org.ctoolkit.services.endpoints;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GooglePublicKeysManager;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.server.spi.Client;
 import com.google.api.server.spi.auth.GoogleAuth;
 import com.google.api.server.spi.auth.GoogleJwtAuthenticator;
@@ -58,21 +56,19 @@ public class FirebaseJwtAuthenticator
 
     private static final String PUBLIC_CERTS_URL = "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
-    private static final GoogleIdTokenVerifier verifier;
+    private final GoogleIdTokenVerifier verifier;
 
-    static
+    public FirebaseJwtAuthenticator()
     {
-        HttpTransport transport = Client.getInstance().getHttpTransport();
-        JsonFactory jsonFactory = Client.getInstance().getJsonFactory();
-
-        GooglePublicKeysManager.Builder keyBuilder = new GooglePublicKeysManager.Builder( transport, jsonFactory );
-        keyBuilder.setPublicCertsEncodedUrl( PUBLIC_CERTS_URL );
-
-        GoogleIdTokenVerifier.Builder builder = new GoogleIdTokenVerifier.Builder( keyBuilder.build() );
-        // no check against issuers
-        builder.setIssuer( null );
-
-        verifier = builder.build();
+        verifier = new GoogleIdTokenVerifier.Builder(
+                new GooglePublicKeysManager.Builder(
+                        Client.getInstance().getHttpTransport(),
+                        Client.getInstance().getJsonFactory() )
+                        .setPublicCertsEncodedUrl( PUBLIC_CERTS_URL )
+                        .build() )
+                // no check against issuers
+                .setIssuer( null )
+                .build();
     }
 
     /**
