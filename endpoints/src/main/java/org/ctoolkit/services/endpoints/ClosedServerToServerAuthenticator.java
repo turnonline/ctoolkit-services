@@ -58,7 +58,7 @@ import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON
  * This will work smoothly if server to server calls are within the same project (Project ID).
  * </p>
  * <p>
- * In order to impersonate call, these claims must be included in the token,
+ * In order to impersonate call, these claims must be included in to token,
  * otherwise returns {@code null} as unauthenticated.
  * <ul>
  *     <li><strong>vnd.turnon.cloud.on-behalf-of-email</strong></li>
@@ -100,7 +100,7 @@ public class ClosedServerToServerAuthenticator
                 new GooglePublicKeysManager.Builder(
                         Client.getInstance().getHttpTransport(),
                         Client.getInstance().getJsonFactory() )
-                        .setPublicCertsEncodedUrl( getCertUrl() )
+                        .setPublicCertsEncodedUrl( getPublicCertsEncodedUrl() )
                         .build() )
                 .setIssuer( getIssuer() )
                 .build()
@@ -114,7 +114,7 @@ public class ClosedServerToServerAuthenticator
     }
 
     @VisibleForTesting
-    static String getCertUrl()
+    static String getPublicCertsEncodedUrl()
     {
         return String.format( "https://www.googleapis.com/robot/v1/metadata/x509/%s%%40appspot.gserviceaccount.com",
                 checkNotNull( projectId, "Project ID is mandatory" ) );

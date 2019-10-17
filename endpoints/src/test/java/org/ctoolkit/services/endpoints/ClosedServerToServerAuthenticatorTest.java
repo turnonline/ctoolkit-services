@@ -133,7 +133,7 @@ public class ClosedServerToServerAuthenticatorTest
                 .isEqualTo( SERVICE_ACCOUNT );
 
         assertWithMessage( "Public Certs Encoded Url" )
-                .that( ClosedServerToServerAuthenticator.getCertUrl() )
+                .that( ClosedServerToServerAuthenticator.getPublicCertsEncodedUrl() )
                 .isEqualTo( "https://www.googleapis.com/robot/v1/metadata/x509/turn-online-eu%40appspot.gserviceaccount.com" );
 
         assertWithMessage( "JWT issuer" )
