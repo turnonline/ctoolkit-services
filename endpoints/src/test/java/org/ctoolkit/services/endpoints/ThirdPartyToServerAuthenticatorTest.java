@@ -100,45 +100,11 @@ public class ThirdPartyToServerAuthenticatorTest
     }
 
     @Test
-    public void authenticate_PassXHeaders() throws ServiceUnavailableException
-    {
-        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT.toUpperCase() );
-
-        new Expectations( tested )
-        {
-            {
-                tested.internalAuthenticate( request );
-                result = user;
-
-                request.getHeader( "X-On-Behalf-Of-Email" );
-                result = EMAIL;
-
-                request.getHeader( "X-On-Behalf-Of-User-Id" );
-                result = USER_ID;
-            }
-        };
-
-        User authenticated = tested.authenticate( request );
-
-        assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( AudienceUser.class );
-        assertThat( authenticated.getEmail() ).isEqualTo( EMAIL );
-        assertThat( authenticated.getId() ).isEqualTo( USER_ID );
-        assertThat( ( ( AudienceUser ) authenticated ).getAudience() ).isEqualTo( PROJECT_ID );
-        assertThat( ( ( AudienceUser ) authenticated ).getServiceAccount() ).isEqualTo( SERVICE_ACCOUNT );
-    }
-
-    @Test
     public void authenticate_EmailHeaderMissing() throws ServiceUnavailableException
     {
-        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT );
-
         new Expectations( tested )
         {
             {
-                tested.internalAuthenticate( request );
-                result = user;
-
                 request.getHeader( ON_BEHALF_OF_EMAIL );
                 result = null;
 
@@ -147,26 +113,15 @@ public class ThirdPartyToServerAuthenticatorTest
             }
         };
 
-        User authenticated = tested.authenticate( request );
-
-        assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( AudienceUser.class );
-        assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
-        assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
+        assertThat( tested.authenticate( request ) ).isNull();
     }
 
     @Test
     public void authenticate_UserIdHeaderMissing() throws ServiceUnavailableException
     {
-        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT );
-
         new Expectations( tested )
         {
             {
-                tested.internalAuthenticate( request );
-                result = user;
-
                 request.getHeader( ON_BEHALF_OF_EMAIL );
                 result = EMAIL;
 
@@ -175,13 +130,7 @@ public class ThirdPartyToServerAuthenticatorTest
             }
         };
 
-        User authenticated = tested.authenticate( request );
-
-        assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( AudienceUser.class );
-        assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
-        assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
+        assertThat( tested.authenticate( request ) ).isNull();
     }
 
     @Test
@@ -211,14 +160,9 @@ public class ThirdPartyToServerAuthenticatorTest
     @Test
     public void authenticate_MissingAllHeaders() throws ServiceUnavailableException
     {
-        User user = new User( SERVICE_ACCOUNT_ID, SERVICE_ACCOUNT );
-
         new Expectations( tested )
         {
             {
-                tested.internalAuthenticate( request );
-                result = user;
-
                 request.getHeader( ON_BEHALF_OF_EMAIL );
                 result = null;
 
@@ -227,11 +171,6 @@ public class ThirdPartyToServerAuthenticatorTest
             }
         };
 
-        User authenticated = tested.authenticate( request );
-        assertThat( authenticated ).isNotNull();
-        assertThat( authenticated ).isInstanceOf( User.class );
-        assertThat( authenticated ).isNotInstanceOf( AudienceUser.class );
-        assertThat( authenticated.getEmail() ).isEqualTo( SERVICE_ACCOUNT );
-        assertThat( authenticated.getId() ).isEqualTo( SERVICE_ACCOUNT_ID );
+        assertThat( tested.authenticate( request ) ).isNull();
     }
 }
