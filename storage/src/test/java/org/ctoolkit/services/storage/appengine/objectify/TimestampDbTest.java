@@ -4,6 +4,7 @@ import com.google.api.client.util.DateTime;
 import com.googlecode.objectify.ObjectifyService;
 import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
 import org.ctoolkit.services.storage.appengine.TimestampEntity;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -32,6 +33,11 @@ public class TimestampDbTest
         uniqueKey.add( "1112282472694100" );
         uniqueKey.add( "5369461238768899" );
 
+    }
+
+    @BeforeMethod
+    public void before()
+    {
         ObjectifyService.register( TimestampEntity.class );
     }
 

@@ -19,9 +19,9 @@
 package org.ctoolkit.services.storage.appengine;
 
 import com.google.appengine.api.utils.SystemProperty;
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.cloud.datastore.Datastore;
+import com.google.cloud.datastore.testing.LocalDatastoreHelper;
+import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 import org.ctoolkit.services.storage.EntityLongIdentityHasherTestEntity;
 import org.ctoolkit.services.storage.EntityStringIdentityHasherTestEntity;
@@ -31,11 +31,15 @@ import org.ctoolkit.services.storage.appengine.objectify.FakeEntity;
 import org.ctoolkit.services.storage.appengine.objectify.ParentEntity;
 import org.ctoolkit.services.storage.appengine.objectify.ParentFakeEntity;
 import org.ctoolkit.services.storage.appengine.objectify.SiblingChildEntity;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 
 import java.io.Closeable;
-import java.lang.reflect.Method;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The base class for App Engine backend services local testing.
@@ -44,17 +48,25 @@ import java.lang.reflect.Method;
  */
 public class BackendServiceTestCase
 {
-    private LocalServiceTestHelper helper = new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig(),
-            new LocalDatastoreServiceTestConfig().setDefaultHighRepJobPolicyUnappliedJobPercentage( 0 ) );
-
     private Closeable session;
 
-    @BeforeMethod
-    public void setUp( Method m )
+    @BeforeSuite
+    public void beforeAll( ITestContext context ) throws IOException, InterruptedException
     {
-        SystemProperty.environment.set( "Development" );
+        LocalDatastoreHelper helper = get( context );
+        helper.start();
 
-        helper.setUp();
+        SystemProperty.environment.set( "Development" );
+    }
+
+    @BeforeMethod
+    public void before( ITestContext context ) throws IOException
+    {
+        LocalDatastoreHelper helper = get( context );
+        helper.reset();
+        Datastore datastore = helper.getOptions().getService();
+        ObjectifyService.init( new ObjectifyFactory( datastore ) );
+
         session = ObjectifyService.begin();
 
         ObjectifyService.register( FakeEntity.class );
@@ -73,6 +85,23 @@ public class BackendServiceTestCase
     public void tearDown() throws Exception
     {
         session.close();
-        helper.tearDown();
+    }
+
+    @AfterSuite
+    public void stop( ITestContext context ) throws InterruptedException, TimeoutException, IOException
+    {
+        LocalDatastoreHelper helper = get( context );
+        helper.stop();
+    }
+
+    private LocalDatastoreHelper get( ITestContext context )
+    {
+        LocalDatastoreHelper helper = ( LocalDatastoreHelper ) context.getAttribute( LocalDatastoreHelper.class.getName() );
+        if ( helper == null )
+        {
+            helper = LocalDatastoreHelper.create( 1.0 );
+            context.setAttribute( LocalDatastoreHelper.class.getName(), helper );
+        }
+        return helper;
     }
 }

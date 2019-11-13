@@ -42,7 +42,7 @@ public class GuicefiedOfyFactory
     {
         this.injector = injector;
 
-        ObjectifyService.setFactory( this );
+        ObjectifyService.init( this );
         for ( EntityRegistrar next : configs )
         {
             next.register( this );
