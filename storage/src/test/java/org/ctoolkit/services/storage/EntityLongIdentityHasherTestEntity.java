@@ -23,7 +23,7 @@ import com.google.common.hash.Funnel;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 import com.googlecode.objectify.annotation.Entity;
-import org.ctoolkit.services.storage.appengine.objectify.EntityLongIdentityHasher;
+import org.ctoolkit.services.datastore.objectify.EntityLongIdentityHasher;
 
 import javax.annotation.Nonnull;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,37 +16,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.storage.appengine.blob;
 
-import com.googlecode.objectify.annotation.Entity;
+import com.google.cloud.storage.Storage;
+import com.google.inject.AbstractModule;
+import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
+import org.ctoolkit.services.storage.CtoolkitServicesStorageModule;
 
-import static com.googlecode.objectify.ObjectifyService.ofy;
+import javax.inject.Singleton;
 
 /**
- * The simple entity for test purpose (no parent/child relationship).
+ * The guice module configuration intended to be used for testing.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-@Entity
-public class SiblingChildEntity
-        extends EntityLongChildOf<ParentEntity>
+public class TestModule
+        extends AbstractModule
 {
-    private static final long serialVersionUID = 1L;
-
     @Override
-    protected long getModelVersion()
+    protected void configure()
     {
-        return 1;
-    }
+        bind( Storage.class ).toProvider( TestStorageProvider.class ).in( Singleton.class );
 
-    @Override
-    public void save()
-    {
-        ofy().save().entity( this ).now();
-    }
-
-    @Override
-    public void delete()
-    {
+        install( new CtoolkitServicesAppEngineModule() );
+        install( new CtoolkitServicesStorageModule() );
     }
 }

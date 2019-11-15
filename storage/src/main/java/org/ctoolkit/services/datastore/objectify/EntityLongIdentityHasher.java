@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.OnSave;
@@ -30,24 +30,42 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * {@link PropertiesHasher} with basic implementation in order to simplify client code.
  * <p>
  * Once used, the client is being required to implement only {@link PropertiesHasher#calcPropsHashCode()}
- * and {@link EntityStringIdentityHasher#newPropertiesHashCode()}.
+ * and {@link EntityLongIdentityHasher#newPropertiesHashCode()}.
  * <p>
  * It keeps the reference to the client specified implementation of {@link PropertiesHashCode}
  * in property {@link #hashCode}.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public abstract class EntityStringIdentityHasher
-        extends EntityStringIdentity
+public abstract class EntityLongIdentityHasher
+        extends EntityLongIdentity
         implements PropertiesHasher
 {
-    private static final long serialVersionUID = -3189592333592348269L;
+    private static final long serialVersionUID = 7444984756468293559L;
 
     private Key<PropertiesHashCode> hashCode;
+
+    /**
+     * Check whether client selected properties are ready to be calculated.
+     * By default it returns {@code true}, override for customized behavior.
+     * <p>
+     * If this returns {@code false}, call to the {@link PropertiesHasher#hashCodeSnapshot()}
+     * will not persist anything and method itself will return {@code false} indicating call has been ignored.
+     *
+     * @return true if ready to calculate
+     */
+    public boolean isPropertiesReady()
+    {
+        return true;
+    }
 
     @Override
     public final PropertiesHashCode getPropsHashCode()
     {
+        if ( !isPropertiesReady() )
+        {
+            return null;
+        }
         return hashCode == null ? null : ofy().load().key( hashCode ).now();
     }
 

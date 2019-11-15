@@ -16,37 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
-import com.googlecode.objectify.annotation.Entity;
-
-import static com.googlecode.objectify.ObjectifyService.ofy;
+import com.googlecode.objectify.condition.PojoIf;
 
 /**
- * The fake entity for test purpose.
+ * The implementation of the {@link com.googlecode.objectify.condition.If} that defines a condition
+ * to test whether {@link BaseEntityIdentity#createdDate} should be in indexed
+ * in the datastore or not.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
+ * @see IndexCreatedDate
  */
-@Entity
-public class FakeEntity
-        extends EntityLongChildOf<ParentFakeEntity>
+class CreatedDateIf
+        extends PojoIf<BaseEntityIdentity>
 {
-    private static final long serialVersionUID = 1L;
-
     @Override
-    protected long getModelVersion()
+    public boolean matchesPojo( BaseEntityIdentity pojo )
     {
-        return 1;
-    }
-
-    @Override
-    public void save()
-    {
-        ofy().save().entity( this ).now();
-    }
-
-    @Override
-    public void delete()
-    {
+        return pojo instanceof IndexCreatedDate;
     }
 }

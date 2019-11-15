@@ -16,9 +16,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
+import com.googlecode.objectify.annotation.Ignore;
+import com.googlecode.objectify.annotation.IgnoreSave;
+
+import java.util.Objects;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
@@ -28,18 +33,25 @@ import static com.googlecode.objectify.ObjectifyService.ofy;
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Entity
-public class Child2LevelEntity
-        extends EntityStringChildOf<ChildEntity>
+public class ChildEntity
+        extends EntityLongChildOf<ParentEntity>
 {
     private static final long serialVersionUID = 1L;
 
-    Child2LevelEntity()
+    @IgnoreSave( IfNoIdOtherwiseCascading.class )
+    private Ref<Child2LevelEntity> childEntity;
+
+    @Ignore
+    private Child2LevelEntity tChildEntity;
+
+    Child2LevelEntity getChildEntity()
     {
+        return tChildEntity;
     }
 
-    Child2LevelEntity( String id )
+    void setChildEntity( Child2LevelEntity tChildEntity )
     {
-        super.setId( id );
+        this.tChildEntity = tChildEntity;
     }
 
     @Override
@@ -51,11 +63,33 @@ public class Child2LevelEntity
     @Override
     public void save()
     {
+        if ( getId() == null )
+        {
+            ofy().save().entity( this ).now();
+        }
         ofy().save().entity( this ).now();
     }
 
     @Override
     public void delete()
     {
+        ofy().delete().entity( this ).now();
+    }
+
+    @Override
+    public boolean equals( Object o )
+    {
+        if ( this == o ) return true;
+        if ( !( o instanceof ChildEntity ) ) return false;
+        ChildEntity that = ( ChildEntity ) o;
+        return Objects.equals( getParent().getId(), that.getParent().getId() ) &&
+                Objects.equals( getId(), that.getId() );
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash( getParent().getId(), getId() );
     }
 }

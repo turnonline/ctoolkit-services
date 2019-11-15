@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.storage.guice;
 
+import com.google.cloud.datastore.Datastore;
 import com.google.inject.Injector;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
@@ -38,8 +39,11 @@ public class GuicefiedOfyFactory
     private final Injector injector;
 
     @Inject
-    public GuicefiedOfyFactory( Injector injector, Set<EntityRegistrar> configs )
+    public GuicefiedOfyFactory( Datastore datastore,
+                                Injector injector,
+                                Set<EntityRegistrar> configs )
     {
+        super( datastore );
         this.injector = injector;
 
         ObjectifyService.init( this );

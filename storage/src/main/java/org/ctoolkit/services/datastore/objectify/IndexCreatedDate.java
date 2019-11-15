@@ -16,30 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine;
-
-import com.google.cloud.storage.Storage;
-import com.google.inject.AbstractModule;
-import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
-import org.ctoolkit.services.storage.CtoolkitServicesStorageModule;
-import org.ctoolkit.services.storage.appengine.blob.TestStorageProvider;
-
-import javax.inject.Singleton;
+package org.ctoolkit.services.datastore.objectify;
 
 /**
- * The guice module configuration intended to be used for testing.
+ * The marker interface to let index {@link BaseEntityIdentity#createdDate} property.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public class TestModule
-        extends AbstractModule
+public interface IndexCreatedDate
 {
-    @Override
-    protected void configure()
-    {
-        bind( Storage.class ).toProvider( TestStorageProvider.class ).in( Singleton.class );
-
-        install( new CtoolkitServicesAppEngineModule() );
-        install( new CtoolkitServicesStorageModule() );
-    }
 }

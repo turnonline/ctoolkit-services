@@ -23,7 +23,6 @@ import com.google.appengine.api.modules.ModulesServiceFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
-import com.googlecode.objectify.ObjectifyService;
 
 import javax.inject.Singleton;
 import java.util.Set;
@@ -47,8 +46,6 @@ public class CtoolkitServicesTaskModule
     {
         // bind cron task
         Multibinder.newSetBinder( binder(), CronTaskRegistrar.class );
-        // The datastore Kind place holder to generate unique ID for task name
-        ObjectifyService.register( TaskUniqueIdGenerator.class );
     }
 
     @Provides

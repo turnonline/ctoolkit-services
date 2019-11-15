@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,13 +16,24 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore;
+
+import com.google.cloud.datastore.Datastore;
+import com.google.cloud.datastore.DatastoreOptions;
+
+import javax.inject.Provider;
 
 /**
- * The marker interface to let index {@link BaseEntityIdentity#modificationDate} property.
+ * The cloud storage service instance provider with default configuration.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public interface IndexModificationDate
+public class DefaultDatastoreProvider
+        implements Provider<Datastore>
 {
+    @Override
+    public Datastore get()
+    {
+        return DatastoreOptions.getDefaultInstance().getService();
+    }
 }

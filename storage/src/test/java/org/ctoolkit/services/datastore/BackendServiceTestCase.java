@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Comvai, s.r.o. All Rights Reserved.
+ * Copyright (c) 2019 Comvai, s.r.o. All Rights Reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,21 +16,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine;
+package org.ctoolkit.services.datastore;
 
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.cloud.datastore.Datastore;
 import com.google.cloud.datastore.testing.LocalDatastoreHelper;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
+import org.ctoolkit.services.datastore.objectify.Child2LevelEntity;
+import org.ctoolkit.services.datastore.objectify.ChildEntity;
+import org.ctoolkit.services.datastore.objectify.FakeEntity;
+import org.ctoolkit.services.datastore.objectify.ParentEntity;
+import org.ctoolkit.services.datastore.objectify.ParentFakeEntity;
+import org.ctoolkit.services.datastore.objectify.SiblingChildEntity;
 import org.ctoolkit.services.storage.EntityLongIdentityHasherTestEntity;
 import org.ctoolkit.services.storage.EntityStringIdentityHasherTestEntity;
-import org.ctoolkit.services.storage.appengine.objectify.Child2LevelEntity;
-import org.ctoolkit.services.storage.appengine.objectify.ChildEntity;
-import org.ctoolkit.services.storage.appengine.objectify.FakeEntity;
-import org.ctoolkit.services.storage.appengine.objectify.ParentEntity;
-import org.ctoolkit.services.storage.appengine.objectify.ParentFakeEntity;
-import org.ctoolkit.services.storage.appengine.objectify.SiblingChildEntity;
 import org.testng.ITestContext;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;

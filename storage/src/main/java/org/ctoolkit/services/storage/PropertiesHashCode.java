@@ -19,7 +19,7 @@
 package org.ctoolkit.services.storage;
 
 import com.googlecode.objectify.annotation.Entity;
-import org.ctoolkit.services.storage.appengine.objectify.EntityLongIdentity;
+import org.ctoolkit.services.datastore.objectify.EntityLongIdentity;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;

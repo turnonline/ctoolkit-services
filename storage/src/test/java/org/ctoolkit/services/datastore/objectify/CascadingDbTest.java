@@ -16,9 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
-import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
+import org.ctoolkit.services.datastore.BackendServiceTestCase;
 import org.testng.annotations.Test;
 
 import java.util.List;

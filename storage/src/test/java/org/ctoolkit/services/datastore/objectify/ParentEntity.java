@@ -16,42 +16,85 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.Entity;
 import com.googlecode.objectify.annotation.Ignore;
 import com.googlecode.objectify.annotation.IgnoreSave;
 
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The entity for test purpose with parent/child relationship.
+ * The parent entity for test purpose.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
 @Entity
-public class ChildEntity
-        extends EntityLongChildOf<ParentEntity>
+public class ParentEntity
+        extends EntityLongIdentity
 {
     private static final long serialVersionUID = 1L;
 
     @IgnoreSave( IfNoIdOtherwiseCascading.class )
-    private Ref<Child2LevelEntity> childEntity;
+    private Ref<ChildEntity> childEntity;
 
     @Ignore
-    private Child2LevelEntity tChildEntity;
+    private ChildEntity tChildEntity;
 
-    Child2LevelEntity getChildEntity()
+    @IgnoreSave( IfNoIdOtherwiseCascading.class )
+    private Ref<SiblingChildEntity> siblingChildEntity;
+
+    @Ignore
+    private SiblingChildEntity tSiblingChildEntity;
+
+    @IgnoreSave( IfNoIdOtherwiseCascading.class )
+    List<Ref<ChildEntity>> children;
+
+    @Ignore
+    private List<ChildEntity> tChildren = new ArrayList<>();
+
+    public void add( ChildEntity entity )
+    {
+        tChildren.add( entity );
+    }
+
+    public void remove( ChildEntity entity )
+    {
+        tChildren.remove( entity );
+    }
+
+    public void clearChildren()
+    {
+        tChildren = null;
+    }
+
+    public List<ChildEntity> getChildren()
+    {
+        return fromListOfRefs( children, tChildren );
+    }
+
+    ChildEntity getChildEntity()
     {
         return tChildEntity;
     }
 
-    void setChildEntity( Child2LevelEntity tChildEntity )
+    void setChildEntity( ChildEntity tChildEntity )
     {
         this.tChildEntity = tChildEntity;
+    }
+
+    public SiblingChildEntity getSiblingChildEntity()
+    {
+        return tSiblingChildEntity;
+    }
+
+    public void setSiblingChildEntity( SiblingChildEntity siblingChildEntity )
+    {
+        this.tSiblingChildEntity = siblingChildEntity;
     }
 
     @Override
@@ -73,23 +116,5 @@ public class ChildEntity
     @Override
     public void delete()
     {
-        ofy().delete().entity( this ).now();
-    }
-
-    @Override
-    public boolean equals( Object o )
-    {
-        if ( this == o ) return true;
-        if ( !( o instanceof ChildEntity ) ) return false;
-        ChildEntity that = ( ChildEntity ) o;
-        return Objects.equals( getParent().getId(), that.getParent().getId() ) &&
-                Objects.equals( getId(), that.getId() );
-    }
-
-    @Override
-    public int hashCode()
-    {
-
-        return Objects.hash( getParent().getId(), getId() );
     }
 }

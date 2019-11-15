@@ -19,7 +19,7 @@
 package org.ctoolkit.services.storage;
 
 import com.googlecode.objectify.annotation.Entity;
-import org.ctoolkit.services.storage.appengine.objectify.EntityStringIdentityHasher;
+import org.ctoolkit.services.datastore.objectify.EntityStringIdentityHasher;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;

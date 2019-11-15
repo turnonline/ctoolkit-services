@@ -16,13 +16,46 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
+
+import com.googlecode.objectify.annotation.Entity;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The marker interface to let index {@link BaseEntityIdentity#createdDate} property.
+ * The entity for test purpose with parent/child relationship.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public interface IndexCreatedDate
+@Entity
+public class Child2LevelEntity
+        extends EntityStringChildOf<ChildEntity>
 {
+    private static final long serialVersionUID = 1L;
+
+    Child2LevelEntity()
+    {
+    }
+
+    Child2LevelEntity( String id )
+    {
+        super.setId( id );
+    }
+
+    @Override
+    protected long getModelVersion()
+    {
+        return 1;
+    }
+
+    @Override
+    public void save()
+    {
+        ofy().save().entity( this ).now();
+    }
+
+    @Override
+    public void delete()
+    {
+    }
 }

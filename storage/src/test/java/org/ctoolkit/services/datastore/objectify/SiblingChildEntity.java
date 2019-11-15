@@ -16,24 +16,37 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
-import com.googlecode.objectify.condition.PojoIf;
+import com.googlecode.objectify.annotation.Entity;
+
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The implementation of the {@link com.googlecode.objectify.condition.If} that defines a condition
- * to test whether {@link BaseEntityIdentity#modificationDate} should be in indexed
- * in the datastore or not.
+ * The simple entity for test purpose (no parent/child relationship).
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
- * @see IndexModificationDate
  */
-class ModificationDateIf
-        extends PojoIf<BaseEntityIdentity>
+@Entity
+public class SiblingChildEntity
+        extends EntityLongChildOf<ParentEntity>
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
-    public boolean matchesPojo( BaseEntityIdentity pojo )
+    protected long getModelVersion()
     {
-        return pojo instanceof IndexModificationDate;
+        return 1;
+    }
+
+    @Override
+    public void save()
+    {
+        ofy().save().entity( this ).now();
+    }
+
+    @Override
+    public void delete()
+    {
     }
 }

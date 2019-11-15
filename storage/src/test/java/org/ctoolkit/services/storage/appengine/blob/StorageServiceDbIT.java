@@ -22,11 +22,12 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.testing.RemoteStorageHelper;
 import com.google.common.io.ByteStreams;
+import org.ctoolkit.services.datastore.BackendServiceTestCase;
 import org.ctoolkit.services.storage.StorageService;
-import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import javax.inject.Inject;
@@ -44,6 +45,7 @@ import static org.testng.Assert.assertTrue;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
+@Guice( modules = TestModule.class )
 public class StorageServiceDbIT
         extends BackendServiceTestCase
 {

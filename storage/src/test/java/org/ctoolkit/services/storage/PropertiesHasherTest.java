@@ -18,7 +18,7 @@
 
 package org.ctoolkit.services.storage;
 
-import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
+import org.ctoolkit.services.datastore.BackendServiceTestCase;
 import org.testng.annotations.Test;
 
 import static com.google.common.truth.Truth.assertThat;

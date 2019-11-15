@@ -1,9 +1,8 @@
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
 import com.google.api.client.util.DateTime;
 import com.googlecode.objectify.ObjectifyService;
-import org.ctoolkit.services.storage.appengine.BackendServiceTestCase;
-import org.ctoolkit.services.storage.appengine.TimestampEntity;
+import org.ctoolkit.services.datastore.BackendServiceTestCase;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 

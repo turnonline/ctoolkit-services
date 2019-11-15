@@ -1,4 +1,4 @@
-package org.ctoolkit.services.storage.appengine.objectify;
+package org.ctoolkit.services.datastore.objectify;
 
 import com.google.api.client.util.DateTime;
 import com.google.common.base.Joiner;
