@@ -160,6 +160,9 @@ public class TaskQueueExecutorBeanTest
                 key.getKind();
                 result = "FakeEntity";
 
+                key.getName();
+                result = null;
+
                 key.getId();
                 result = id;
             }

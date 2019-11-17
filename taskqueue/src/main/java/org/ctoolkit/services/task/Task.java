@@ -203,16 +203,16 @@ public abstract class Task<T>
             else
             {
                 Object identification;
-                long id = entityKey.getId();
+                String name = entityKey.getName();
 
-                if ( id == 0 )
+                if ( name != null )
                 {
-                    // 0 if this key has a name
+                    // this key has a name, not ID
                     identification = null;
                 }
                 else
                 {
-                    identification = id;
+                    identification = entityKey.getId();
                 }
 
                 return namePrefix + "_" + entityKey.getKind() + ( identification == null ? "" : "_" + identification );
