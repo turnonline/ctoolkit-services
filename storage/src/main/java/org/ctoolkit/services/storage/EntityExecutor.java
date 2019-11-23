@@ -58,6 +58,8 @@ public interface EntityExecutor
      * are free, they may take significant time because they require an index walk.
      * <p>
      *
+     * @param criteria a criteria holder {@link Criteria}
+     * @param <T>      the type of the entity to be counted
      * @return the total number of values in the result
      */
     <T> int count( @Nonnull Criteria<T> criteria );

@@ -298,6 +298,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      * @param tCollectionOfEntities the empty collection to be populated, non empty will be passed back
      * @param defaultCollection     the default collection to be used if tCollectionOfEntities is {@code null}
      * @param <T>                   the concrete type of the entity
+     * @param <C>                   the concrete type of the entity in the transient collection
      * @return the populated collection from the references or default collection
      */
     public <T, C extends Collection<T>> C fromCollectionOfRefs( @Nullable Collection<Ref<T>> collectionOfRefs,

@@ -85,7 +85,8 @@ public interface EntityIdentity<ID_TYPE>
      * are going to be cascading saved, but no support to ignore cascading children
      * (if needed then use {@link #save(Ignored)}).
      *
-     * @param ignored the field names of this entity (no cascading to children) to be ignored while saving
+     * @param ignored     the field names of this entity (no cascading to children) to be ignored while saving
+     * @param moreIgnored another field names to be ignored while saving
      */
     void save( @Nonnull String ignored, String... moreIgnored );
 

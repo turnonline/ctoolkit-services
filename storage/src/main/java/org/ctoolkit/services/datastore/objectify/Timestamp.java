@@ -117,6 +117,7 @@ public abstract class Timestamp
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource, {@code null} for now
      * @param target    the entity target type, a type that will be stored in datastore
+     * @param <T>       the concrete type of the timestamp
      * @return the timestamp
      */
     public static <T extends Timestamp> T of( @Nonnull String type,
@@ -147,6 +148,7 @@ public abstract class Timestamp
      * @param uniqueKey the resource unique key as a list of IDs
      * @param last      the last modification date of incoming resource, {@code null} for now
      * @param target    the entity target type, a type that will be stored in datastore
+     * @param <T>       the concrete type of the timestamp
      * @return the timestamp
      */
     public static <T extends Timestamp> T of( @Nonnull String type,

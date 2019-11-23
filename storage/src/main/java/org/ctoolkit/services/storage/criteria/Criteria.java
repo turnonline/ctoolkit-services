@@ -514,6 +514,7 @@ public class Criteria<T>
      * Sets the maximum number of results to retrieve.
      *
      * @param limit the max number of results to retrieve
+     * @return this criteria instance
      */
     public Criteria<T> limit( int limit )
     {
@@ -535,6 +536,7 @@ public class Criteria<T>
      * Sets the position of the first result to retrieve.
      *
      * @param offset first result of query
+     * @return this criteria instance
      */
     public Criteria<T> offset( int offset )
     {
