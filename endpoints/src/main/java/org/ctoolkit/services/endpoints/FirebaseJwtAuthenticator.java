@@ -19,9 +19,6 @@
 package org.ctoolkit.services.endpoints;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.googleapis.auth.oauth2.GooglePublicKeysManager;
-import com.google.api.server.spi.Client;
 import com.google.api.server.spi.auth.GoogleAuth;
 import com.google.api.server.spi.auth.GoogleJwtAuthenticator;
 import com.google.api.server.spi.auth.common.User;
@@ -54,22 +51,13 @@ public class FirebaseJwtAuthenticator
 {
     private static final Logger logger = LoggerFactory.getLogger( FirebaseJwtAuthenticator.class );
 
-    private static final String PUBLIC_CERTS_URL = "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com";
-
-    private final GoogleIdTokenVerifier verifier;
+    private final FirebaseTokenVerifier verifier;
 
     public FirebaseJwtAuthenticator()
     {
-        verifier = new GoogleIdTokenVerifier.Builder(
-                new GooglePublicKeysManager.Builder(
-                        Client.getInstance().getHttpTransport(),
-                        Client.getInstance().getJsonFactory() )
-                        .setPublicCertsEncodedUrl( PUBLIC_CERTS_URL )
-                        .build() )
-                // no check against issuers
-                .setIssuer( null )
-                .build();
+        this.verifier = new FirebaseTokenVerifier();
     }
+
 
     /**
      * Valid token will result in a new instance {@link AudienceUser} with all these properties populated.
@@ -90,18 +78,9 @@ public class FirebaseJwtAuthenticator
             return null;
         }
 
-        GoogleIdToken idToken;
-        try
+        GoogleIdToken idToken = getVerifier().verify( token );
+        if ( idToken == null )
         {
-            idToken = getVerifier().verify( token );
-            if ( idToken == null )
-            {
-                return null;
-            }
-        }
-        catch ( Exception e )
-        {
-            logger.warn( "Error while verifying JWT", e );
             return null;
         }
 
@@ -138,7 +117,7 @@ public class FirebaseJwtAuthenticator
     }
 
     @VisibleForTesting
-    GoogleIdTokenVerifier getVerifier()
+    FirebaseTokenVerifier getVerifier()
     {
         return verifier;
     }

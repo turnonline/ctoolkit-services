@@ -19,19 +19,15 @@
 package org.ctoolkit.services.endpoints;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.server.spi.auth.GoogleAuth;
 import com.google.api.server.spi.auth.common.User;
 import mockit.Expectations;
-import mockit.Injectable;
 import mockit.Mocked;
 import mockit.Tested;
 import mockit.Verifications;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 import static org.testng.Assert.assertEquals;
@@ -51,8 +47,8 @@ public class FirebaseJwtAuthenticatorTest
     @Tested
     private FirebaseJwtAuthenticator tested;
 
-    @Injectable
-    private GoogleIdTokenVerifier verifier;
+    @Mocked
+    private FirebaseTokenVerifier verifier;
 
     @Mocked
     private HttpServletRequest request;
@@ -65,9 +61,8 @@ public class FirebaseJwtAuthenticatorTest
 
     @Test
     public void authenticate_Ok()
-            throws GeneralSecurityException, IOException
     {
-        final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setSubject( "userId123" );
         payload.setEmail( "verified@turnonline.biz" );
         payload.setAudience( "my-audience" );
@@ -98,9 +93,8 @@ public class FirebaseJwtAuthenticatorTest
 
     @Test
     public void authenticate_NotOkUserIdNull()
-            throws GeneralSecurityException, IOException
     {
-        final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setEmail( "verified@turnonline.biz" );
         payload.setSubject( null );
         payload.setAudience( "my-audience" );
@@ -112,9 +106,8 @@ public class FirebaseJwtAuthenticatorTest
 
     @Test
     public void authenticate_NotOkUserAudienceNull()
-            throws GeneralSecurityException, IOException
     {
-        final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setEmail( "verified@turnonline.biz" );
         payload.setSubject( "userId123" );
         payload.setAudience( null );
@@ -126,39 +119,12 @@ public class FirebaseJwtAuthenticatorTest
 
     @Test
     public void authenticate_VerifiedButEmailNull()
-            throws GeneralSecurityException, IOException
     {
-        final GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setSubject( "userId123" );
         payload.setAudience( "my-audience" );
 
         notPassedExpectations( tested, request, verifier, idToken, payload );
-
-        User user = tested.authenticate( request );
-
-        assertNull( user );
-    }
-
-    @Test
-    public void authenticate_Exception()
-            throws GeneralSecurityException, IOException
-    {
-        new Expectations( tested )
-        {
-            {
-                GoogleAuth.getAuthToken( request );
-                result = FAKE_TOKEN;
-
-                GoogleAuth.isJwt( FAKE_TOKEN );
-                result = true;
-
-                tested.getVerifier();
-                result = verifier;
-
-                verifier.verify( FAKE_TOKEN );
-                result = new Exception();
-            }
-        };
 
         User user = tested.authenticate( request );
 
@@ -208,7 +174,6 @@ public class FirebaseJwtAuthenticatorTest
 
     @Test
     public void authenticateFail()
-            throws GeneralSecurityException, IOException
     {
         new Expectations( tested )
         {
@@ -234,10 +199,9 @@ public class FirebaseJwtAuthenticatorTest
 
     private void passedExpectations( FirebaseJwtAuthenticator tested,
                                      HttpServletRequest request,
-                                     GoogleIdTokenVerifier verifier,
+                                     FirebaseTokenVerifier verifier,
                                      GoogleIdToken idToken,
                                      GoogleIdToken.Payload payload )
-            throws GeneralSecurityException, IOException
     {
         new Expectations( tested )
         {
@@ -265,10 +229,9 @@ public class FirebaseJwtAuthenticatorTest
 
     private void notPassedExpectations( FirebaseJwtAuthenticator tested,
                                         HttpServletRequest request,
-                                        GoogleIdTokenVerifier verifier,
+                                        FirebaseTokenVerifier verifier,
                                         GoogleIdToken idToken,
                                         GoogleIdToken.Payload payload )
-            throws GeneralSecurityException, IOException
     {
         new Expectations( tested )
         {
