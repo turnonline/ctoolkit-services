@@ -26,12 +26,19 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.googlecode.objectify.ObjectifyService.ofy;
 
 /**
- * The extension of the {@link Task} with dedicated convenient method {@link #execute(Object)}.
- * The task might be retired if no entity will be found once task has started
+ * The extension of the {@link Task} with dedicated convenient method {@link #execute(Object)}
+ * executed within transaction. The task might be retired if no entity will be found once task has started
  * as in the meantime entity could be removed with another process etc.
  * In this case warning will be logged.
+ * <p>
+ * <strong>Dedicated task lasting for seconds, not minutes</strong>
+ * </p>
+ * <p>
+ * Transactions have a maximum duration of 60 seconds with a 10 second idle expiration time after 30 seconds.
+ * </p>
  *
  * @param <T> the type of the entity that task will work with
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
@@ -154,15 +161,17 @@ public abstract class EntityTask<T>
     @Override
     public final void execute()
     {
-        T entity = workWith();
-        if ( entity == null )
-        {
-            logger.warn( "No Entity has been found for specified key '" + getEntityKey()
-                    + "'. Task '" + getTaskName() + "' has been retired." );
-            return;
-        }
+        ofy().transact( () -> {
+            T entity = workWith();
+            if ( entity == null )
+            {
+                logger.warn( "No Entity has been found for specified key '" + getEntityKey()
+                        + "'. Task '" + getTaskName() + "' has been retired." );
+                return;
+            }
 
-        execute( entity );
+            execute( entity );
+        } );
     }
 
     /**

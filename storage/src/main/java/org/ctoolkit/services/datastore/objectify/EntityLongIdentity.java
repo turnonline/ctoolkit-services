@@ -27,7 +27,7 @@ import com.googlecode.objectify.annotation.Id;
  * a numeric value will be generated for you using the standard App Engine allocator.
  * <p>
  * While using manual 'Id' allocation it's recommended first allocate 'Id' to reserve it
- * {@link ObjectifyFactory#allocateIds(Class, int)}. Once allocated it will not be used
+ * {@link ObjectifyFactory#allocateId(Class)}. Once allocated it will not be used
  * by the datastore's automatic ID allocator for entities with the same kind and parent.
  * <p>
  * <b>Datastore Note:</b> Don't use the value 0 (zero) for the ID. If you do,
