@@ -531,7 +531,7 @@ public abstract class Task<T>
      * @param errorMessage the specified detail message for {@code IllegalArgumentException}
      * @return the entity the task will handle or throws {@link IllegalArgumentException} if not found
      */
-    public final T workWith( String errorMessage )
+    public T workWith( String errorMessage )
     {
         return workWith( true, errorMessage );
     }
