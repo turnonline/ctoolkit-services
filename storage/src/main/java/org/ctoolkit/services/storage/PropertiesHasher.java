@@ -27,6 +27,7 @@ import com.google.common.hash.Hashing;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +102,10 @@ public interface PropertiesHasher
             else if ( value instanceof Boolean )
             {
                 into.putBoolean( ( Boolean ) value );
+            }
+            else if ( value instanceof Date )
+            {
+                into.putLong( ( ( Date ) value ).getTime() );
             }
             else if ( value instanceof Float )
             {

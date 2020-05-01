@@ -23,6 +23,7 @@ import org.ctoolkit.services.datastore.objectify.EntityStringIdentityHasher;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,7 @@ public class EntityStringIdentityHasherTestEntity
             properties.put( "boolean", true );
             properties.put( "integer", Integer.MAX_VALUE );
             properties.put( "double", 13579.6D );
+            properties.put( "date", new Date( 1568351020000L ) );
 
             Map<String, Object> nested = new HashMap<>();
             nested.put( "float", 3.6F );
