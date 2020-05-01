@@ -153,7 +153,7 @@ public class PropertiesHasherTest
 
         String hashCode = hashCodeEntity.getHashCode();
         assertThat( hashCode ).isNotNull();
-        assertThat( hashCode ).isEqualTo( "57d2230a6f124888eaf22e40b088913e4b9b7bd185d8787d310a5c744bfd79e4" );
+        assertThat( hashCode ).isEqualTo( "213fa1dd378d03936d6f95a971b693c8b048361049fa56fdb5b7097971d52ec1" );
 
         // the second standalone (independent) hash code
         assertThat( entity.hashCodeSnapshot( HASHER_NAME ) ).isTrue();
@@ -186,7 +186,7 @@ public class PropertiesHasherTest
 
         String hashCode = hashCodeEntity.getHashCode();
         assertThat( hashCode ).isNotNull();
-        assertThat( hashCode ).isEqualTo( "156393fd0a078f1049cc47d650e4f6a12f56fed7c08a1dbe4810c99a3b25f6c9" );
+        assertThat( hashCode ).isEqualTo( "a46bb1dc60d16a1cd1f1964940e3f48efb4d8709c19a0f4ca2f7b690e204f512" );
 
         // the second standalone (independent) hash code
         hashCode = hashCodeEntity.getHashCode( HASHER_NAME );

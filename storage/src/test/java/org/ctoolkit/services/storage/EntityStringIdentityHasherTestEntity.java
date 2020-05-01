@@ -61,8 +61,8 @@ public class EntityStringIdentityHasherTestEntity
             nested.put( "long", Long.MAX_VALUE );
             properties.put( "nested", nested );
 
-            List<Map> nested1List = new ArrayList<>();
-            List<Map> nested2List = new ArrayList<>();
+            List<Map<?, ?>> nested1List = new ArrayList<>();
+            List<Map<?, ?>> nested2List = new ArrayList<>();
 
             Map<String, Object> listMap1 = new HashMap<>();
 
@@ -88,7 +88,7 @@ public class EntityStringIdentityHasherTestEntity
 
             Map<String, Object> listMap3 = new HashMap<>();
             listMap3.put( "first", 6.6F );
-            listMap3.put( "array", jsonArray2 );
+            listMap3.put( "array", jsonArray );
             listMap3.put( "pricing", jsonArray2 );
             nested1List.add( listMap3 );
 
