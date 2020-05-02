@@ -37,6 +37,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The contract to manage group of entity properties overall hashcode.
+ * <p>
+ * <strong>List of supported types in the {@link Map} that will be included in to final hash code calculation</strong>
+ * </p>
+ * <ul>
+ *     <li>{@link String}</li>
+ *     <li>{@link Long}</li>
+ *     <li>{@link Integer}</li>
+ *     <li>{@link Double}</li>
+ *     <li>{@link Boolean}</li>
+ *     <li>{@link Date}</li>
+ *     <li>{@link Enum}</li>
+ *     <li>{@link Float}</li>
+ *     <li>{@link Character}</li>
+ * </ul>
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -159,7 +173,7 @@ public interface PropertiesHasher
                 String itemKey;
                 String keySuffix;
 
-                List list = ( List ) value;
+                List<?> list = ( List<?> ) value;
                 for ( int index = 0; index < list.size(); index++ )
                 {
                     keySuffix = key + "[" + index + "]";
@@ -167,7 +181,7 @@ public interface PropertiesHasher
                     Object itemValue = list.get( index );
                     if ( itemValue instanceof Map )
                     {
-                        Map map = ( Map ) itemValue;
+                        Map<?, ?> map = ( Map<?, ?> ) itemValue;
                         @SuppressWarnings( "unchecked" ) Map<String, Object> nested = ( Map<String, Object> ) map;
                         flatMap.putAll( flatMap( nested, itemKey ) );
                     }
