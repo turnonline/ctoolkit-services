@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.storage;
 
+import com.google.common.collect.BoundType;
 import com.googlecode.objectify.annotation.Entity;
 import org.ctoolkit.services.datastore.objectify.EntityStringIdentityHasher;
 
@@ -56,6 +57,7 @@ public class EntityStringIdentityHasherTestEntity
             properties.put( "integer", Integer.MAX_VALUE );
             properties.put( "double", 13579.6D );
             properties.put( "date", new Date( 1568351020000L ) );
+            properties.put( "someEnum", BoundType.OPEN );
 
             Map<String, Object> nested = new HashMap<>();
             nested.put( "float", 3.6F );

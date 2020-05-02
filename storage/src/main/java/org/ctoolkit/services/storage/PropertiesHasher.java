@@ -107,6 +107,10 @@ public interface PropertiesHasher
             {
                 into.putLong( ( ( Date ) value ).getTime() );
             }
+            else if ( value instanceof Enum )
+            {
+                into.putString( ( ( Enum<?> ) value ).name(), Charsets.UTF_8 );
+            }
             else if ( value instanceof Float )
             {
                 into.putFloat( ( Float ) value );
