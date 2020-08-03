@@ -66,7 +66,7 @@ public class CloudStorageUploadServletTest
 {
     private static final String BUCKET = "test-bucket.appspot.com";
 
-    private static final String FILE_NAME = "nice.jpeg";
+    private static final String FILE_NAME = "nícé.jpeg";
 
     @Tested
     private CloudStorageUploadServlet tested;
@@ -133,7 +133,7 @@ public class CloudStorageUploadServletTest
 
                 assertThat( blobInfo ).isNotNull();
                 assertThat( blobInfo.getBucket() ).isEqualTo( BUCKET );
-                assertThat( blobInfo.getName() ).isEqualTo( accountId + "/uploads/" + FILE_NAME );
+                assertThat( blobInfo.getName() ).isEqualTo( accountId + "/uploads/nice.jpeg" );
             }
         };
 
@@ -341,7 +341,7 @@ public class CloudStorageUploadServletTest
 
                 assertThat( blobInfo ).isNotNull();
                 assertThat( blobInfo.getBucket() ).isEqualTo( BUCKET );
-                assertThat( blobInfo.getName() ).isEqualTo( "uploads/" + FILE_NAME );
+                assertThat( blobInfo.getName() ).isEqualTo( "uploads/nice.jpeg" );
             }
         };
 
@@ -402,7 +402,7 @@ public class CloudStorageUploadServletTest
 
                 assertThat( blobInfo ).isNotNull();
                 assertThat( blobInfo.getBucket() ).isEqualTo( BUCKET );
-                assertThat( blobInfo.getName() ).isEqualTo( "uploads/" + FILE_NAME );
+                assertThat( blobInfo.getName() ).isEqualTo( "uploads/nice.jpeg" );
             }
         };
 

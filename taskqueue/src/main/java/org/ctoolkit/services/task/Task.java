@@ -658,7 +658,7 @@ public abstract class Task<T>
         {
             logger.info( "The task with name '"
                     + scheduled.getGenericName()
-                    + "' is being scheduled to be executed as next." );
+                    + "' has been scheduled as next" );
         }
 
         // once parent task has been successfully executed, enqueue the next task

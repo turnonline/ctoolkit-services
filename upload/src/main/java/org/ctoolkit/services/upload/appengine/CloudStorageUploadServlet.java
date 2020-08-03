@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.text.MessageFormat;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -410,7 +411,7 @@ public class CloudStorageUploadServlet
             String[] tokens = fileName.split( "\\.(?=[^.]+$)" );
             fileName = tokens[0] + "-" + System.currentTimeMillis() + "." + tokens[1];
         }
-        return fileName;
+        return Normalizer.normalize( fileName, Normalizer.Form.NFD ).replaceAll( "[^\\p{ASCII}]", "" );
     }
 
     /**
