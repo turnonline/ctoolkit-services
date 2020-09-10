@@ -230,7 +230,7 @@ public abstract class BaseEntityIdentity<ID_TYPE>
      * @param value the string to be normalized
      * @return the normalized string or {@code null}
      */
-    public String normalize( @Nullable String value )
+    public static String normalize( @Nullable String value )
     {
         if ( Strings.isNullOrEmpty( value ) )
         {
