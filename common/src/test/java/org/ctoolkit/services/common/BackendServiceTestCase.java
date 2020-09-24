@@ -19,17 +19,19 @@
 package org.ctoolkit.services.common;
 
 import com.google.appengine.api.utils.SystemProperty;
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalMemcacheServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalModulesServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.googlecode.objectify.ObjectifyService;
+import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Guice;
 
-import java.io.Closeable;
-import java.lang.reflect.Method;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The common test case for all integration tests requiring App Engine services to be available within unit test.
@@ -39,25 +41,43 @@ import java.lang.reflect.Method;
 @Guice( modules = TestModule.class )
 public class BackendServiceTestCase
 {
-    private LocalServiceTestHelper helper = new LocalServiceTestHelper(
-            new LocalMemcacheServiceTestConfig(),
-            new LocalModulesServiceTestConfig(),
-            new LocalDatastoreServiceTestConfig().setDefaultHighRepJobPolicyUnappliedJobPercentage( 0 ) );
+    protected LocalServiceTestHelper helper;
 
-    private Closeable session;
+    private LocalObjectifyHelper ofyHelper;
+
+    @Inject
+    public void setLocalDatastoreHelper( LocalObjectifyHelper loh )
+    {
+        this.ofyHelper = loh;
+
+        helper = new LocalServiceTestHelper( new LocalMemcacheServiceTestConfig(),
+                new LocalModulesServiceTestConfig(),
+                new LocalURLFetchServiceTestConfig(),
+                ofyHelper );
+    }
 
     @BeforeMethod
-    public void setUp( Method m )
+    public void beforeMethod()
     {
         helper.setUp();
-        session = ObjectifyService.begin();
-        SystemProperty.environment.set( "Development" );
     }
 
     @AfterMethod
-    public void tearDown() throws Exception
+    public void afterMethod()
     {
-        session.close();
         helper.tearDown();
+    }
+
+    @BeforeSuite
+    public void start() throws IOException, InterruptedException
+    {
+        SystemProperty.environment.set( "Development" );
+        ofyHelper.start();
+    }
+
+    @AfterSuite
+    public void stop() throws InterruptedException, TimeoutException, IOException
+    {
+        ofyHelper.stop();
     }
 }

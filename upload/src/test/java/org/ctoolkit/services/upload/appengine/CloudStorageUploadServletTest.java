@@ -500,7 +500,9 @@ public class CloudStorageUploadServletTest
             }
         };
 
-        assertThat( tested.isAnyImageContentType( part ) ).named( "Image content-type" ).isTrue();
+        assertWithMessage( "Image content-type" )
+                .that( tested.isAnyImageContentType( part ) )
+                .isTrue();
     }
 
     @Test
@@ -514,7 +516,9 @@ public class CloudStorageUploadServletTest
             }
         };
 
-        assertThat( tested.isAnyImageContentType( part ) ).named( "Image content-type" ).isTrue();
+        assertWithMessage( "Image content-type" )
+                .that( tested.isAnyImageContentType( part ) )
+                .isTrue();
     }
 
     @Test
@@ -528,7 +532,9 @@ public class CloudStorageUploadServletTest
             }
         };
 
-        assertThat( tested.isAnyImageContentType( part ) ).named( "Image content-type" ).isTrue();
+        assertWithMessage( "Image content-type" )
+                .that( tested.isAnyImageContentType( part ) )
+                .isTrue();
     }
 
     @Test
@@ -542,7 +548,9 @@ public class CloudStorageUploadServletTest
             }
         };
 
-        assertThat( tested.isAnyImageContentType( part ) ).named( "Image content-type" ).isTrue();
+        assertWithMessage( "Image content-type" )
+                .that( tested.isAnyImageContentType( part ) )
+                .isTrue();
     }
 
     @Test
@@ -556,7 +564,9 @@ public class CloudStorageUploadServletTest
             }
         };
 
-        assertThat( tested.isAnyImageContentType( part ) ).named( "Image content-type" ).isFalse();
+        assertWithMessage( "Image content-type" )
+                .that( tested.isAnyImageContentType( part ) )
+                .isFalse();
     }
 
     @Test

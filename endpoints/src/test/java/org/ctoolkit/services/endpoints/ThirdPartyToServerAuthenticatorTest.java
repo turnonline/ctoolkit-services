@@ -94,7 +94,7 @@ public class ThirdPartyToServerAuthenticatorTest
 
                 assertWithMessage( "Authenticated user taken from request attribute" )
                         .that( vu )
-                        .isSameAs( verifiedUser );
+                        .isSameInstanceAs( verifiedUser );
             }
         };
     }
