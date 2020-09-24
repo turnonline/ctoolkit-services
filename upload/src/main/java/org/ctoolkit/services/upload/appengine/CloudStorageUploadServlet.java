@@ -67,6 +67,7 @@ import java.util.UUID;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS;
 import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN;
+import static com.google.common.net.HttpHeaders.AUTHORIZATION;
 import static com.google.common.net.HttpHeaders.CACHE_CONTROL;
 import static com.google.common.net.HttpHeaders.X_REQUESTED_WITH;
 import static org.ctoolkit.services.storage.StorageService.GOOGLE_STORAGE_NAME_PATTERN;
@@ -440,13 +441,16 @@ public class CloudStorageUploadServlet
      * <ul>
      * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_ORIGIN}: *</li>
      * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_METHODS}: OPTIONS,POST</li>
-     * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_HEADERS}: Cache-Control,X-Requested-With</li>
+     * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_HEADERS}: Authorization,Cache-Control,X-Requested-With,
+     * vnd.turnon.cloud.associated-id</li>
      * </ul>
      */
     @Singleton
     public static class AccessControl
             implements Filter
     {
+        public static final String ASSOCIATED_ID = "vnd.turnon.cloud.associated-id";
+
         @Override
         public void init( FilterConfig filterConfig )
         {
@@ -460,7 +464,8 @@ public class CloudStorageUploadServlet
 
             response.addHeader( ACCESS_CONTROL_ALLOW_ORIGIN, "*" );
             response.addHeader( ACCESS_CONTROL_ALLOW_METHODS, "OPTIONS,POST" );
-            response.addHeader( ACCESS_CONTROL_ALLOW_HEADERS, CACHE_CONTROL + "," + X_REQUESTED_WITH );
+            response.addHeader( ACCESS_CONTROL_ALLOW_HEADERS,
+                    AUTHORIZATION + "," + CACHE_CONTROL + "," + X_REQUESTED_WITH + "," + ASSOCIATED_ID );
             chain.doFilter( request, response );
         }
 
