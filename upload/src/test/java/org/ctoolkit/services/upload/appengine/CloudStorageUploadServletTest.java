@@ -108,7 +108,7 @@ public class CloudStorageUploadServletTest
 
         // test call
         long accountId = 132435L;
-        tested.upload( request, response, accountId );
+        tested.upload( request, response, accountId, null );
 
         new Verifications()
         {
@@ -138,7 +138,7 @@ public class CloudStorageUploadServletTest
         };
 
         String expectedResponse = fromFile( "upload-response.json" );
-        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
     }
 
     @Test
@@ -156,7 +156,7 @@ public class CloudStorageUploadServletTest
 
         // test call
         long accountId = 132435L;
-        tested.upload( request, response, accountId );
+        tested.upload( request, response, accountId, null );
 
         new Verifications()
         {
@@ -178,7 +178,30 @@ public class CloudStorageUploadServletTest
         };
 
         String expectedResponse = fromFile( "upload-response.json" );
-        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
+    }
+
+    @Test
+    public void upload_ImageCreatedWithAssociatedId() throws ServletException, IOException, JSONException
+    {
+        expectationsWithParts();
+
+        // test call
+        tested.upload( request, response, 785412589L, "543852" );
+
+        new Verifications()
+        {
+            {
+                response.setStatus( HttpServletResponse.SC_CREATED );
+
+                ServingUrlOptions suo;
+                imageService.getServingUrl( suo = withCapture() );
+                assertThat( suo ).isNotNull();
+            }
+        };
+
+        String expectedResponse = fromFile( "upload-response-associated-id.json" );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
     }
 
     @Test
@@ -199,7 +222,7 @@ public class CloudStorageUploadServletTest
 
         // test call
         long accountId = 132435L;
-        tested.upload( request, response, accountId );
+        tested.upload( request, response, accountId, null );
 
         new Verifications()
         {
@@ -222,7 +245,7 @@ public class CloudStorageUploadServletTest
         };
 
         String expectedResponse = fromFile( "upload-response-excl-prefix.json" );
-        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
     }
 
     @Test
@@ -233,7 +256,7 @@ public class CloudStorageUploadServletTest
 
         // test call
         long accountId = 4352L;
-        tested.upload( request, response, accountId );
+        tested.upload( request, response, accountId, null );
 
         new Verifications()
         {
@@ -255,7 +278,7 @@ public class CloudStorageUploadServletTest
         };
 
         String expectedResponse = fromFile( "upload-response-incl-timestamp.json" );
-        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
     }
 
     @Test
@@ -270,7 +293,7 @@ public class CloudStorageUploadServletTest
         };
 
         long accountId = 132435L;
-        tested.upload( request, response, accountId );
+        tested.upload( request, response, accountId, null );
 
         new Verifications()
         {
@@ -295,7 +318,7 @@ public class CloudStorageUploadServletTest
 
         // test call
         long accountId = 132435L;
-        tested.upload( request, response, accountId );
+        tested.upload( request, response, accountId, null );
 
         new Verifications()
         {
@@ -346,7 +369,7 @@ public class CloudStorageUploadServletTest
         };
 
         String expectedResponse = fromFile( "upload-response-min.json" );
-        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
     }
 
     @Test
@@ -407,7 +430,7 @@ public class CloudStorageUploadServletTest
         };
 
         String expectedResponse = fromFile( "upload-response-min.json" );
-        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
+        JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.NON_EXTENSIBLE );
     }
 
     @Test
@@ -456,6 +479,10 @@ public class CloudStorageUploadServletTest
                     .that( metadata.getServingUrl() )
                     .isEqualTo( "https://cdn.google/abc683" );
 
+            assertWithMessage( "Associated ID" )
+                    .that( metadata.getAssociatedId() )
+                    .isEqualTo( "543852" );
+
             assertWithMessage( "Account ID" )
                     .that( accountId )
                     .isEqualTo( 132435L );
@@ -463,7 +490,8 @@ public class CloudStorageUploadServletTest
 
         // test call
         long accountId = 132435L;
-        tested.upload( request, response, accountId );
+        String associatedId = "543852";
+        tested.upload( request, response, accountId, associatedId );
 
         String expectedResponse = fromFile( "upload-response-excl-prefix.json" );
         JSONAssert.assertEquals( expectedResponse, writer.toString(), JSONCompareMode.LENIENT );
@@ -479,7 +507,7 @@ public class CloudStorageUploadServletTest
         } );
 
         // test call
-        tested.upload( request, response, null );
+        tested.upload( request, response, null, null );
 
         new Verifications()
         {

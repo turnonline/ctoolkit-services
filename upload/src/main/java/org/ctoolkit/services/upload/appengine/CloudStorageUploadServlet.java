@@ -98,9 +98,10 @@ import static org.ctoolkit.services.storage.StorageService.GOOGLE_STORAGE_NAME_P
  * {
  *     "items": [
  *         {
- *             "fileName": "my.jpeg",
- *             "storageName": "/gs/my-default-bucket.appspot.com/uploads/nice.jpeg",
- *             "servingUrl": "https://lh3.googleusercontent.com/abc683.."
+ *             "fileName": "nice.jpeg",
+ *             "storageName": "/gs/my-default-bucket.appspot.com/{accountId}/uploads/nice.jpeg",
+ *             "servingUrl": "https://lh3.googleusercontent.com/abc683..",
+ *             "associatedId": "5781254982..."
  *         }
  *     ]
  * }
@@ -169,16 +170,22 @@ public class CloudStorageUploadServlet
     protected void doPost( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
-        upload( request, response, null );
+        upload( request, response, null, null );
     }
 
     /**
      * If Account ID is provided, storage path will be prepended with directory (based on the Account ID)
      * that acts as an owner of all account related uploads.
+     * <p>
+     * 'Associated ID' represents an identification of the concrete object that's associated
+     * with the uploaded BLOB. It's useful mainly for the use cases when an uploaded BLOB
+     * will be associated with a new record tha was just created.
+     * </p>
      */
     protected void upload( @Nonnull HttpServletRequest request,
                            @Nonnull HttpServletResponse response,
-                           @Nullable Long accountId )
+                           @Nullable Long accountId,
+                           @Nullable String associatedId )
             throws ServletException, IOException
     {
         Collection<Part> parts = request.getParts();
@@ -240,6 +247,11 @@ public class CloudStorageUploadServlet
             jsonEntry.addProperty( "storageName", storageName );
             jsonEntry.addProperty( "fileName", filename );
 
+            if ( !Strings.isNullOrEmpty( associatedId ) )
+            {
+                jsonEntry.addProperty( "associatedId", associatedId );
+            }
+
             String servingUrl = null;
 
             if ( isAnyImageContentType( part ) )
@@ -286,7 +298,9 @@ public class CloudStorageUploadServlet
                         .generalStorageName( storageName )
                         .fileName( filename )
                         .relativePath( relativePath )
-                        .servingUrl( servingUrl ).build();
+                        .servingUrl( servingUrl )
+                        .associatedId( associatedId )
+                        .build();
                 uploads.add( metadata );
             }
         }

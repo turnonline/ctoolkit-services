@@ -56,26 +56,29 @@ public interface StorageUploadListener
     class Metadata
             implements Serializable
     {
-        private static final long serialVersionUID = 382970411903226244L;
+        private static final long serialVersionUID = -5100808396225197411L;
 
-        private BlobInfo blobInfo;
+        private final BlobInfo blobInfo;
 
-        private String fileName;
+        private final String fileName;
 
-        private String relativePath;
+        private final String relativePath;
 
-        private String cloudStorageName;
+        private final String cloudStorageName;
 
-        private String generalStorageName;
+        private final String generalStorageName;
 
-        private String servingUrl;
+        private final String servingUrl;
+
+        private final String associatedId;
 
         private Metadata( BlobInfo blobInfo,
                           String fileName,
                           String relativePath,
                           String cloudStorageName,
                           String generalStorageName,
-                          String servingUrl )
+                          String servingUrl,
+                          String associatedId )
         {
             this.blobInfo = blobInfo;
             this.fileName = fileName;
@@ -83,6 +86,7 @@ public interface StorageUploadListener
             this.cloudStorageName = cloudStorageName;
             this.generalStorageName = generalStorageName;
             this.servingUrl = servingUrl;
+            this.associatedId = associatedId;
         }
 
         /**
@@ -133,6 +137,15 @@ public interface StorageUploadListener
             return servingUrl;
         }
 
+        /**
+         * The ID that represents an identification of the concrete object
+         * that's associated with the uploaded BLOB.
+         */
+        public String getAssociatedId()
+        {
+            return associatedId;
+        }
+
         @Override
         public String toString()
         {
@@ -142,6 +155,7 @@ public interface StorageUploadListener
                     .add( "cloudStorageName", cloudStorageName )
                     .add( "generalStorageName", generalStorageName )
                     .add( "servingUrl", servingUrl )
+                    .add( "associatedId", associatedId )
                     .toString();
         }
 
@@ -158,6 +172,8 @@ public interface StorageUploadListener
             private String generalStorageName;
 
             private String servingUrl;
+
+            private String associatedId;
 
             public Builder blobInfo( BlobInfo blobInfo )
             {
@@ -195,9 +211,21 @@ public interface StorageUploadListener
                 return this;
             }
 
+            public Builder associatedId( String associatedId )
+            {
+                this.associatedId = associatedId;
+                return this;
+            }
+
             public Metadata build()
             {
-                return new Metadata( blobInfo, fileName, path, cloudStorageName, generalStorageName, servingUrl );
+                return new Metadata( blobInfo,
+                        fileName,
+                        path,
+                        cloudStorageName,
+                        generalStorageName,
+                        servingUrl,
+                        associatedId );
             }
         }
     }

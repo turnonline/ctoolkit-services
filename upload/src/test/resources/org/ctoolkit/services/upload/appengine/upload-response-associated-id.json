@@ -1,0 +1,10 @@
+{
+    "items": [
+        {
+            "fileName": "nice.jpeg",
+            "storageName": "/gs/test-bucket.appspot.com/785412589/uploads/nice.jpeg",
+            "servingUrl": "https://cdn.google/abc683",
+            "associatedId": "543852"
+        }
+    ]
+}
