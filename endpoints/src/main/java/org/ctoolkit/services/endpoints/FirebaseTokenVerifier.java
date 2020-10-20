@@ -27,8 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The Firebase thread-safe token verifier that ignores (no additional checks)
- * validated token's audience and issuer.
+ * The dedicated Firebase thread-safe token verifier.
+ * <p>
+ * <b>Default {@link GoogleIdTokenVerifier}</b>
+ * configuration checks the issuer against fixed list of expected issuers.
+ * However, within TurnOnline.biz Ecosystem we want to allow any of the issuers.
+ * </p>
  *
  * @author <a href="mailto:medvegy@turnonline.biz">Aurel Medvegy</a>
  */
@@ -37,8 +41,6 @@ public class FirebaseTokenVerifier
     private static final Logger LOGGER = LoggerFactory.getLogger( FirebaseTokenVerifier.class );
 
     private static final String PUBLIC_CERTS_URL = "https://www.googleapis.com/service_accounts/v1/metadata/x509/securetoken@system.gserviceaccount.com";
-
-    private static final String GOOGLE_ISSUER = "https://securetoken.google.com/";
 
     private final GoogleIdTokenVerifier verifier;
 
@@ -50,14 +52,13 @@ public class FirebaseTokenVerifier
                         Client.getInstance().getJsonFactory() )
                         .setPublicCertsEncodedUrl( PUBLIC_CERTS_URL )
                         .build() )
-                // no check against issuers
+                // null to suppress the issuer check, will be validated later
                 .setIssuer( null )
                 .build();
     }
 
     /**
      * Verifies that the given token is valid and returns the ID token if succeeded.
-     * Issuer is being verified against {@link #GOOGLE_ISSUER} + audience taken from the token.
      *
      * @param token Google ID token string
      * @return Google ID token if verified successfully or {@code null} if failed
@@ -76,15 +77,6 @@ public class FirebaseTokenVerifier
         catch ( Exception e )
         {
             LOGGER.warn( "Error while verifying token", e );
-            return null;
-        }
-
-        String audience = ( String ) idToken.getPayload().getAudience();
-        String issuer = GOOGLE_ISSUER + audience;
-
-        if ( !idToken.verifyIssuer( issuer ) )
-        {
-            LOGGER.warn( "Expected issuer '" + issuer + "' but got '" + idToken.getPayload().getIssuer() + "'" );
             return null;
         }
 

@@ -52,12 +52,6 @@ public class FirebaseTokenVerifierTest
     @Test
     public void verify_Valid() throws GeneralSecurityException, IOException
     {
-        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
-        payload.setSubject( "userId123" );
-        payload.setEmail( "verified@turnonline.biz" );
-        payload.setAudience( "my-audience" );
-        payload.setIssuer( "https://securetoken.google.com/my-audience" );
-
         new Expectations( tested )
         {
             {
@@ -66,45 +60,10 @@ public class FirebaseTokenVerifierTest
 
                 verifier.verify( FAKE_TOKEN );
                 result = idToken;
-
-                idToken.getPayload();
-                result = payload;
-
-                idToken.verifyIssuer( payload.getIssuer() );
-                result = true;
             }
         };
 
         assertThat( tested.verify( FAKE_TOKEN ) ).isNotNull();
-    }
-
-    @Test
-    public void verify_InvalidIssuer() throws GeneralSecurityException, IOException
-    {
-        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
-        payload.setSubject( "userId123" );
-        payload.setEmail( "verified@turnonline.biz" );
-        payload.setAudience( "my-audience" );
-        payload.setIssuer( "https://securetoken.google.com/invalid-audience" );
-
-        new Expectations( tested )
-        {
-            {
-                tested.getVerifier();
-                result = verifier;
-
-                verifier.verify( FAKE_TOKEN );
-                result = idToken;
-
-                idToken.getPayload();
-                result = payload;
-
-                idToken.verifyIssuer( anyString );
-                result = false;
-            }
-        };
-
-        assertThat( tested.verify( FAKE_TOKEN ) ).isNull();
     }
 
     @Test
