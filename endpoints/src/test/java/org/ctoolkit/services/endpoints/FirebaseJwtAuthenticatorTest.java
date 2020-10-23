@@ -51,12 +51,6 @@ public class FirebaseJwtAuthenticatorTest
     private FirebaseJwtAuthenticatorWithAliases testedAliases;
 
     @Tested
-    private FirebaseJwtAuthenticatorWithSingleAlias testedSingleAlias;
-
-    @Tested
-    private FirebaseJwtAuthenticatorWithEmptyAlias testedEmptyAlias;
-
-    @Mocked
     private FirebaseTokenVerifier verifier;
 
     @Mocked
@@ -207,7 +201,7 @@ public class FirebaseJwtAuthenticatorTest
     }
 
     @Test
-    public void authenticate_WithAudienceSingleAlias()
+    public void authenticate_WithAudienceAliases()
     {
         GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
         payload.setSubject( "userId123" );
@@ -224,46 +218,6 @@ public class FirebaseJwtAuthenticatorTest
         assertEquals( verifiedUser.getEmail(), "verified@turnonline.biz" );
         assertEquals( verifiedUser.getToken(), FAKE_TOKEN );
         assertEquals( verifiedUser.getAudience(), "target-audience" );
-    }
-
-    @Test
-    public void authenticate_WithAudienceAliases()
-    {
-        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
-        payload.setSubject( "userId123" );
-        payload.setEmail( "verified@turnonline.biz" );
-        payload.setAudience( "alias-a1" );
-
-        passedExpectations( testedSingleAlias, request, verifier, idToken, payload );
-
-        User user = testedSingleAlias.authenticate( request );
-        AudienceUser verifiedUser = ( AudienceUser ) user;
-
-        assertNotNull( user );
-        assertEquals( verifiedUser.getId(), "userId123" );
-        assertEquals( verifiedUser.getEmail(), "verified@turnonline.biz" );
-        assertEquals( verifiedUser.getToken(), FAKE_TOKEN );
-        assertEquals( verifiedUser.getAudience(), "target-audience" );
-    }
-
-    @Test
-    public void authenticate_WithEmptyAlias()
-    {
-        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
-        payload.setSubject( "userId123" );
-        payload.setEmail( "verified@turnonline.biz" );
-        payload.setAudience( "alias-xy123" );
-
-        passedExpectations( testedEmptyAlias, request, verifier, idToken, payload );
-
-        User user = testedEmptyAlias.authenticate( request );
-        AudienceUser verifiedUser = ( AudienceUser ) user;
-
-        assertNotNull( user );
-        assertEquals( verifiedUser.getId(), "userId123" );
-        assertEquals( verifiedUser.getEmail(), "verified@turnonline.biz" );
-        assertEquals( verifiedUser.getToken(), FAKE_TOKEN );
-        assertEquals( verifiedUser.getAudience(), "alias-xy123" );
     }
 
     @Test
@@ -292,7 +246,7 @@ public class FirebaseJwtAuthenticatorTest
                                      GoogleIdToken idToken,
                                      GoogleIdToken.Payload payload )
     {
-        new Expectations( tested )
+        new Expectations( tested, verifier )
         {
             {
                 GoogleAuth.getAuthToken( request );

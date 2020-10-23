@@ -27,8 +27,6 @@ import com.google.api.server.spi.config.Singleton;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableListMultimap;
-import com.google.common.collect.ListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +54,6 @@ public class FirebaseJwtAuthenticator
 
     private final FirebaseTokenVerifier verifier;
 
-    private final ListMultimap<String, String> trustedAliases;
-
     public FirebaseJwtAuthenticator()
     {
         this( null, null );
@@ -65,27 +61,14 @@ public class FirebaseJwtAuthenticator
 
     /**
      * Constructor that supports mapping of audiences. Trusted aliases represent a GCP projects
-     * that are considered as trusted and it's safe to accept it as aliases to the target audience.
+     * that are considered as trusted and it's safe to accept it as an aliases to the target audience.
      *
      * @param targetAudience the audience to be mapped to once verified audience alias matched
      * @param trustedAliases the comma separated list of audience as trusted aliases
      */
     protected FirebaseJwtAuthenticator( @Nullable String targetAudience, @Nullable String trustedAliases )
     {
-        this.verifier = new FirebaseTokenVerifier();
-        if ( targetAudience != null && trustedAliases != null && !trustedAliases.isEmpty() )
-        {
-            String[] aliases = trustedAliases.split( "," );
-
-            this.trustedAliases = ImmutableListMultimap
-                    .<String, String>builder()
-                    .putAll( targetAudience, aliases )
-                    .build();
-        }
-        else
-        {
-            this.trustedAliases = ImmutableListMultimap.of();
-        }
+        this.verifier = new FirebaseTokenVerifier( targetAudience, trustedAliases );
     }
 
     /**
@@ -115,45 +98,35 @@ public class FirebaseJwtAuthenticator
 
         String userId = idToken.getPayload().getSubject();
         String email = idToken.getPayload().getEmail();
-        String payloadAudience = ( String ) idToken.getPayload().getAudience();
+        String audience = ( String ) idToken.getPayload().getAudience();
 
         AudienceUser user;
-        String audience;
-
         if ( Strings.isNullOrEmpty( email )
                 || Strings.isNullOrEmpty( userId )
-                || Strings.isNullOrEmpty( payloadAudience ) )
+                || Strings.isNullOrEmpty( audience ) )
         {
             logger.info( "All of the User properties 'email', 'subject' (userId), and 'audience' must be present: "
                     + MoreObjects.toStringHelper( "User" )
                     .add( "email", email )
                     .add( "userId", userId )
-                    .add( "audience", payloadAudience )
+                    .add( "audience", audience )
                     .toString() );
 
             return null;
         }
         else
         {
-            if ( trustedAliases.containsValue( payloadAudience ) )
-            {
-                audience = trustedAliases.keys().iterator().next();
-            }
-            else
-            {
-                audience = payloadAudience;
-            }
             user = new AudienceUser.Builder()
                     .email( email )
                     .userId( userId )
-                    .audience( audience )
+                    .audience( verifier.targetAudience( audience ) )
                     .token( token )
                     .build();
 
             request.setAttribute( AudienceUser.class.getName(), user );
         }
 
-        logger.info( "Firebase authenticated user: " + user.getId() + " with audience: " + audience );
+        logger.info( "Firebase authenticated user: " + user.getId() + " with audience: " + user.getAudience() );
 
         return user;
     }

@@ -23,8 +23,12 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.auth.oauth2.GooglePublicKeysManager;
 import com.google.api.server.spi.Client;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
 
 /**
  * The dedicated Firebase thread-safe token verifier.
@@ -44,7 +48,21 @@ public class FirebaseTokenVerifier
 
     private final GoogleIdTokenVerifier verifier;
 
+    private final ListMultimap<String, String> trustedAliases;
+
     public FirebaseTokenVerifier()
+    {
+        this( null, null );
+    }
+
+    /**
+     * Constructor that supports mapping of audiences. Trusted aliases represent a GCP projects
+     * that are considered as trusted and it's safe to accept it as an aliases to the target audience.
+     *
+     * @param targetAudience the audience to be mapped to once verified audience alias matched
+     * @param trustedAliases the comma separated list of audience as trusted aliases
+     */
+    public FirebaseTokenVerifier( @Nullable String targetAudience, @Nullable String trustedAliases )
     {
         verifier = new GoogleIdTokenVerifier.Builder(
                 new GooglePublicKeysManager.Builder(
@@ -55,6 +73,20 @@ public class FirebaseTokenVerifier
                 // null to suppress the issuer check, will be validated later
                 .setIssuer( null )
                 .build();
+
+        if ( targetAudience != null && trustedAliases != null && !trustedAliases.isEmpty() )
+        {
+            String[] aliases = trustedAliases.split( "," );
+
+            this.trustedAliases = ImmutableListMultimap
+                    .<String, String>builder()
+                    .putAll( targetAudience, aliases )
+                    .build();
+        }
+        else
+        {
+            this.trustedAliases = ImmutableListMultimap.of();
+        }
     }
 
     /**
@@ -81,6 +113,20 @@ public class FirebaseTokenVerifier
         }
 
         return idToken;
+    }
+
+    public String targetAudience( String payloadAudience )
+    {
+        String audience;
+        if ( trustedAliases.containsValue( payloadAudience ) )
+        {
+            audience = trustedAliases.keys().iterator().next();
+        }
+        else
+        {
+            audience = payloadAudience;
+        }
+        return audience;
     }
 
     @VisibleForTesting
