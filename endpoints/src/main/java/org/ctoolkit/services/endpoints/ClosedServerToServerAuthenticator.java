@@ -90,19 +90,22 @@ public class ClosedServerToServerAuthenticator
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ClosedServerToServerAuthenticator.class );
 
-    private static final String projectId = SystemProperty.applicationId.get();
-
     private final GoogleIdTokenVerifier verifier;
 
     public ClosedServerToServerAuthenticator()
+    {
+        this( SystemProperty.applicationId.get() );
+    }
+
+    public ClosedServerToServerAuthenticator( String projectId )
     {
         this( new GoogleIdTokenVerifier.Builder(
                 new GooglePublicKeysManager.Builder(
                         Client.getInstance().getHttpTransport(),
                         Client.getInstance().getJsonFactory() )
-                        .setPublicCertsEncodedUrl( getPublicCertsEncodedUrl() )
+                        .setPublicCertsEncodedUrl( getPublicCertsEncodedUrl( projectId ) )
                         .build() )
-                .setIssuer( getIssuer() )
+                .setIssuer( getIssuer( projectId ) )
                 .build()
         );
     }
@@ -114,14 +117,14 @@ public class ClosedServerToServerAuthenticator
     }
 
     @VisibleForTesting
-    static String getPublicCertsEncodedUrl()
+    static String getPublicCertsEncodedUrl( String projectId )
     {
         return String.format( "https://www.googleapis.com/robot/v1/metadata/x509/%s%%40appspot.gserviceaccount.com",
                 checkNotNull( projectId, "Project ID is mandatory" ) );
     }
 
     @VisibleForTesting
-    static String getIssuer()
+    static String getIssuer( String projectId )
     {
         return checkNotNull( projectId, "Project ID is mandatory" ) + "@appspot.gserviceaccount.com";
     }
@@ -135,8 +138,7 @@ public class ClosedServerToServerAuthenticator
     @Override
     public User authenticate( HttpServletRequest request )
     {
-        String on = request.getHeader( INTERNAL_CALL );
-        if ( !Boolean.parseBoolean( on ) )
+        if ( !continueWithAuth( request ) )
         {
             // Not an internal call, skip processing
             return null;
@@ -211,5 +213,18 @@ public class ClosedServerToServerAuthenticator
         request.setAttribute( AudienceUser.class.getName(), verifiedUser );
 
         return verifiedUser;
+    }
+
+    /**
+     * Returns {@code true} if a request header value has indicated to continue with the authentication.
+     * If {@code false} this {@link Authenticator} stops processing and it will end up as unauthenticated.
+     *
+     * @param request the HTTP servlet request
+     * @return true to continue with authentication
+     */
+    protected boolean continueWithAuth( HttpServletRequest request )
+    {
+        String on = request.getHeader( INTERNAL_CALL );
+        return Boolean.parseBoolean( on );
     }
 }

@@ -63,6 +63,8 @@ public class ClosedServerToServerAuthenticatorTest
 
     private static final String SERVICE_ACCOUNT = "sa-name@my-project-id.iam.gserviceaccount.com";
 
+    private static final String PROJECT_ID = "turn-online-eu";
+
     @Tested
     private ClosedServerToServerAuthenticator tested;
 
@@ -80,7 +82,7 @@ public class ClosedServerToServerAuthenticatorTest
     @BeforeMethod
     public void before()
     {
-        SystemProperty.applicationId.set( "turn-online-eu" );
+        SystemProperty.applicationId.set( PROJECT_ID );
         tested = new ClosedServerToServerAuthenticator( verifier );
         payload = new GoogleIdToken.Payload();
         payload.setSubject( SERVICE_ACCOUNT );
@@ -133,11 +135,11 @@ public class ClosedServerToServerAuthenticatorTest
                 .isEqualTo( SERVICE_ACCOUNT );
 
         assertWithMessage( "Public Certs Encoded Url" )
-                .that( ClosedServerToServerAuthenticator.getPublicCertsEncodedUrl() )
+                .that( ClosedServerToServerAuthenticator.getPublicCertsEncodedUrl( PROJECT_ID ) )
                 .isEqualTo( "https://www.googleapis.com/robot/v1/metadata/x509/turn-online-eu%40appspot.gserviceaccount.com" );
 
         assertWithMessage( "JWT issuer" )
-                .that( ClosedServerToServerAuthenticator.getIssuer() )
+                .that( ClosedServerToServerAuthenticator.getIssuer( PROJECT_ID ) )
                 .isEqualTo( "turn-online-eu@appspot.gserviceaccount.com" );
 
         new Verifications()
