@@ -80,6 +80,7 @@ public class FirebaseJwtAuthenticatorTest
         assertEquals( verifiedUser.getEmail(), "verified@turnonline.biz" );
         assertEquals( verifiedUser.getToken(), FAKE_TOKEN );
         assertEquals( verifiedUser.getAudience(), "my-audience" );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.READ );
 
         new Verifications()
         {
@@ -92,6 +93,174 @@ public class FirebaseJwtAuthenticatorTest
                         .isSameInstanceAs( verifiedUser );
             }
         };
+    }
+
+    @Test
+    public void authenticate_GET_ReadAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "GET";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.READ );
+    }
+
+    @Test
+    public void authenticate_HEAD_ReadAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "HEAD";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.READ );
+    }
+
+    @Test
+    public void authenticate_OPTIONS_ReadAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "OPTIONS";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.READ );
+    }
+
+    @Test
+    public void authenticate_POST_WriteAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "POST";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.WRITE );
+    }
+
+    @Test
+    public void authenticate_PUT_WriteAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "PUT";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.WRITE );
+    }
+
+    @Test
+    public void authenticate_PATCH_WriteAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "PATCH";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.WRITE );
+    }
+
+    @Test
+    public void authenticate_DELETE_WriteAccess()
+    {
+        GoogleIdToken.Payload payload = new GoogleIdToken.Payload();
+        payload.setSubject( "userId123" );
+        payload.setEmail( "verified@turnonline.biz" );
+        payload.setAudience( "my-audience" );
+
+        passedExpectations( tested, request, verifier, idToken, payload );
+        new Expectations()
+        {
+            {
+                request.getMethod();
+                result = "DELETE";
+            }
+        };
+
+        User user = tested.authenticate( request );
+        AudienceUser verifiedUser = ( AudienceUser ) user;
+
+        assertNotNull( user );
+        assertEquals( verifiedUser.getAccess(), AudienceUser.Access.WRITE );
     }
 
     @Test

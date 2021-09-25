@@ -197,8 +197,7 @@ public class ClosedServerToServerAuthenticator
                     + MoreObjects.toStringHelper( "AudienceUser" )
                     .add( "email", email )
                     .add( "userId", userId )
-                    .add( "audience", audience )
-                    .toString() );
+                    .add( "audience", audience ) );
 
             return null;
         }
@@ -207,6 +206,7 @@ public class ClosedServerToServerAuthenticator
                 .email( email )
                 .userId( userId )
                 .audience( audience )
+                .access( request.getMethod() )
                 .serviceAccount( serviceAccount );
 
         AudienceUser verifiedUser = builder.build();

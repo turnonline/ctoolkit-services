@@ -99,7 +99,7 @@ public class ThirdPartyToServerAuthenticator
                     .add( "email", email )
                     .add( "userId", userId ) );
 
-            // no on behalf of user, return authenticated service account
+            // none on behalf of user, return authenticated service account
             return null;
         }
 
@@ -113,6 +113,7 @@ public class ThirdPartyToServerAuthenticator
             builder.email( email )
                     .userId( userId )
                     .audience( audience )
+                    .access( request.getMethod() )
                     .serviceAccount( serviceAccount );
 
             AudienceUser verifiedUser = builder.build();

@@ -18,6 +18,7 @@
 
 package org.ctoolkit.services.endpoints;
 
+import com.google.api.client.http.HttpMethods;
 import com.google.api.server.spi.auth.common.User;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
@@ -42,13 +43,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class AudienceUser
         extends User
 {
-    private static final long serialVersionUID = 5538973246473903961L;
+    private static final long serialVersionUID = 2461702890569978066L;
 
-    private String token;
+    private final String token;
 
-    private String audience;
+    private final String audience;
 
-    private String serviceAccount;
+    private final String serviceAccount;
+
+    private final Access access;
 
     /**
      * These values are mandatory:
@@ -56,6 +59,7 @@ public class AudienceUser
      *     <li>{@link Builder#userId(String)}</li>
      *     <li>{@link Builder#email(String)}</li>
      *     <li>{@link Builder#audience(String)}</li>
+     *     <li>{@link Builder#access(String)}</li>
      * </ul>
      */
     private AudienceUser( Builder builder )
@@ -63,6 +67,7 @@ public class AudienceUser
         super( checkNotNull( builder.userId, "User ID is mandatory" ),
                 checkNotNull( builder.email, "Email is mandatory" ) );
         this.audience = checkNotNull( builder.audience, "Audience is mandatory" );
+        this.access = checkNotNull( builder.access, "Access is mandatory" );
         this.token = builder.token;
         this.serviceAccount = builder.serviceAccount;
     }
@@ -95,6 +100,16 @@ public class AudienceUser
     public String getServiceAccount()
     {
         return serviceAccount;
+    }
+
+    /**
+     * Returns the type of the access.
+     *
+     * @return access type
+     */
+    public Access getAccess()
+    {
+        return access;
     }
 
     @Override
@@ -130,6 +145,24 @@ public class AudienceUser
         return string.toString();
     }
 
+    /**
+     * Types of the access based on the HTTP method.
+     */
+    public enum Access
+    {
+        /**
+         * Marker as read access for the following methods:
+         * GET, HEAD, OPTIONS
+         */
+        READ,
+
+        /**
+         * Marker as write access for the following methods:
+         * POST, PUT, PATCH, and DELETE.
+         */
+        WRITE
+    }
+
     public static class Builder
     {
         private String userId;
@@ -141,6 +174,8 @@ public class AudienceUser
         private String audience;
 
         private String serviceAccount;
+
+        private Access access;
 
         public Builder userId( @Nonnull String userId )
         {
@@ -163,6 +198,37 @@ public class AudienceUser
         public Builder audience( @Nonnull String audience )
         {
             this.audience = audience;
+            return this;
+        }
+
+        /**
+         * Set one of the HTTP method from incoming request:
+         * <ul>
+         *     <li>HEAD</li>
+         *     <li>OPTIONS</li>
+         *     <li>GET</li>
+         *     <li>POST</li>
+         *     <li>PUT</li>
+         *     <li>PATCH</li>
+         *     <li>DELETE</li>
+         * </ul>
+         *
+         * @param method the HTTP method
+         */
+        public Builder access( @Nonnull String method )
+        {
+            if ( HttpMethods.POST.equals( method )
+                    || HttpMethods.PUT.equals( method )
+                    || HttpMethods.PATCH.equals( method )
+                    || HttpMethods.DELETE.equals( method ) )
+            {
+                this.access = AudienceUser.Access.WRITE;
+            }
+            else
+            {
+                this.access = AudienceUser.Access.READ;
+            }
+
             return this;
         }
 

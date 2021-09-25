@@ -109,8 +109,7 @@ public class FirebaseJwtAuthenticator
                     + MoreObjects.toStringHelper( "User" )
                     .add( "email", email )
                     .add( "userId", userId )
-                    .add( "audience", audience )
-                    .toString() );
+                    .add( "audience", audience ) );
 
             return null;
         }
@@ -120,6 +119,7 @@ public class FirebaseJwtAuthenticator
                     .email( email )
                     .userId( userId )
                     .audience( verifier.targetAudience( audience ) )
+                    .access( request.getMethod() )
                     .token( token )
                     .build();
 

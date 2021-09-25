@@ -100,6 +100,9 @@ public class ClosedServerToServerAuthenticatorTest
                 request.getHeader( INTERNAL_CALL );
                 result = Boolean.TRUE.toString();
 
+                request.getMethod();
+                result = "POST";
+
                 idToken.getPayload();
                 result = payload;
             }
@@ -129,6 +132,10 @@ public class ClosedServerToServerAuthenticatorTest
         assertWithMessage( "Authenticated user audience" )
                 .that( verifiedUser.getAudience() )
                 .isEqualTo( AUDIENCE );
+
+        assertWithMessage( "Authenticated user access" )
+                .that( verifiedUser.getAccess() )
+                .isEqualTo( AudienceUser.Access.WRITE );
 
         assertWithMessage( "Authenticated user origin service account" )
                 .that( verifiedUser.getServiceAccount() )
