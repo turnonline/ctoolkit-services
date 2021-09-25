@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
-public interface HasOwner<T extends EntityIdentity>
+public interface HasOwner<T extends EntityIdentity<?>>
 {
     /**
      * Returns the owner of the entity that implements this interface.
