@@ -18,12 +18,10 @@
 
 package org.ctoolkit.services.common;
 
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheEntry;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheListener;
-import net.sf.jsr107cache.CacheStatistics;
-
+import javax.cache.Cache;
+import javax.cache.CacheEntry;
+import javax.cache.CacheListener;
+import javax.cache.CacheStatistics;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -90,18 +88,18 @@ class NonFunctionalCache
     }
 
     @Override
-    public Map getAll( Collection keys ) throws CacheException
+    public Map getAll( Collection keys )
     {
         return null;
     }
 
     @Override
-    public void load( Object key ) throws CacheException
+    public void load( Object key )
     {
     }
 
     @Override
-    public void loadAll( Collection keys ) throws CacheException
+    public void loadAll( Collection keys )
     {
     }
 

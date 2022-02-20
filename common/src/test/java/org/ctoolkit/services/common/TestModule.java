@@ -20,8 +20,9 @@ package org.ctoolkit.services.common;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
-import net.sf.jsr107cache.Cache;
 import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
+
+import javax.cache.Cache;
 
 /**
  * The guice module configuration for testing purpose only.

@@ -18,16 +18,13 @@
 
 package org.ctoolkit.services.common;
 
-import net.sf.jsr107cache.Cache;
-
+import javax.cache.Cache;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.HashMap;
 
 /**
- * The JCache provider to provide default cache instance by
- * {@link PropertyService#create(String)} with no namespace defined.
+ * The JCache provider to provide default cache instance.
  *
  * @author <a href="mailto:aurel.medvegy@ctoolkit.org">Aurel Medvegy</a>
  */
@@ -46,6 +43,6 @@ class JCacheProvider
     @Override
     public Cache get()
     {
-        return service.create( new HashMap<>() );
+        return service.create();
     }
 }

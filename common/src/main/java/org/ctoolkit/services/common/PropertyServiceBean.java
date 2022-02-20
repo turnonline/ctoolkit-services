@@ -24,19 +24,16 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.Text;
-import com.google.appengine.api.memcache.jsr107cache.GCacheFactory;
 import com.google.appengine.api.utils.SystemProperty;
 import com.google.common.base.Strings;
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import javax.cache.Cache;
+import javax.cache.CacheException;
+import javax.cache.CacheFactory;
 import javax.inject.Inject;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -60,8 +57,6 @@ class PropertyServiceBean
 
     private static final String ENTITY_PROPERTY_VALUE = "value";
 
-    private static final String PROPERTY_CACHE_NAMESPACE = "ctoolkit_common_properties_cache_namespace";
-
     private final CacheFactory factory;
 
     private DatastoreService datastoreService = DatastoreServiceFactory.getDatastoreService();
@@ -78,7 +73,7 @@ class PropertyServiceBean
     PropertyServiceBean( CacheFactory factory, @Configuration Map<String, String> configuration )
     {
         this.factory = factory;
-        cache = create( PROPERTY_CACHE_NAMESPACE );
+        cache = create();
 
         String productionAppId = configuration.get( "service.property.appId.production" );
         String testAppId = configuration.get( "service.property.appId.test" );
@@ -122,23 +117,11 @@ class PropertyServiceBean
     }
 
     @Override
-    public Cache create( @Nullable String namespace )
-    {
-        Map<String, String> properties = new HashMap<>();
-        if ( !Strings.isNullOrEmpty( namespace ) )
-        {
-            properties.put( GCacheFactory.NAMESPACE, namespace );
-        }
-
-        return create( properties );
-    }
-
-    @Override
-    public Cache create( @Nonnull Map config )
+    public Cache create()
     {
         try
         {
-            return factory.createCache( config );
+            return factory.createCache( Collections.emptyMap() );
         }
         catch ( CacheException e )
         {

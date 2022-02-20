@@ -18,11 +18,7 @@
 
 package org.ctoolkit.services.common;
 
-import net.sf.jsr107cache.Cache;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Map;
+import javax.cache.Cache;
 
 /**
  * The set of convenient methods to handle application properties.
@@ -44,19 +40,9 @@ public interface PropertyService
      * an implementation-dependent overhead, which is approximately 73 bytes. A key cannot be larger than 250 bytes.
      * In the Java runtime, keys that are objects or strings longer than 250 bytes will be hashed.
      *
-     * @param namespace the namespace definition. <code>null</code> value means no namespace set.
      * @return the cache instance.
      */
-    Cache create( @Nullable String namespace );
-
-    /**
-     * Same as {@link #create(String)} but with possibility to configure cache behavior.
-     * To configure cache use App Engine Memcache config API to fill map.
-     *
-     * @param config the configuration map.
-     * @return the cache instance.
-     */
-    Cache create( @Nonnull Map config );
+    Cache create();
 
     /**
      * Return property as String for specified property key.

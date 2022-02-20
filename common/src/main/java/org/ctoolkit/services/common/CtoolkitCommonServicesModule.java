@@ -25,9 +25,9 @@ import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
-import net.sf.jsr107cache.CacheFactory;
 import org.ctoolkit.services.guice.CtoolkitServicesAppEngineModule;
 
+import javax.cache.CacheFactory;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;

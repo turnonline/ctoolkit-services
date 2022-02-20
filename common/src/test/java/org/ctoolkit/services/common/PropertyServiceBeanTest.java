@@ -20,10 +20,10 @@ package org.ctoolkit.services.common;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheFactory;
 import org.testng.annotations.Test;
 
+import javax.cache.Cache;
+import javax.cache.CacheFactory;
 import javax.inject.Inject;
 import java.io.InputStream;
 import java.io.InputStreamReader;

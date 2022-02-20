@@ -100,7 +100,7 @@
             <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-framework</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.slf4j</groupId>
@@ -111,12 +111,12 @@
             <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-framework-guice</artifactId>
-                <version>2.2.1</version>
+                <version>2.2.2</version>
             </dependency>
             <dependency>
                 <groupId>com.google.endpoints</groupId>
                 <artifactId>endpoints-management-control-appengine-all</artifactId>
-                <version>1.0.13</version>
+                <version>1.0.14</version>
             </dependency>
             <!--Test dependencies-->
             <dependency>
@@ -153,7 +153,7 @@
     </dependencyManagement>
 
     <properties>
-        <gae.version>1.9.82</gae.version>
+        <gae.version>1.9.95</gae.version>
         <jmockit.version>1.41</jmockit.version>
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <!-- jmockit settings for OpenJDK otherwise throws 'IllegalStateException: To run on OpenJDK 64-Bit Server VM use -javaagent..' -->
