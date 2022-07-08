@@ -445,7 +445,7 @@ public class FirebaseJwtAuthenticatorTest
                                         GoogleIdToken idToken,
                                         GoogleIdToken.Payload payload )
     {
-        new Expectations( tested )
+        new Expectations( tested, verifier )
         {
             {
                 GoogleAuth.getAuthToken( request );
