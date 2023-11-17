@@ -41,8 +41,8 @@ import java.util.Iterator;
  * <strong>Important note</strong>
  * It gives to the caller permission to access resources on behalf of user represented by its email and userId
  * <ul>
- *     <li>Request header <strong>vnd.turnon.cloud.on-behalf-of-email</strong></li>
- *     <li>Request header <strong>vnd.turnon.cloud.on-behalf-of-user-id</strong></li>
+ *     <li>Request header <strong>Vnd-ConnecSys-On-Behalf-Of-Email</strong></li>
+ *     <li>Request header <strong>Vnd-ConnecSys-On-Behalf-Of-User-Id</strong></li>
  * </ul>
  * <p>
  * within caller's audience, that's declared by service account.
@@ -55,9 +55,9 @@ import java.util.Iterator;
 public class ThirdPartyToServerAuthenticator
         extends GoogleOAuth2Authenticator
 {
-    public static final String ON_BEHALF_OF_EMAIL = "vnd.turnon.cloud.on-behalf-of-email";
+    public static final String ON_BEHALF_OF_EMAIL = "Vnd-ConnecSys-On-Behalf-Of-Email";
 
-    public static final String ON_BEHALF_OF_USER_ID = "vnd.turnon.cloud.on-behalf-of-user-id";
+    public static final String ON_BEHALF_OF_USER_ID = "Vnd-ConnecSys-On-Behalf-Of-User-Id";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ThirdPartyToServerAuthenticator.class );
 

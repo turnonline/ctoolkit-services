@@ -122,7 +122,7 @@ public class CloudStorageUploadServlet
      * Optional header to instruct image service adjust image size in the response.
      * Valid sizes must be between 0 and  1600.
      */
-    public static final String RESPONSE_IMAGE_SIZE = "vnd.turnon.cloud.response-image-size";
+    public static final String RESPONSE_IMAGE_SIZE = "Vnd-ConnecSys-Response-Image-Size";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CloudStorageUploadServlet.class );
 
@@ -456,14 +456,14 @@ public class CloudStorageUploadServlet
      * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_ORIGIN}: *</li>
      * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_METHODS}: OPTIONS,POST</li>
      * <li>{@link HttpHeaders#ACCESS_CONTROL_ALLOW_HEADERS}: Authorization,Cache-Control,X-Requested-With,
-     * vnd.turnon.cloud.associated-id</li>
+     * Vnd-ConnecSys-Associated-Id</li>
      * </ul>
      */
     @Singleton
     public static class AccessControl
             implements Filter
     {
-        public static final String ASSOCIATED_ID = "vnd.turnon.cloud.associated-id";
+        public static final String ASSOCIATED_ID = "Vnd-ConnecSys-Associated-Id";
 
         @Override
         public void init( FilterConfig filterConfig )

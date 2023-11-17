@@ -61,13 +61,13 @@ import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON
  * In order to impersonate call, these claims must be included in to token,
  * otherwise returns {@code null} as unauthenticated.
  * <ul>
- *     <li><strong>vnd.turnon.cloud.on-behalf-of-email</strong></li>
- *     <li><strong>vnd.turnon.cloud.on-behalf-of-user-id</strong></li>
- *     <li><strong>vnd.turnon.cloud.on-behalf-of-audience</strong></li>
+ *     <li><strong>Vnd-ConnecSys-On-Behalf-Of-Email</strong></li>
+ *     <li><strong>Vnd-ConnecSys-On-Behalf-Of-User-Id</strong></li>
+ *     <li><strong>Vnd-ConnecSys-On-Behalf-Of-Audience</strong></li>
  * </ul>
  * This HTTP request header must be present, otherwise processing of this Authenticator will be skipped
  * <ul>
- *     <li><strong>vnd.turnon.cloud.internal-call=true</strong></li>
+ *     <li><strong>Vnd-ConnecSys-Internal-Call=true</strong></li>
  * </ul>
  * <p>
  * The authenticated user is type of the {@link AudienceUser} and is available as request attribute:
@@ -84,9 +84,9 @@ import static org.ctoolkit.services.endpoints.ThirdPartyToServerAuthenticator.ON
 public class ClosedServerToServerAuthenticator
         implements Authenticator
 {
-    public static final String ON_BEHALF_OF_AUDIENCE = "vnd.turnon.cloud.on-behalf-of-audience";
+    public static final String ON_BEHALF_OF_AUDIENCE = "Vnd-ConnecSys-On-Behalf-Of-Audience";
 
-    public static final String INTERNAL_CALL = "vnd.turnon.cloud.internal-call";
+    public static final String INTERNAL_CALL = "Vnd-ConnecSys-Internal-Call";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( ClosedServerToServerAuthenticator.class );
 
