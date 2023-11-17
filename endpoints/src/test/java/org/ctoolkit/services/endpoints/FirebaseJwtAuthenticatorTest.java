@@ -356,10 +356,7 @@ public class FirebaseJwtAuthenticatorTest
                 GoogleAuth.isJwt( FAKE_TOKEN );
                 result = true;
 
-                tested.getVerifier();
-                result = verifier;
-
-                verifier.verify( FAKE_TOKEN );
+                tested.getVerifier().verify( FAKE_TOKEN );
                 result = null;
             }
         };
