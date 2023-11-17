@@ -28,7 +28,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.ctoolkit.services</groupId>
     <artifactId>ctoolkit-services</artifactId>
-    <version>0.37-SNAPSHOT</version>
+    <version>0.36-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>CtoolkiT Services - Google App Engine</name>
     <description>
